@@ -18,21 +18,38 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import { z } from "zod";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { createUser } from "./actions/create-user";
+import { toast } from "sonner";
+import { useTransition } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
+  username: z.string().min(3),
   password: z.string().min(8),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;
 
 const Home = () => {
+  const [isPending, startTransition] = useTransition();
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
   });
 
   const { data } = useSession();
+
+  const onSubmit = (data: FormSchema) => {
+    startTransition(async () => {
+      try {
+        await createUser(data);
+        toast.success("User created successfully");
+      } catch (error) {
+        toast.error("An error occurred while creating the user");
+        console.error(error);
+      }
+    });
+  };
 
   return (
     <div className="container py-5 space-y-5">
@@ -71,7 +88,7 @@ const Home = () => {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(() => {})} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
                 name="name"
@@ -104,6 +121,25 @@ const Home = () => {
 
               <FormField
                 control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="username"
+                        type="username"
+                        {...field}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
@@ -120,7 +156,9 @@ const Home = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={isPending}>
+                Submit
+              </Button>
             </form>
           </Form>
         </CardContent>
