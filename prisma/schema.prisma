@@ -44,6 +44,7 @@ model User {
   email         String?   @unique
   password      String?
   emailVerified DateTime? @map("email_verified")
+  perfil        Boolean   @default(false)
   image         String?
   accounts      Account[]
   sessions      Session[]

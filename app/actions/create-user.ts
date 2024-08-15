@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { FormSchema } from "../page";
+import { FormSchema } from "../sign-up/page";
 import bcrypt from "bcryptjs";
 
 export const createUser = async (data: FormSchema) => {

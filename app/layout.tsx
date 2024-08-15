@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "@/providers/session";
 import { Toaster } from "@/components/ui/sonner";
+import Header from "@/components/header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className="dark">
-      <body className={inter.className}>
-        <SessionProvider>{children}</SessionProvider>
+      <body className={inter.className} style={{ minHeight: "100vh" }}>
+        <SessionProvider>
+          <Header />
+          {children}
+        </SessionProvider>
         <Toaster />
       </body>
     </html>

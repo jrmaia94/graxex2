@@ -30,15 +30,33 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         // se a senha estiver errada, retornar nulo
         if (!isPasswordValid) return null;
         // se a senha estiver correta, retornar o usuário
-        return {
-          id: user.id,
-          name: user.name,
-          username: user.username,
-        };
+        return { ...user };
       },
     }),
   ],
   session: {
     strategy: "jwt",
+  },
+  callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        const id = account.providerAccountId;
+
+        const user = await prisma.user.findUnique({
+          where: {
+            id: id,
+          },
+        });
+
+        token.perfil = user?.perfil;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.sub || "";
+      session.user.perfil = token.perfil;
+
+      return session;
+    },
   },
 });
