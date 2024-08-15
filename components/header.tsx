@@ -14,6 +14,8 @@ import {
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { useState } from "react";
+import { itemsMenu } from "@/constants/nav-menu";
+import ItemMenu from "./item-menu";
 
 const Header = () => {
   const { data } = useSession();
@@ -46,7 +48,7 @@ const Header = () => {
               <SheetDescription></SheetDescription>
               <div className="flex flex-col pt-4 w-full items-center justify-center">
                 {!data?.user ? (
-                  <div className="flex flex-col w-full items-center justify-center">
+                  <div className="flex flex-col w-full items-center justify-center border-b border-solid pb-4">
                     <div className="pb-6">
                       <Avatar className="w-[70px] h-[70px] bg-primary">
                         <User2Icon
@@ -71,7 +73,7 @@ const Header = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex flex-col w-full gap-4 items-center justify-center">
+                  <div className="flex flex-col w-full gap-4 items-center justify-center border-primary border-b border-solid pb-5">
                     <Avatar className="w-[70px] h-[70px]">
                       <AvatarImage
                         src={data.user.image || ""}
@@ -85,6 +87,9 @@ const Header = () => {
                     </Button>
                   </div>
                 )}
+                {itemsMenu.map((item, index) => (
+                  <ItemMenu key={index} itemMenu={item} />
+                ))}
               </div>
             </SheetContent>
           </Sheet>

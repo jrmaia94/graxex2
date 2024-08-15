@@ -52,7 +52,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       session.user.id = token.sub || "";
       session.user.perfil = token.perfil;
 

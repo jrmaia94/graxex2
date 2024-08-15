@@ -1,27 +1,22 @@
-interface ItemsMenuOptions {
+export interface ItemsMenuOptions {
   title: string;
   href: string;
-  icon: string;
 }
 export const itemsMenu: ItemsMenuOptions[] = [
   {
-    title: "Cliente",
+    title: "Clientes",
     href: "/clientes",
-    icon: "",
   },
   {
     title: "Veículos",
     href: "/veiculos",
-    icon: "",
   },
   {
     title: "Agendamentos",
     href: "/agendamentos",
-    icon: "",
   },
   {
-    title: "Cliente",
-    href: "/clientes",
-    icon: "",
+    title: "Configurações",
+    href: "/configs",
   },
 ];
