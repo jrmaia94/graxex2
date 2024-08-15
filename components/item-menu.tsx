@@ -9,7 +9,13 @@ import {
 import Link from "next/link";
 import { Button } from "./ui/button";
 
-const ItemMenu = ({ itemMenu }: { itemMenu: ItemsMenuOptions }) => {
+const ItemMenu = ({
+  itemMenu,
+  action,
+}: {
+  itemMenu: ItemsMenuOptions;
+  action: Function;
+}) => {
   const itemIcon = (icon: string) => {
     switch (icon) {
       case "Clientes":
@@ -25,7 +31,11 @@ const ItemMenu = ({ itemMenu }: { itemMenu: ItemsMenuOptions }) => {
   return (
     <Card className="border-none mt-3 p-2 w-[200px] bg-transparent">
       <CardContent className="p-0 flex items-center justify-start w-full">
-        <Link href={itemMenu.href} className="flex gap-2 items-center">
+        <Link
+          onClick={() => action(false)}
+          href={itemMenu.href}
+          className="flex gap-2 items-center"
+        >
           {itemIcon(itemMenu.title)}
           <p>{itemMenu.title}</p>
         </Link>

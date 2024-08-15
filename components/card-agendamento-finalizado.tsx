@@ -1,7 +1,7 @@
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { EyeIcon, Trash2, UserIcon } from "lucide-react";
+import { Edit, EyeIcon, Trash2, UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -9,14 +9,11 @@ import {
   DialogHeader,
   DialogContent,
   DialogTrigger,
-  DialogTitle,
 } from "./ui/dialog";
 import { CardAgendamentoProps } from "@/app/page";
-import CardAgendamentoFull from "./card-agendamento-full";
-import { Description } from "@radix-ui/react-dialog";
 //import CardAgendamentoFull from "./card-agendamento-full";
 
-const CardAgendamento = ({
+const CardAgendamentoFinalizado = ({
   agendamento,
 }: {
   agendamento: CardAgendamentoProps;
@@ -61,31 +58,20 @@ const CardAgendamento = ({
           </div>
         </div>
         <div className="flex w-[30%] flex-col items-center justify-center gap-1 px-2 py-3 pr-8">
-          <p className="text-xs font-light">
-            {Intl.DateTimeFormat("pt-BR", { month: "long" })
-              .format(agendamento.date)
-              .split("")
-              .map((e, i) => (i === 0 ? e.toUpperCase() : e))
-              .join("")}
+          <p className="text-xs font-light w-full text-wrap text-center">
+            Dias desde o último atendimento
           </p>
           <p className="text-3xl font-bold">
-            {Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(
-              agendamento.date
-            )}
+            {agendamento.serviceCompleted &&
+              Math.round(
+                (new Date(Date.now()).valueOf() -
+                  agendamento.serviceCompleted.valueOf()) /
+                  1000 /
+                  60 /
+                  60 /
+                  24
+              )}
           </p>
-          <p className="font-light">
-            {Intl.DateTimeFormat("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }).format(agendamento.date)}
-          </p>
-          <Button
-            size="xs"
-            variant="ghost"
-            className="absolute bottom-3 right-1"
-          >
-            <Trash2 size={20} />
-          </Button>
         </div>
         <Dialog>
           <DialogTrigger asChild>
@@ -97,17 +83,14 @@ const CardAgendamento = ({
               <EyeIcon size={20} />
             </Button>
           </DialogTrigger>
-          <DialogContent className="left-1/2 top-1/2 max-h-[600px] w-[90%] p-5">
-            <DialogHeader>
-              <Description></Description>
-              <DialogTitle>Detalhes sobre o agendamento</DialogTitle>
-            </DialogHeader>
+          <DialogContent className="left-1/2 top-1/2 min-h-[100px] w-[90%] p-5">
+            <DialogHeader>Detalhes sobre o agendamento</DialogHeader>
             <div className="w-[100%]">
-              <CardAgendamentoFull
+              {/*               <CardAgendamentoFull
                 agendamento={agendamento}
-                cliente={agendamento.cliente}
-                veiculos={agendamento.veiculos}
-              />
+                cliente={cliente}
+                veiculos={veiculos}
+              /> */}
             </div>
           </DialogContent>
         </Dialog>
@@ -116,4 +99,4 @@ const CardAgendamento = ({
   );
 };
 
-export default CardAgendamento;
+export default CardAgendamentoFinalizado;

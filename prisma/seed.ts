@@ -2,6 +2,10 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
+  const veiculosCliente1 = [];
+  const veiculosCliente2 = [];
+  const veiculosCliente3 = [];
+  const veiculosCliente4 = [];
   // Criando Clientes
   const cliente1 = await prisma.cliente.create({
     data: {
@@ -53,6 +57,8 @@ async function main() {
     },
   });
 
+  veiculosCliente1.push(veiculo1);
+
   const veiculo2 = await prisma.veiculo.create({
     data: {
       modelo: "Semirreboque Modelo A",
@@ -64,6 +70,8 @@ async function main() {
       clienteId: cliente1.id,
     },
   });
+
+  veiculosCliente1.push(veiculo2);
 
   // Cliente 2 - 4 veículos
   const veiculo3 = await prisma.veiculo.create({
@@ -78,6 +86,8 @@ async function main() {
     },
   });
 
+  veiculosCliente2.push(veiculo3);
+
   const veiculo4 = await prisma.veiculo.create({
     data: {
       modelo: "Semirreboque Modelo B",
@@ -89,6 +99,8 @@ async function main() {
       clienteId: cliente2.id,
     },
   });
+
+  veiculosCliente2.push(veiculo4);
 
   const veiculo5 = await prisma.veiculo.create({
     data: {
@@ -102,6 +114,8 @@ async function main() {
     },
   });
 
+  veiculosCliente2.push(veiculo5);
+
   const veiculo6 = await prisma.veiculo.create({
     data: {
       modelo: "Semirreboque Duplo Modelo C",
@@ -113,6 +127,8 @@ async function main() {
       clienteId: cliente2.id,
     },
   });
+
+  veiculosCliente2.push(veiculo6);
 
   // Cliente 3 - 1 veículo
   const veiculo7 = await prisma.veiculo.create({
@@ -127,6 +143,8 @@ async function main() {
     },
   });
 
+  veiculosCliente3.push(veiculo7);
+
   // Cliente 4 - 1 veículo
   const veiculo8 = await prisma.veiculo.create({
     data: {
@@ -140,34 +158,24 @@ async function main() {
     },
   });
 
+  veiculosCliente4.push(veiculo8);
+
   // Criando Agendamentos para cada Veículo
   // Cliente 1 - 2 Agendamentos por Veículo
   await prisma.agendamento.create({
     data: {
-      date: new Date("2024-09-01T08:00:00.000Z"),
+      date: new Date("2024-07-01T08:00:00.000Z"),
       clienteId: cliente1.id,
       veiculos: {
-        create: [{ veiculoId: veiculo1.id }],
-      },
-    },
-  });
-
-  await prisma.agendamento.create({
-    data: {
-      date: new Date("2024-09-15T14:00:00.000Z"),
-      clienteId: cliente1.id,
-      veiculos: {
-        create: [{ veiculoId: veiculo1.id }],
-      },
-    },
-  });
-
-  await prisma.agendamento.create({
-    data: {
-      date: new Date("2024-09-05T10:00:00.000Z"),
-      clienteId: cliente1.id,
-      veiculos: {
-        create: [{ veiculoId: veiculo2.id }],
+        create: veiculosCliente1.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
     },
   });
@@ -177,43 +185,72 @@ async function main() {
       date: new Date("2024-09-20T16:00:00.000Z"),
       clienteId: cliente1.id,
       veiculos: {
-        create: [{ veiculoId: veiculo2.id }],
+        create: veiculosCliente1.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
     },
   });
 
   // Cliente 2 - 2 Agendamentos por Veículo
-  const veiculosCliente2 = [veiculo3, veiculo4, veiculo5, veiculo6];
 
-  for (const veiculo of veiculosCliente2) {
-    await prisma.agendamento.create({
-      data: {
-        date: new Date("2024-09-01T08:00:00.000Z"),
-        clienteId: cliente2.id,
-        veiculos: {
-          create: [{ veiculoId: veiculo.id }],
-        },
+  await prisma.agendamento.create({
+    data: {
+      date: new Date("2024-07-15T08:00:00.000Z"),
+      clienteId: cliente2.id,
+      veiculos: {
+        create: veiculosCliente2.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
-    });
+    },
+  });
 
-    await prisma.agendamento.create({
-      data: {
-        date: new Date("2024-09-10T14:00:00.000Z"),
-        clienteId: cliente2.id,
-        veiculos: {
-          create: [{ veiculoId: veiculo.id }],
-        },
+  await prisma.agendamento.create({
+    data: {
+      date: new Date("2024-09-10T14:00:00.000Z"),
+      clienteId: cliente2.id,
+      veiculos: {
+        create: veiculosCliente2.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
-    });
-  }
+    },
+  });
 
   // Cliente 3 - 2 Agendamentos para 1 Veículo
   await prisma.agendamento.create({
     data: {
-      date: new Date("2024-09-05T08:00:00.000Z"),
+      date: new Date("2024-07-05T08:00:00.000Z"),
       clienteId: cliente3.id,
       veiculos: {
-        create: [{ veiculoId: veiculo7.id }],
+        create: veiculosCliente3.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
     },
   });
@@ -223,7 +260,15 @@ async function main() {
       date: new Date("2024-09-12T16:00:00.000Z"),
       clienteId: cliente3.id,
       veiculos: {
-        create: [{ veiculoId: veiculo7.id }],
+        create: veiculosCliente3.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
     },
   });
@@ -231,10 +276,18 @@ async function main() {
   // Cliente 4 - 2 Agendamentos para 1 Veículo
   await prisma.agendamento.create({
     data: {
-      date: new Date("2024-09-07T09:00:00.000Z"),
+      date: new Date("2024-08-07T09:00:00.000Z"),
       clienteId: cliente4.id,
       veiculos: {
-        create: [{ veiculoId: veiculo8.id }],
+        create: veiculosCliente4.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
     },
   });
@@ -244,7 +297,15 @@ async function main() {
       date: new Date("2024-09-14T13:00:00.000Z"),
       clienteId: cliente4.id,
       veiculos: {
-        create: [{ veiculoId: veiculo8.id }],
+        create: veiculosCliente4.map((veiculo) => {
+          return {
+            veiculo: {
+              connect: {
+                id: veiculo.id,
+              },
+            },
+          };
+        }),
       },
     },
   });

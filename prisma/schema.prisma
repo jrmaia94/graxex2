@@ -67,6 +67,7 @@ model Cliente {
   address      String?
   phone        String?
   imageUrl     String?
+  CPFCNPJ      Int?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   veiculos     Veiculo[]
@@ -87,13 +88,14 @@ model Veiculo {
 }
 
 model Agendamento {
-  id        String                    @id @default(uuid())
-  date      DateTime
-  createdAt DateTime                  @default(now())
-  updatedAt DateTime                  @updatedAt
-  clienteId String
-  cliente   Cliente                   @relation(fields: [clienteId], references: [id])
-  veiculos  AgendamentosPorVeiculos[]
+  id               String                    @id @default(uuid())
+  date             DateTime
+  serviceCompleted DateTime?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  clienteId        String
+  cliente          Cliente                   @relation(fields: [clienteId], references: [id])
+  veiculos         AgendamentosPorVeiculos[]
 }
 
 model AgendamentosPorVeiculos {

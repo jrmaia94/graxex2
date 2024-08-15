@@ -88,7 +88,11 @@ const Header = () => {
                   </div>
                 )}
                 {itemsMenu.map((item, index) => (
-                  <ItemMenu key={index} itemMenu={item} />
+                  <ItemMenu
+                    action={setIsSheetOpen}
+                    key={index}
+                    itemMenu={item}
+                  />
                 ))}
               </div>
             </SheetContent>
