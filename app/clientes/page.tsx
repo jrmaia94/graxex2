@@ -35,7 +35,7 @@ const Clientes = () => {
         Clientes
       </h2>
       <div className="mb-3">
-        <Search action={setClientes} />
+        <Search origin="clientes" action={setClientes} />
       </div>
       <div className="flex flex-col gap-1">
         {clientes?.map((cliente) => (

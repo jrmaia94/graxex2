@@ -132,6 +132,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
           <label className="text-primary-foreground">id</label>
           <input
             readOnly
+            disabled
             ref={inputIDRef}
             type="text"
             className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"

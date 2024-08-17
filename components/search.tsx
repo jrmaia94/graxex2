@@ -15,7 +15,7 @@ const formSchema = z.object({
   param: z.string().trim(),
 });
 
-const Search = ({ action }: { action: Function }) => {
+const Search = ({ action, origin }: { action: Function; origin: string }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,7 +55,7 @@ const Search = ({ action }: { action: Function }) => {
         <Button type="submit">
           <SearchIcon />
         </Button>
-        <Link href="/clientes/create">
+        <Link href={`/${origin}/create`}>
           <Button>
             <PlusIcon />
           </Button>

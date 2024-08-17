@@ -8,7 +8,7 @@ interface CardVeiculoProps {
 
 const CardVeiculo = ({ veiculo }: CardVeiculoProps) => {
   return (
-    <div className="mb-2 flex flex-row items-center gap-2 border-b border-solid pb-2">
+    <div className="flex flex-row items-center gap-2">
       {veiculo.imageUrl ? (
         <Image
           alt="Foto do veículo"
