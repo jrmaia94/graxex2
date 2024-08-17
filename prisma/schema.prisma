@@ -62,12 +62,13 @@ model VerificationToken {
 }
 
 model Cliente {
-  id           String        @id @default(uuid())
-  name         String
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
   address      String?
   phone        String?
   imageUrl     String?
-  CPFCNPJ      Int?
+  image        Bytes?
+  CPFCNPJ      String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   veiculos     Veiculo[]
@@ -75,33 +76,33 @@ model Cliente {
 }
 
 model Veiculo {
-  id           String                    @id @default(uuid())
+  id           Int                       @id @default(autoincrement())
   modelo       String
   fabricante   String?
   imageUrl     String?
   placa        String                    @unique
   cor          String?
   numEixos     Int
-  clienteId    String
+  clienteId    Int
   cliente      Cliente                   @relation(fields: [clienteId], references: [id])
   agendamentos AgendamentosPorVeiculos[]
 }
 
 model Agendamento {
-  id               String                    @id @default(uuid())
+  id               Int                       @id @default(autoincrement())
   date             DateTime
   serviceCompleted DateTime?
   createdAt        DateTime                  @default(now())
   updatedAt        DateTime                  @updatedAt
-  clienteId        String
+  clienteId        Int
   cliente          Cliente                   @relation(fields: [clienteId], references: [id])
   veiculos         AgendamentosPorVeiculos[]
 }
 
 model AgendamentosPorVeiculos {
-  veiculoId     String
+  veiculoId     Int
   veiculo       Veiculo     @relation(fields: [veiculoId], references: [id])
-  agendamentoId String
+  agendamentoId Int
   agendamento   Agendamento @relation(fields: [agendamentoId], references: [id])
 
   @@id([veiculoId, agendamentoId])

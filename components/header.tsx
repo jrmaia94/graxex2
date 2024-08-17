@@ -83,7 +83,7 @@ const Header = () => {
                     <span>{data.user.name}</span>
                     <Button className="gap-x-2" onClick={() => signOut()}>
                       <LogOutIcon />
-                      Sign out
+                      Logout
                     </Button>
                   </div>
                 )}

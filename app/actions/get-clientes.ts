@@ -27,7 +27,7 @@ export const getAllClientes = async () => {
   return clientes;
 };
 
-export const getClienteById = async (id: string) => {
+export const getClienteById = async (id: number) => {
   const cliente = await prisma.cliente.findUnique({
     where: {
       id: id,

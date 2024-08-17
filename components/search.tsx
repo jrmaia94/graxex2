@@ -12,9 +12,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 
 const formSchema = z.object({
-  param: z.string().trim().min(1, {
-    message: "Digite algo para buscar",
-  }),
+  param: z.string().trim(),
 });
 
 const Search = ({ action }: { action: Function }) => {
@@ -57,7 +55,7 @@ const Search = ({ action }: { action: Function }) => {
         <Button type="submit">
           <SearchIcon />
         </Button>
-        <Link href="/clientes/new">
+        <Link href="/clientes/create">
           <Button>
             <PlusIcon />
           </Button>
