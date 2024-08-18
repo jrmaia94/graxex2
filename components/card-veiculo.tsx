@@ -8,20 +8,20 @@ interface CardVeiculoProps {
 
 const CardVeiculo = ({ veiculo }: CardVeiculoProps) => {
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex justify-between items-center max-w-[500px] gap-2">
       {veiculo.imageUrl ? (
         <Image
           alt="Foto do veículo"
           src={veiculo.imageUrl}
           width={50}
           height={50}
-          className="h-[50px] w-[50px] rounded-full"
+          className="h-[50px] max-w-[50px] rounded-full"
         />
       ) : (
         <TruckIcon size={50} />
       )}
-      <div className="flex w-full flex-row">
-        <div className="flex w-full flex-col items-start">
+      <div className="flex flex-row max-w-[450px]">
+        <div className="flex w-[200px] flex-col items-start">
           <h3 className="text-bold pe-8 text-xl uppercase whitespace-nowrap max-w-[200px] truncate">
             {veiculo.modelo}
           </h3>
@@ -29,17 +29,17 @@ const CardVeiculo = ({ veiculo }: CardVeiculoProps) => {
             {veiculo.fabricante}
           </h3>
         </div>
-        <div className="flex w-full flex-col items-start">
+        <div className="flex flex-col items-start">
           <div className="flex flex-row">
-            <h3 className="pe-1 text-gray-400">Placa:</h3>
-            <p>{veiculo.placa}</p>
+            <h3 className="text-sm pe-1 text-gray-400">Placa:</h3>
+            <p className="text-sm">{veiculo.placa}</p>
           </div>
-          <div className="flex flex-row">
+          <div className="text-sm flex flex-row">
             <h3 className="pe-1 text-gray-400">Cor:</h3>
-            <p>{veiculo.cor}</p>
+            <p className="text-sm">{veiculo.cor}</p>
           </div>
-          <div className="flex flex-col">
-            <p>{veiculo.numEixos} eixos</p>
+          <div className="text-sm flex flex-col">
+            <p className="text-sm">{veiculo.numEixos} eixos</p>
           </div>
         </div>
       </div>

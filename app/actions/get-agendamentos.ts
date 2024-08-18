@@ -44,3 +44,39 @@ export const getAgendamentosFinalizados = async () => {
 
   return agendamentos;
 };
+
+export const getAllAgendamentos = async () => {
+  const agendamentos = await prisma.agendamento.findMany({
+    include: {
+      veiculos: {
+        include: {
+          veiculo: true,
+        },
+      },
+      cliente: true,
+    },
+    orderBy: {
+      id: "asc",
+    },
+  });
+
+  return agendamentos;
+};
+
+export const getAgendamentoById = async (id: number) => {
+  const agendamento = await prisma.agendamento.findUnique({
+    where: {
+      id: id,
+    },
+    include: {
+      cliente: true,
+      veiculos: {
+        include: {
+          veiculo: true,
+        },
+      },
+    },
+  });
+
+  return agendamento;
+};

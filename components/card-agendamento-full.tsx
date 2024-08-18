@@ -4,6 +4,7 @@ import { Card, CardContent } from "./ui/card";
 import CardVeiculo from "./card-veiculo";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Edit } from "lucide-react";
+import Link from "next/link";
 
 interface CardAgendamentoProps {
   agendamento: Agendamento;
@@ -20,7 +21,9 @@ const CardAgendamentoFull = ({
     <Card>
       <CardContent className="flex max-h-[70vh] flex-col gap-0 overflow-hidden p-2">
         <div className="flex w-full justify-end py-1 pe-2 relative">
-          <Edit className="absolute top-1 left-1" />
+          <Link href={`/agendamentos/${cliente.id}`}>
+            <Edit className="absolute top-1 left-1" />
+          </Link>
           <p className="text-lg italic">
             {Intl.DateTimeFormat("pt-BR", {
               day: "2-digit",
@@ -37,7 +40,7 @@ const CardAgendamentoFull = ({
           <h3 className="mb-2 font-bold uppercase text-gray-400">Veículos</h3>
           <ScrollArea className="h-72 w-full rounded-md border-none">
             {veiculos.map((veiculo) => (
-              <div key={veiculo.id} className="border-b border-solid py-2">
+              <div key={veiculo.id} className="border-b border-solid p-2">
                 <CardVeiculo veiculo={veiculo} />
               </div>
             ))}

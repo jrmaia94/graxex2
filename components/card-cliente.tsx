@@ -24,7 +24,9 @@ const CardCliente = ({ cliente }: CardClienteProps) => {
       <div className="flex flex-col overflow-hidden">
         <h3 className="w-[290px] truncate text-3xl">{cliente.name}</h3>
         <Link
-          href={`https://wa.me//${cliente.phone}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
+          href={`https://wa.me//${cliente.phone
+            ?.toString()
+            .replace(/\D/g, "")}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
           target="_blank"
           className="flex gap-1"
         >
