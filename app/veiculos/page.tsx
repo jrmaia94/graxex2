@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { Veiculo } from "@prisma/client";
 import CardVeiculo from "@/components/card-veiculo";
 import { getAllVeiculos } from "../actions/get-veiculos";
+import { deleteVeiculoById } from "../actions/delete-veiculos";
 
 const PageVeiculos = () => {
   const { data }: { data: any } = useSession({
@@ -45,7 +46,25 @@ const PageVeiculos = () => {
                 <Link href={`/veiculos/${veiculo.id}`} className="p-0 m-0">
                   <Edit size={20} />
                 </Link>
-                <Button variant="ghost" className="p-0 m-0 h-5">
+                <Button
+                  onClick={() => {
+                    deleteVeiculoById(veiculo.id)
+                      .then((res) => {
+                        toast.success(
+                          `Veículo com o id ${veiculo.id} foi excluído!`
+                        );
+                        setTimeout(() => {
+                          window.location.reload();
+                        }, 1000);
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        toast.error("Não foi possível deletar o veículo!");
+                      });
+                  }}
+                  variant="ghost"
+                  className="p-0 m-0 h-5"
+                >
                   <Trash2Icon size={20} />
                 </Button>
               </div>

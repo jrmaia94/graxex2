@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { getSomeClientes } from "@/app/actions/get-clientes";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Veiculo } from "@prisma/client";
 
 const formSchema = z.object({
   param: z.string().trim(),
@@ -26,7 +27,19 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     getSomeClientes(data.param)
       .then((res) => {
-        action(res);
+        // Lidando com os casos de quando o Search é chamado de outras páginas
+        switch (origin) {
+          case "clientes":
+            return action(res);
+          case "veiculos":
+            let veiculos: Veiculo[] = [];
+            res.map((cliente) =>
+              cliente.veiculos.map((veiculo) => veiculos.push(veiculo))
+            );
+            return action(veiculos);
+          default:
+            break;
+        }
       })
       .catch((err) => {
         console.log(err);

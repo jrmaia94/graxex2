@@ -11,13 +11,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { deleteClienteById } from "../actions/delete-clientes";
+import { useRouter } from "next/navigation";
 
 const Clientes = () => {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     getAllClientes()
@@ -46,7 +48,25 @@ const Clientes = () => {
                 <Link href={`/clientes/${cliente.id}`} className="p-0 m-0">
                   <Edit size={20} />
                 </Link>
-                <Button variant="ghost" className="p-0 m-0 h-5">
+                <Button
+                  onClick={() => {
+                    deleteClienteById(parseInt(cliente.id.toString()))
+                      .then((res) => {
+                        toast.success(
+                          `Cliente ${res.name} deletado com sucesso`
+                        );
+                        setTimeout(() => {
+                          window.location.reload();
+                        }, 1000);
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        toast.error("Erro ao deletar cliente");
+                      });
+                  }}
+                  variant="ghost"
+                  className="p-0 m-0 h-5"
+                >
                   <Trash2Icon size={20} />
                 </Button>
               </div>

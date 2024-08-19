@@ -9,6 +9,9 @@ export const getSomeClientes = async (name: string) => {
         mode: "insensitive",
       },
     },
+    include: {
+      veiculos: true,
+    },
     orderBy: {
       name: "asc",
     },
