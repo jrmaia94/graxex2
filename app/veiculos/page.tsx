@@ -1,7 +1,7 @@
 "use client";
 
 import Search from "@/components/search";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,25 +12,30 @@ import { Veiculo } from "@prisma/client";
 import CardVeiculo from "@/components/card-veiculo";
 import { getAllVeiculos } from "../actions/get-veiculos";
 import { deleteVeiculoById } from "../actions/delete-veiculos";
+import Loader from "@/components/loader";
 
 const PageVeiculos = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const [isPending, startTransition] = useTransition();
   const [veiculos, setVeiculos] = useState<Veiculo[]>();
 
   useEffect(() => {
-    getAllVeiculos()
-      .then((res) => {
-        setVeiculos(res);
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Erro ano buscar veiculos!");
-      });
+    startTransition(() => {
+      getAllVeiculos()
+        .then((res) => {
+          setVeiculos(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Erro ano buscar veiculos!");
+        });
+    });
   }, []);
   return (
     <div className="px-4">
+      {isPending && <Loader />}
       <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
         Veiculos
       </h2>

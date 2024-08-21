@@ -3,7 +3,7 @@
 import CardCliente from "@/components/card-cliente";
 import Search from "@/components/search";
 import { Cliente } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { getAllClientes } from "../actions/get-clientes";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -13,26 +13,31 @@ import { Edit, Trash2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { deleteClienteById } from "../actions/delete-clientes";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/loader";
 
 const Clientes = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const [isPending, startTransition] = useTransition();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const router = useRouter();
 
   useEffect(() => {
-    getAllClientes()
-      .then((res) => {
-        setClientes(res);
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Erro ao buscar clientes!");
-      });
+    startTransition(() => {
+      getAllClientes()
+        .then((res) => {
+          setClientes(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Erro ao buscar clientes!");
+        });
+    });
   }, []);
   return (
     <div className="px-4">
+      {isPending && <Loader />}
       <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
         Clientes
       </h2>

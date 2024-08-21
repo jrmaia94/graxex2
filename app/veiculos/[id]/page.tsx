@@ -14,6 +14,7 @@ import { createVeiculo } from "@/app/actions/post-veiculo";
 import { getVeiculoById } from "@/app/actions/get-veiculos";
 import { Cliente, Veiculo } from "@prisma/client";
 import { getAllClientes } from "@/app/actions/get-clientes";
+import Loader from "@/components/loader";
 
 interface VeiculoPageProps {
   params: {
@@ -87,17 +88,19 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
 
   // Lida com o carregamento da página com parâmetros
   useEffect(() => {
-    params.id !== "create" &&
-      getVeiculoById(parseInt(params.id.toString()))
-        .then((res) => {
-          if (!res) toast.info("Cliente não encontrado!");
-          if (res) setVeiculo(res);
-          //console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Ocorreu um erro na buscar do cliente!");
-        });
+    startTransition(() => {
+      params.id !== "create" &&
+        getVeiculoById(parseInt(params.id.toString()))
+          .then((res) => {
+            if (!res) toast.info("Cliente não encontrado!");
+            if (res) setVeiculo(res);
+            //console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Ocorreu um erro na buscar do cliente!");
+          });
+    });
   }, [params]);
 
   // Atualiza inputs com os dados do cliente encontrado
@@ -127,6 +130,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
 
   return (
     <div className="px-8 pt-8">
+      {isPending && <Loader />}
       <form
         onSubmit={handleSubmit}
         className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"

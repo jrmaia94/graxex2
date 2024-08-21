@@ -35,6 +35,9 @@ export const getClienteById = async (id: number) => {
     where: {
       id: id,
     },
+    include: {
+      veiculos: true,
+    },
   });
 
   return cliente;

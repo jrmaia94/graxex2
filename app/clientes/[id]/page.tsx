@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import InputMask from "react-input-mask";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState, useTransition } from "react";
-
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { createCliente } from "@/app/actions/post-cliente";
 import { updateCliente, UpdateCliente } from "@/app/actions/update-cliente";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/loader";
 
 interface ClientePageProps {
   params: {
@@ -89,17 +89,19 @@ const ClientePage = ({ params }: ClientePageProps) => {
 
   // Lida com o carregamento da página com parâmetros
   useEffect(() => {
-    params.id !== "create" &&
-      getClienteById(parseInt(params.id.toString()))
-        .then((res) => {
-          if (!res) toast.info("Cliente não encontrado!");
-          if (res) setCliente(res);
-          //console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Ocorreu um erro na buscar do cliente!");
-        });
+    startTransition(() => {
+      params.id !== "create" &&
+        getClienteById(parseInt(params.id.toString()))
+          .then((res) => {
+            if (!res) toast.info("Cliente não encontrado!");
+            if (res) setCliente(res);
+            //console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Ocorreu um erro na buscar do cliente!");
+          });
+    });
   }, [params]);
 
   // Atualiza inputs com os dados do cliente encontrado
@@ -124,6 +126,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
 
   return (
     <div className="px-8 pt-8">
+      {isPending && <Loader />}
       <form
         onSubmit={handleSubmit}
         className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
