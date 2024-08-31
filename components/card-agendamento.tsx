@@ -37,7 +37,7 @@ const CardAgendamento = ({
             <UserIcon size={50} />
           )}
           <div className="overflow-hidden">
-            <h3 className="truncate text-3xl">{agendamento.cliente.name}</h3>
+            <h3 className="truncate text-2xl">{agendamento.cliente.name}</h3>
             <Link
               href={`https://wa.me//${agendamento.cliente.phone}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
               target="_blank"
@@ -50,7 +50,7 @@ const CardAgendamento = ({
                 width={15}
                 height={15}
               />
-              <p className="">{agendamento.cliente.phone}</p>
+              <p className="text-ring">{agendamento.cliente.phone}</p>
             </Link>
 
             <p className="text-sm italic">
@@ -72,12 +72,6 @@ const CardAgendamento = ({
             {Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(
               agendamento.date
             )}
-          </p>
-          <p className="font-light">
-            {Intl.DateTimeFormat("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }).format(agendamento.date)}
           </p>
           <Button
             size="xs"

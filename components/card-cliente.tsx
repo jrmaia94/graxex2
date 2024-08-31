@@ -22,7 +22,7 @@ const CardCliente = ({ cliente }: CardClienteProps) => {
         <UserIcon size={70} />
       )}
       <div className="flex flex-col overflow-hidden">
-        <h3 className="w-[290px] truncate text-3xl">{cliente.name}</h3>
+        <h3 className="w-[290px] truncate text-2xl">{cliente.name}</h3>
         <Link
           href={`https://wa.me//${cliente.phone
             ?.toString()
@@ -37,9 +37,8 @@ const CardCliente = ({ cliente }: CardClienteProps) => {
             width={15}
             height={15}
           />
-          <p className="text-gray-400">{cliente.phone}</p>
+          <p className="text-ring">{cliente.phone}</p>
         </Link>
-        <p className="text-gray-400">{cliente.address}</p>
       </div>
     </div>
   );

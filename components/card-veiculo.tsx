@@ -20,26 +20,21 @@ const CardVeiculo = ({ veiculo }: CardVeiculoProps) => {
       ) : (
         <TruckIcon size={50} />
       )}
-      <div className="flex flex-row max-w-[450px]">
-        <div className="flex w-[200px] flex-col items-start">
-          <h3 className="text-bold pe-8 text-xl uppercase whitespace-nowrap max-w-[200px] truncate">
-            {veiculo.modelo}
+      <div className="flex flex-row w-full">
+        <div className="flex w-full flex-col items-start">
+          <h3 className="text-bold pe-4 text-md uppercase">
+            {veiculo.fabricante} -{" "}
+            <span className="text-sm">{veiculo.modelo}</span>
           </h3>
-          <h3 className="text-bold pe-4 text-sm uppercase">
-            {veiculo.fabricante}
-          </h3>
-        </div>
-        <div className="flex flex-col items-start">
-          <div className="flex flex-row">
-            <h3 className="text-sm pe-1 text-gray-400">Placa:</h3>
-            <p className="text-sm">{veiculo.placa}</p>
-          </div>
-          <div className="text-sm flex flex-row">
-            <h3 className="pe-1 text-gray-400">Cor:</h3>
-            <p className="text-sm">{veiculo.cor}</p>
-          </div>
-          <div className="text-sm flex flex-col">
-            <p className="text-sm">{veiculo.numEixos} eixos</p>
+          <div className="flex gap-3">
+            <div className="flex flex-row">
+              <h3 className="text-sm pe-1 text-gray-400">Placa:</h3>
+              <p className="text-sm">{veiculo.placa}</p>
+            </div>
+            <div className="text-sm flex flex-row">
+              <h3 className="pe-1 text-gray-400">Cor:</h3>
+              <p className="text-sm">{veiculo.cor}</p>
+            </div>
           </div>
         </div>
       </div>
