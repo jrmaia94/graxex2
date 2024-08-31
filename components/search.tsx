@@ -11,12 +11,16 @@ import { getSomeClientes } from "@/app/actions/get-clientes";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Agendamento, Veiculo } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 const formSchema = z.object({
   param: z.string().trim(),
 });
 
 const Search = ({ action, origin }: { action: Function; origin: string }) => {
+  const { data }: { data: any } = useSession({
+    required: true,
+  });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -24,35 +28,36 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof formSchema>) => {
-    getSomeClientes(data.param)
-      .then((res) => {
-        // Lidando com os casos de quando o Search é chamado de outras páginas
-        switch (origin) {
-          case "clientes":
-            return action(res);
-          case "veiculos":
-            let veiculos: Veiculo[] = [];
-            res.map((cliente) =>
-              cliente.veiculos.map((veiculo) => veiculos.push(veiculo))
-            );
-            return action(veiculos);
-          case "agendamentos":
-            let agendamentos: Agendamento[] = [];
-            res.map((cliente) => {
-              cliente.agendamentos.map((agendamento) =>
-                agendamentos.push(agendamento)
+  const handleSubmit = (formData: z.infer<typeof formSchema>) => {
+    data?.user &&
+      getSomeClientes(formData.param, data.user)
+        .then((res) => {
+          // Lidando com os casos de quando o Search é chamado de outras páginas
+          switch (origin) {
+            case "clientes":
+              return action(res);
+            case "veiculos":
+              let veiculos: Veiculo[] = [];
+              res.map((cliente) =>
+                cliente.veiculos.map((veiculo) => veiculos.push(veiculo))
               );
-            });
-            return action(agendamentos);
-          default:
-            break;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Erro ao buscar clientes!");
-      });
+              return action(veiculos);
+            case "agendamentos":
+              let agendamentos: Agendamento[] = [];
+              res.map((cliente) => {
+                cliente.agendamentos.map((agendamento) =>
+                  agendamentos.push(agendamento)
+                );
+              });
+              return action(agendamentos);
+            default:
+              break;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Erro ao buscar clientes!");
+        });
   };
   return (
     <Form {...form}>
