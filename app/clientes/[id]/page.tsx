@@ -24,6 +24,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const [cliente, setCliente] = useState<UpdateCliente>();
@@ -67,7 +68,8 @@ const ClientePage = ({ params }: ClientePageProps) => {
       };
 
       params.id === "create"
-        ? createCliente(cadCliente)
+        ? data?.user &&
+          createCliente(cadCliente, data.user)
             .then((res) => {
               toast.success("Cliente cadastrado com sucesso!");
               router.push(`/clientes/${res.id}`);
@@ -76,7 +78,11 @@ const ClientePage = ({ params }: ClientePageProps) => {
               console.log(err);
               toast.error("Erro ao cadastrar cliente!");
             })
-        : updateCliente({ id: parseInt(params.id.toString()), ...cadCliente })
+        : data?.user &&
+          updateCliente(
+            { id: parseInt(params.id.toString()), ...cadCliente },
+            data.user
+          )
             .then((res) => {
               toast.success("Cliente atualizado!");
             })
@@ -91,7 +97,8 @@ const ClientePage = ({ params }: ClientePageProps) => {
   useEffect(() => {
     startTransition(() => {
       params.id !== "create" &&
-        getClienteById(parseInt(params.id.toString()))
+        data?.user &&
+        getClienteById(parseInt(params.id.toString()), data.user)
           .then((res) => {
             if (!res) toast.info("Cliente não encontrado!");
             if (res) setCliente(res);
@@ -102,7 +109,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
             toast.error("Ocorreu um erro na buscar do cliente!");
           });
     });
-  }, [params]);
+  }, [params, data]);
 
   // Atualiza inputs com os dados do cliente encontrado
   useEffect(() => {

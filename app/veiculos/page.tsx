@@ -23,16 +23,17 @@ const PageVeiculos = () => {
 
   useEffect(() => {
     startTransition(() => {
-      getAllVeiculos()
-        .then((res) => {
-          setVeiculos(res);
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Erro ano buscar veiculos!");
-        });
+      data?.user &&
+        getAllVeiculos(data.user)
+          .then((res) => {
+            setVeiculos(res);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Erro ano buscar veiculos!");
+          });
     });
-  }, []);
+  }, [data]);
   return (
     <div className="px-4">
       {isPending && <Loader />}
@@ -53,19 +54,20 @@ const PageVeiculos = () => {
                 </Link>
                 <Button
                   onClick={() => {
-                    deleteVeiculoById(veiculo.id)
-                      .then((res) => {
-                        toast.success(
-                          `Veículo com o id ${veiculo.id} foi excluído!`
-                        );
-                        setTimeout(() => {
-                          window.location.reload();
-                        }, 1000);
-                      })
-                      .catch((err) => {
-                        console.log(err);
-                        toast.error("Não foi possível deletar o veículo!");
-                      });
+                    data?.user &&
+                      deleteVeiculoById(veiculo.id, data.user)
+                        .then((res) => {
+                          toast.success(
+                            `Veículo com o id ${veiculo.id} foi excluído!`
+                          );
+                          setTimeout(() => {
+                            window.location.reload();
+                          }, 1000);
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                          toast.error("Não foi possível deletar o veículo!");
+                        });
                   }}
                   variant="ghost"
                   className="p-0 m-0 h-5"

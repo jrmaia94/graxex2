@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { Veiculo } from "@prisma/client";
+import { User, Veiculo } from "@prisma/client";
 import { z } from "zod";
 
 export type CreateVeiculo = Pick<
@@ -17,17 +17,21 @@ const dataSchema = z.object({
   numEixos: z.number(),
 });
 
-export const createVeiculo = async (veiculo: CreateVeiculo) => {
-  if (dataSchema.safeParse(veiculo).success) {
-    try {
-      const createdVeiculo = await prisma.veiculo.create({
-        data: veiculo,
-      });
-      return createdVeiculo;
-    } catch (error) {
-      throw error;
+export const createVeiculo = async (veiculo: CreateVeiculo, user: User) => {
+  if (user.perfil) {
+    if (dataSchema.safeParse(veiculo).success) {
+      try {
+        const createdVeiculo = await prisma.veiculo.create({
+          data: veiculo,
+        });
+        return createdVeiculo;
+      } catch (error) {
+        throw error;
+      }
+    } else {
+      throw Error("Problem with the validation of schema!");
     }
   } else {
-    throw Error("Problem with the validation of schema!");
+    throw Error("Usuário não autorizado!");
   }
 };

@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { getSomeClientes } from "@/app/actions/get-clientes";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Veiculo } from "@prisma/client";
+import { Agendamento, Veiculo } from "@prisma/client";
 
 const formSchema = z.object({
   param: z.string().trim(),
@@ -37,6 +37,14 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
               cliente.veiculos.map((veiculo) => veiculos.push(veiculo))
             );
             return action(veiculos);
+          case "agendamentos":
+            let agendamentos: Agendamento[] = [];
+            res.map((cliente) => {
+              cliente.agendamentos.map((agendamento) =>
+                agendamentos.push(agendamento)
+              );
+            });
+            return action(agendamentos);
           default:
             break;
         }

@@ -3,7 +3,7 @@ import { Loader2Icon } from "lucide-react";
 const Loader = () => {
   return (
     <div
-      className="absolute top-0 right-0 flex w-full h-full justify-center items-center"
+      className="absolute top-0 right-0 flex w-full h-full justify-center items-center z-10"
       style={{ backgroundColor: "rgba(50, 50, 50, 0.5)" }}
     >
       <style>{`

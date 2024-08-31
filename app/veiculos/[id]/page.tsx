@@ -15,6 +15,7 @@ import { getVeiculoById } from "@/app/actions/get-veiculos";
 import { Cliente, Veiculo } from "@prisma/client";
 import { getAllClientes } from "@/app/actions/get-clientes";
 import Loader from "@/components/loader";
+import Link from "next/link";
 
 interface VeiculoPageProps {
   params: {
@@ -66,7 +67,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
       };
 
       params.id === "create"
-        ? createVeiculo(cadVeiculo)
+        ? data?.user &&
+          createVeiculo(cadVeiculo, data.user)
             .then((res) => {
               toast.success("Veículo cadastrado com sucesso!");
               router.push(`/veiculos/${res.id}`);
@@ -75,7 +77,11 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
               console.log(err);
               toast.error("Erro ao cadastrar cliente!");
             })
-        : updateVeiculo({ id: parseInt(params.id.toString()), ...cadVeiculo })
+        : data?.user &&
+          updateVeiculo(
+            { id: parseInt(params.id.toString()), ...cadVeiculo },
+            data.user
+          )
             .then((res) => {
               toast.success("Veículo atualizado!");
             })
@@ -90,7 +96,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   useEffect(() => {
     startTransition(() => {
       params.id !== "create" &&
-        getVeiculoById(parseInt(params.id.toString()))
+        data?.user &&
+        getVeiculoById(parseInt(params.id.toString()), data.user)
           .then((res) => {
             if (!res) toast.info("Cliente não encontrado!");
             if (res) setVeiculo(res);
@@ -101,7 +108,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
             toast.error("Ocorreu um erro na buscar do cliente!");
           });
     });
-  }, [params]);
+  }, [params, data]);
 
   // Atualiza inputs com os dados do cliente encontrado
   useEffect(() => {
@@ -118,15 +125,16 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
 
   // Lida com a mascara do input CPF/CNPJ
   useEffect(() => {
-    getAllClientes()
-      .then((res) => {
-        setClientes(res);
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Não foi possível carregar os clientes");
-      });
-  }, []);
+    data?.user &&
+      getAllClientes(data.user)
+        .then((res) => {
+          setClientes(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Não foi possível carregar os clientes");
+        });
+  }, [data]);
 
   return (
     <div className="px-8 pt-8">
@@ -206,7 +214,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
             <option value={9}>9</option>
           </select>
         </div>
-        <div>
+        <div className="flex gap-10 items-center">
           <Button
             disabled={isPending}
             className="w-[100px] bg-primary"
@@ -214,6 +222,9 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
           >
             Salvar
           </Button>
+          <Link className="text-blue-400" href="/veiculos/create">
+            Novo
+          </Link>
         </div>
       </form>
     </div>

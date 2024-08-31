@@ -21,7 +21,7 @@ const CardAgendamentoFull = ({
     <Card>
       <CardContent className="flex max-h-[70vh] flex-col gap-0 overflow-hidden p-2">
         <div className="flex w-full justify-end py-1 pe-2 relative">
-          <Link href={`/agendamentos/${cliente.id}`}>
+          <Link href={`/agendamentos/${agendamento.id}`}>
             <Edit className="absolute top-1 left-1" />
           </Link>
           <p className="text-lg italic">

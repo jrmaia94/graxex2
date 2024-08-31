@@ -1,14 +1,15 @@
 "use client";
 
-import { getAgendamentoById } from "@/app/actions/get-agendamentos";
 import { getAllClientes, getClienteById } from "@/app/actions/get-clientes";
-import { updateAgendamento } from "@/app/actions/update-agendamento";
+import { createAgendamento } from "@/app/actions/post-agendamento";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
+import { JsonValue } from "@prisma/client/runtime/library";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -18,79 +19,28 @@ interface SchemaVeiculo {
   price: number;
 }
 
-interface UpdateAgendamentoPageProps {
-  params: {
-    id: string;
-  };
-}
-
-interface AgendamentoFull extends Agendamento {
-  cliente: Cliente;
-  veiculos: {
-    veiculo: Veiculo;
-  }[];
-}
-
-const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
+const AgendamentoPage = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const idRef = useRef<any>(null);
   const clienteRef = useRef<any>(null);
   const dateRef = useRef<any>(null);
   const dateIsDoneRef = useRef<any>(null);
   const isDoneRef = useRef<any>(null);
-  const priceRef = useRef<any>(null);
 
-  const [agendamento, setAgendamento] = useState<AgendamentoFull | null>();
+  const router = useRouter();
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [selectedCliente, setSelectedCliente] = useState<Cliente>();
+  const [selectedCliente, setSelectedCliente] = useState<number>(-1);
   const [veiculos, setVeiculos] = useState<SchemaVeiculo[]>([]);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
 
   const [isPending, startTransition] = useTransition();
 
-  type UpdatedAgendamento = Pick<
+  type CreateAgendamento = Pick<
     Agendamento,
-    "clienteId" | "date" | "serviceCompleted" | "id"
+    "clienteId" | "date" | "serviceCompleted" | "price" | "pricePerVeiculo"
   >;
-
-  interface PricePerVeiculo {
-    veiculoId: number;
-    price: number;
-  }
-  const formSubmit = (e: any) => {
-    e.preventDefault();
-
-    startTransition(() => {
-      if (selectedCliente?.id) {
-        const updatedAgendamento: UpdatedAgendamento = {
-          id: parseInt(idRef.current.value),
-          clienteId: selectedCliente.id,
-          date: new Date(new Date(dateRef.current.value).setHours(12)),
-          serviceCompleted: isDone
-            ? new Date(new Date(dateIsDoneRef.current.value).setHours(12))
-            : null,
-        };
-        const selectedVeiculos: Veiculo[] = [];
-        veiculos.forEach((item) => {
-          item.isChecked && selectedVeiculos.push(item.veiculo);
-        });
-
-        data?.user &&
-          updateAgendamento(updatedAgendamento, selectedVeiculos, data.user)
-            .then((res) => {
-              console.log(res);
-              toast.success("Agendamento alterado com sucesso!");
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Não foi possível alterar o agendamento!");
-            });
-      }
-    });
-  };
 
   useEffect(() => {
     startTransition(() => {
@@ -107,62 +57,28 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
   }, [data]);
 
   useEffect(() => {
-    setPrice(agendamento?.price || 0);
-    idRef.current.value = agendamento?.id;
-    let dateFormat = `${Intl.DateTimeFormat("eng", { year: "numeric" }).format(
-      agendamento?.date
-    )}-${Intl.DateTimeFormat("eng", { month: "2-digit" }).format(
-      agendamento?.date
-    )}-${Intl.DateTimeFormat("eng", { day: "2-digit" }).format(
-      agendamento?.date
-    )}`;
-    dateRef.current.value = dateFormat;
-    priceRef.current.value = Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(agendamento?.price || 0);
-    if (agendamento?.serviceCompleted) {
-      let dateIsDoneFormat = `${Intl.DateTimeFormat("eng", {
-        year: "numeric",
-      }).format(agendamento?.serviceCompleted)}-${Intl.DateTimeFormat("eng", {
-        month: "2-digit",
-      }).format(agendamento?.serviceCompleted)}-${Intl.DateTimeFormat("eng", {
-        day: "2-digit",
-      }).format(agendamento?.serviceCompleted)}`;
+    let sum = 0;
+    veiculos.forEach((veiculo) => {
+      if (veiculo.isChecked) {
+        sum += veiculo.price;
+      }
+    });
+    setPrice(sum);
+  }, [veiculos]);
 
-      setIsDone(true);
-      dateIsDoneRef.current.value = dateIsDoneFormat;
-    }
-
-    selectedCliente &&
+  useEffect(() => {
+    selectedCliente > 0 &&
       startTransition(() => {
         data?.user &&
-          getClienteById(selectedCliente.id, data.user)
+          getClienteById(selectedCliente, data.user)
             .then((res) => {
               let arrayVeiculos: SchemaVeiculo[] = [];
               res?.veiculos.map((veiculo) => {
-                if (
-                  agendamento?.veiculos.find((e) => e.veiculo.id === veiculo.id)
-                ) {
-                  let thisPrice: any = agendamento?.pricePerVeiculo.find(
-                    (item: any) => {
-                      if (item?.veiculoId === veiculo.id) {
-                        return item;
-                      }
-                    }
-                  );
-                  arrayVeiculos.push({
-                    veiculo: veiculo,
-                    isChecked: true,
-                    price: thisPrice.price,
-                  });
-                } else {
-                  arrayVeiculos.push({
-                    veiculo: veiculo,
-                    isChecked: false,
-                    price: veiculo.numEixos * 10,
-                  });
-                }
+                arrayVeiculos.push({
+                  veiculo: veiculo,
+                  isChecked: true,
+                  price: veiculo.numEixos * 10,
+                });
               });
               setVeiculos(arrayVeiculos || []);
             })
@@ -171,34 +87,76 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
               toast.error("Erro ao buscar cliente!");
             });
       });
-  }, [selectedCliente, agendamento, data]);
+  }, [selectedCliente, data]);
 
-  useEffect(() => {
-    if (params.id) {
+  const onClickFormSubmit = (e: any) => {
+    e.preventDefault();
+
+    startTransition(() => {
+      let prices: JsonValue = [];
+      veiculos.forEach((item) => {
+        if (item.isChecked) {
+          prices.push({
+            veiculoId: item.veiculo.id,
+            price: item.price,
+          });
+        }
+      });
+
+      const agendamento: CreateAgendamento = {
+        clienteId:
+          (clienteRef?.current?.value &&
+            parseInt(clienteRef?.current?.value)) ||
+          null,
+        date:
+          new Date(new Date(dateRef?.current?.value).setUTCHours(12)) || null,
+        price: price,
+        pricePerVeiculo: prices,
+        serviceCompleted: isDoneRef?.current?.value
+          ? new Date(new Date(dateIsDoneRef?.current?.value).setUTCHours(12)) ||
+            null
+          : null,
+      };
+
+      if (!(agendamento.clienteId > 0) || !(agendamento.date !== null)) {
+        toast.error("Dados obrigatórios não preenchidos!");
+        return;
+      }
+      const selectedVeiculos: Veiculo[] = [];
+
+      veiculos.forEach((item) => {
+        if (item.isChecked) {
+          selectedVeiculos.push(item.veiculo);
+        }
+      });
       data?.user &&
-        getAgendamentoById(parseInt(params.id), data.user)
+        createAgendamento(
+          { ...agendamento, veiculos: selectedVeiculos },
+          data.user
+        )
           .then((res) => {
-            setAgendamento(res);
-            setSelectedCliente(res?.cliente);
+            toast.success("Agendamento criado com sucesso!");
+            setTimeout(() => {
+              router.push(`/agendamentos/${res.id}`);
+            }, 1000);
           })
           .catch((err) => {
             console.log(err);
-            toast.error("Não foi possível encontrar o cliente!");
+            toast.error("Ocorreu um erro no cadastro do agendamento!");
           });
-    }
-  }, [params, data]);
+    });
+  };
 
   return (
     <div className="px-8 pt-8">
       {isPending && <Loader />}
-      <form className="flex flex-col">
+      <form className="flex flex-col" onSubmit={(e) => e.stopPropagation()}>
         <label className="me-2 text-lg" htmlFor="id">
           id
         </label>
         <input
-          ref={idRef}
           type="number"
-          className="px-1 h-7 max-w-[100px] rounded-sm text-primary-foreground mb-2"
+          className="h-7 max-w-[100px] rounded-sm text-primary-foreground mb-2"
           name="id"
           readOnly
         />
@@ -208,12 +166,10 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
         <select
           required
           ref={clienteRef}
-          value={selectedCliente?.id}
-          onChange={() =>
-            setSelectedCliente(clientes.find((cliente) => cliente.id))
-          }
+          value={selectedCliente}
+          onChange={(e) => setSelectedCliente(parseInt(e.target.value))}
           name="cliente"
-          className="px-1 h-7 text-primary-foreground rounded-sm mb-2"
+          className="h-7 text-primary-foreground rounded-sm mb-2"
         >
           <option value={-1}>Selecione um cliente</option>
           {clientes.map((cliente) => (
@@ -264,15 +220,12 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                   defaultValue={Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
-                  }).format(item.price)}
+                  }).format(item.veiculo.numEixos * 10)}
                   onChange={(e) => {
                     setVeiculos((objs) => {
                       let newObjs = [...objs];
                       newObjs.forEach((obj) => {
                         if (obj.veiculo.id === parseInt(e.target.id)) {
-                          console.log(
-                            parseFloat(e.target.value.replace(",", "."))
-                          );
                           obj.price = parseFloat(
                             e.target.value.replace(",", ".")
                           );
@@ -308,8 +261,8 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
           Valor
         </label>
         <input
-          ref={priceRef}
           onBlur={(e) => {
+            setPrice(parseFloat(e.target.value));
             let valueFormat = Intl.NumberFormat("pt-BR", {
               style: "currency",
               currency: "BRL",
@@ -317,6 +270,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             e.target.value = valueFormat;
           }}
           onFocus={(e) => {
+            e.target.value = price.toString();
             e.target.value = e.target.value.replace("R$", "");
             e.target.select();
           }}
@@ -331,7 +285,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
           ref={dateRef}
           name="date"
           type="date"
-          className="px-1 w-[200px] text-primary-foreground h-7 rounded-sm mb-2"
+          className="w-[200px] text-primary-foreground h-7 rounded-sm mb-2"
         />
         <label className="me-2 text-lg" htmlFor="date-finished">
           Data de conclusão
@@ -343,11 +297,10 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             disabled={!isDone}
             name="date-finished"
             type="date"
-            className="px-1 w-[200px] text-primary-foreground h-7 rounded-sm"
+            className="w-[200px] text-primary-foreground h-7 rounded-sm"
           />
           <input
             ref={isDoneRef}
-            checked={isDone}
             type="checkbox"
             className="ms-2 me-1"
             onChange={(e) => setIsDone(e.target.checked)}
@@ -355,7 +308,11 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
           <span>Serviço concluído?</span>
         </div>
         <div className="mt-4">
-          <Button variant="default" className="me-5" onClick={formSubmit}>
+          <Button
+            variant="default"
+            className="me-5"
+            onClick={onClickFormSubmit}
+          >
             Salvar
           </Button>
           <Link className="text-blue-400" href="/agendamentos/create">
@@ -367,4 +324,4 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
   );
 };
 
-export default UpdateAgendamentoPage;
+export default AgendamentoPage;

@@ -24,17 +24,18 @@ const Clientes = () => {
   const router = useRouter();
 
   useEffect(() => {
-    startTransition(() => {
-      getAllClientes()
-        .then((res) => {
-          setClientes(res);
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Erro ao buscar clientes!");
-        });
-    });
-  }, []);
+    data?.user &&
+      startTransition(() => {
+        getAllClientes(data.user)
+          .then((res) => {
+            setClientes(res);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Erro ao buscar clientes!");
+          });
+      });
+  }, [data]);
   return (
     <div className="px-4">
       {isPending && <Loader />}
@@ -55,7 +56,10 @@ const Clientes = () => {
                 </Link>
                 <Button
                   onClick={() => {
-                    deleteClienteById(parseInt(cliente.id.toString()))
+                    deleteClienteById(
+                      parseInt(cliente.id.toString()),
+                      data.user
+                    )
                       .then((res) => {
                         toast.success(
                           `Cliente ${res.name} deletado com sucesso`
@@ -66,7 +70,7 @@ const Clientes = () => {
                       })
                       .catch((err) => {
                         console.log(err);
-                        toast.error("Erro ao deletar cliente");
+                        toast.error("Erro ao deletar cliente!");
                       });
                   }}
                   variant="ghost"

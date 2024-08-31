@@ -1,7 +1,6 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { Cliente } from "@prisma/client";
-import { redirect } from "next/navigation";
+import { Cliente, User } from "@prisma/client";
 import { z } from "zod";
 
 export type CreateCliente = Pick<
@@ -24,17 +23,21 @@ const dataSchema = z.object({
     .nullable(),
 });
 
-export const createCliente = async (cliente: CreateCliente) => {
-  if (dataSchema.safeParse(cliente).success) {
-    try {
-      const createdCliente = await prisma.cliente.create({
-        data: cliente,
-      });
-      return createdCliente;
-    } catch (error) {
-      throw error;
+export const createCliente = async (cliente: CreateCliente, user: User) => {
+  if (user.perfil) {
+    if (dataSchema.safeParse(cliente).success) {
+      try {
+        const createdCliente = await prisma.cliente.create({
+          data: cliente,
+        });
+        return createdCliente;
+      } catch (error) {
+        throw error;
+      }
+    } else {
+      throw Error("Problem with the validation of schema!");
     }
   } else {
-    throw Error("Problem with the validation of schema!");
+    throw Error("Usuário não autorizado!");
   }
 };

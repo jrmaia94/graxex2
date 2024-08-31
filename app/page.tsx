@@ -2,7 +2,7 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useEffect, useState, useTransition } from "react";
+import { startTransition, useEffect, useState, useTransition } from "react";
 import {
   getAgendamentosFinalizados,
   getAgendamentosFuturos,
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import CardAgendamento from "@/components/card-agendamento";
 import CardAgendamentoFinalizado from "@/components/card-agendamento-finalizado";
+import Loader from "@/components/loader";
 
 export interface CardAgendamentoProps extends Agendamento {
   cliente: Cliente;
@@ -19,7 +20,7 @@ export interface CardAgendamentoProps extends Agendamento {
 
 const Home = () => {
   const {} = useTransition();
-  const [userIsAuthorized, setUserIsAuthorized] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [agendamentosFuturos, setAgendamentosFuturos] = useState<
     CardAgendamentoProps[]
   >([]);
@@ -31,43 +32,47 @@ const Home = () => {
   });
 
   useEffect(() => {
-    getAgendamentosFuturos()
-      .then((res) => {
-        const newObj = res.map((e) => {
-          return {
-            ...e,
-            veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
-          };
-        });
-        setAgendamentosFuturos(newObj);
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Não foi possível carregar os agendamentos!");
-      });
+    data?.user &&
+      startTransition(() => {
+        getAgendamentosFuturos(data.user)
+          .then((res) => {
+            const newObj = res.map((e) => {
+              return {
+                ...e,
+                veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
+              };
+            });
+            setAgendamentosFuturos(newObj);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error(
+              `Não foi possível carregar os agendamentos! ${err.message}`
+            );
+          });
 
-    getAgendamentosFinalizados()
-      .then((res) => {
-        const newObj = res.map((e) => {
-          return {
-            ...e,
-            veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
-          };
-        });
-        setAgendamentosFinalizados(newObj);
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Não foi possível carregar os agendamentos finalizados!");
+        getAgendamentosFinalizados(data.user)
+          .then((res) => {
+            const newObj = res.map((e) => {
+              return {
+                ...e,
+                veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
+              };
+            });
+            setAgendamentosFinalizados(newObj);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error(
+              `Não foi possível carregar os agendamentos! ${err.message}`
+            );
+          });
       });
-  }, []);
-
-  useEffect(() => {
-    data?.user?.perfil ? setUserIsAuthorized(true) : setUserIsAuthorized(false);
   }, [data]);
 
   return (
     <div>
+      {isPending && <Loader />}
       <Image
         alt="Foto graxex"
         src="/background.jpeg"

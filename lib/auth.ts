@@ -38,17 +38,25 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user }) {
       if (account) {
-        const id = account.providerAccountId;
-
-        const user = await prisma.user.findUnique({
-          where: {
-            id: id,
-          },
-        });
-
-        token.perfil = user?.perfil;
+        const email = token.email;
+        const id = user.id;
+        if (email) {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: email,
+            },
+          });
+          token.perfil = user?.perfil;
+        } else if (id) {
+          const user = await prisma.user.findUnique({
+            where: {
+              id: id,
+            },
+          });
+          token.perfil = user?.perfil;
+        }
       }
       return token;
     },

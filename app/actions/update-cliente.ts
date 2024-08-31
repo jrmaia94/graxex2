@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { CreateCliente } from "./post-cliente";
+import { User } from "@prisma/client";
 
 export interface UpdateCliente extends CreateCliente {
   id: number;
@@ -23,21 +24,25 @@ const dataSchema = z.object({
     .nullable(),
 });
 
-export const updateCliente = async (cliente: UpdateCliente) => {
-  const { id, ...data } = cliente;
-  if (dataSchema.safeParse(cliente).success) {
-    try {
-      const updatedCliente = await prisma.cliente.update({
-        where: {
-          id: cliente.id,
-        },
-        data: data,
-      });
-      return updatedCliente;
-    } catch (error) {
-      throw error;
+export const updateCliente = async (cliente: UpdateCliente, user: User) => {
+  if (user.perfil) {
+    const { id, ...data } = cliente;
+    if (dataSchema.safeParse(cliente).success) {
+      try {
+        const updatedCliente = await prisma.cliente.update({
+          where: {
+            id: cliente.id,
+          },
+          data: data,
+        });
+        return updatedCliente;
+      } catch (error) {
+        throw error;
+      }
+    } else {
+      throw Error("Problem with the validation of schema!");
     }
   } else {
-    throw Error("Problem with the validation of schema!");
+    throw Error("Usuário não autorizado!");
   }
 };

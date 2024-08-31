@@ -1,46 +1,63 @@
 "use server";
 import { prisma } from "@/lib/prisma";
+import { User } from "@prisma/client";
 
-export const getSomeClientes = async (name: string) => {
-  const clientes = await prisma.cliente.findMany({
-    where: {
-      name: {
-        contains: name,
-        mode: "insensitive",
+export const getSomeClientes = async (name: string, user: User) => {
+  if (user.perfil) {
+    const clientes = await prisma.cliente.findMany({
+      where: {
+        name: {
+          contains: name,
+          mode: "insensitive",
+        },
       },
-    },
-    include: {
-      veiculos: true,
-    },
-    orderBy: {
-      name: "asc",
-    },
-  });
+      include: {
+        veiculos: true,
+        agendamentos: {
+          include: {
+            cliente: true,
+            veiculos: true,
+          },
+        },
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
 
-  return clientes;
+    return clientes;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
 };
 
-export const getAllClientes = async () => {
-  const clientes = await prisma.cliente.findMany({
-    orderBy: {
-      name: "asc",
-    },
-  });
-
-  return clientes;
+export const getAllClientes = async (user: User) => {
+  if (user.perfil) {
+    const clientes = await prisma.cliente.findMany({
+      orderBy: {
+        name: "asc",
+      },
+    });
+    return clientes;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
 };
 
-export const getClienteById = async (id: number) => {
-  const cliente = await prisma.cliente.findUnique({
-    where: {
-      id: id,
-    },
-    include: {
-      veiculos: true,
-    },
-  });
-
-  return cliente;
+export const getClienteById = async (id: number, user: User) => {
+  if (user.perfil) {
+    const cliente = await prisma.cliente.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        veiculos: true,
+      },
+    });
+    return cliente;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
 };
 
 /* export const getAgendamentosFinalizados = async () => {

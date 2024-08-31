@@ -1,82 +1,99 @@
 "use server";
 import { prisma } from "@/lib/prisma";
+import { User } from "@prisma/client";
 
-export const getAgendamentosFuturos = async () => {
-  const agendamentos = await prisma.agendamento.findMany({
-    include: {
-      cliente: true,
-      veiculos: {
-        include: {
-          veiculo: true,
+export const getAgendamentosFuturos = async (user: User) => {
+  if (user.perfil) {
+    const agendamentos = await prisma.agendamento.findMany({
+      include: {
+        cliente: true,
+        veiculos: {
+          include: {
+            veiculo: true,
+          },
         },
       },
-    },
-    where: {
-      serviceCompleted: null,
-    },
-    orderBy: {
-      date: "asc",
-    },
-  });
+      where: {
+        serviceCompleted: null,
+      },
+      orderBy: {
+        date: "asc",
+      },
+    });
 
-  return agendamentos;
+    return agendamentos;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
 };
 
-export const getAgendamentosFinalizados = async () => {
-  const agendamentos = await prisma.agendamento.findMany({
-    include: {
-      cliente: true,
-      veiculos: {
-        include: {
-          veiculo: true,
+export const getAgendamentosFinalizados = async (user: User) => {
+  if (user.perfil) {
+    const agendamentos = await prisma.agendamento.findMany({
+      include: {
+        cliente: true,
+        veiculos: {
+          include: {
+            veiculo: true,
+          },
         },
       },
-    },
-    where: {
-      serviceCompleted: {
-        not: null,
+      where: {
+        serviceCompleted: {
+          not: null,
+        },
       },
-    },
-    orderBy: {
-      serviceCompleted: "asc",
-    },
-  });
+      orderBy: {
+        serviceCompleted: "asc",
+      },
+    });
 
-  return agendamentos;
+    return agendamentos;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
 };
 
-export const getAllAgendamentos = async () => {
-  const agendamentos = await prisma.agendamento.findMany({
-    include: {
-      veiculos: {
-        include: {
-          veiculo: true,
+export const getAllAgendamentos = async (user: User) => {
+  if (user.perfil) {
+    const agendamentos = await prisma.agendamento.findMany({
+      include: {
+        veiculos: {
+          include: {
+            veiculo: true,
+          },
         },
+        cliente: true,
       },
-      cliente: true,
-    },
-    orderBy: {
-      id: "asc",
-    },
-  });
+      orderBy: {
+        id: "asc",
+      },
+    });
 
-  return agendamentos;
+    return agendamentos;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
 };
 
-export const getAgendamentoById = async (id: number) => {
-  const agendamento = await prisma.agendamento.findUnique({
-    where: {
-      id: id,
-    },
-    include: {
-      cliente: true,
-      veiculos: {
-        include: {
-          veiculo: true,
+export const getAgendamentoById = async (id: number, user: User) => {
+  if (user.perfil) {
+    const agendamento = await prisma.agendamento.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        cliente: true,
+        veiculos: {
+          include: {
+            veiculo: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return agendamento;
+    return agendamento;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
 };
