@@ -68,9 +68,9 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
         const updatedAgendamento: UpdatedAgendamento = {
           id: parseInt(idRef.current.value),
           clienteId: selectedCliente.id,
-          date: new Date(new Date(dateRef.current.value).setHours(12)),
+          date: new Date(new Date(dateRef.current.value).setUTCHours(12)),
           serviceCompleted: isDone
-            ? new Date(new Date(dateIsDoneRef.current.value).setHours(12))
+            ? new Date(new Date(dateIsDoneRef.current.value).setUTCHours(12))
             : null,
         };
         const selectedVeiculos: Veiculo[] = [];
