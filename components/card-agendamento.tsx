@@ -1,3 +1,4 @@
+"use client";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
@@ -11,9 +12,11 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "./ui/dialog";
-import { CardAgendamentoProps } from "@/app/page";
 import CardAgendamentoFull from "./card-agendamento-full";
 import { Description } from "@radix-ui/react-dialog";
+import { useSession } from "next-auth/react";
+import { deleteAgendamentoById } from "@/app/actions/delete-agendamento";
+import { toast } from "sonner";
 //import CardAgendamentoFull from "./card-agendamento-full";
 
 interface ClienteFull extends Cliente {
@@ -30,6 +33,24 @@ const CardAgendamento = ({
 }: {
   agendamento: AgendamentoProps;
 }) => {
+  const { data }: { data: any } = useSession({
+    required: true,
+  });
+
+  const deleteAgendamento = (id: number) => {
+    data.user &&
+      deleteAgendamentoById(id, data.user)
+        .then((res) => {
+          toast.success(`Agendamento com Id ${res.id} deletado com sucesso!`);
+          setTimeout(() => {
+            window.location.reload();
+          }, 800);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Não foi possível deletar o agendamento!");
+        });
+  };
   return (
     <Card>
       <CardContent className="relative m-0 flex max-w-[90vw] flex-row items-center justify-between p-0">
@@ -88,6 +109,7 @@ const CardAgendamento = ({
             size="xs"
             variant="ghost"
             className="absolute bottom-3 right-1"
+            onClick={() => deleteAgendamento(agendamento.id)}
           >
             <Trash2 size={20} />
           </Button>
