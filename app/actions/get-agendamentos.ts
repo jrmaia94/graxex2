@@ -6,7 +6,11 @@ export const getAgendamentosFuturos = async (user: User) => {
   if (user.perfil) {
     const agendamentos = await prisma.agendamento.findMany({
       include: {
-        cliente: true,
+        cliente: {
+          include: {
+            veiculos: true,
+          },
+        },
         veiculos: {
           include: {
             veiculo: true,
@@ -63,7 +67,9 @@ export const getAllAgendamentos = async (user: User) => {
             veiculo: true,
           },
         },
-        cliente: true,
+        cliente: {
+          include: { veiculos: true },
+        },
       },
       orderBy: {
         id: "asc",

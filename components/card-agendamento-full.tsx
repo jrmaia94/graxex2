@@ -6,9 +6,7 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Edit } from "lucide-react";
 import Link from "next/link";
 
-interface CardAgendamentoProps {
-  agendamento: Agendamento;
-  cliente: Cliente;
+interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
 }
 
@@ -16,7 +14,11 @@ const CardAgendamentoFull = ({
   agendamento,
   cliente,
   veiculos,
-}: CardAgendamentoProps) => {
+}: {
+  agendamento: Agendamento;
+  veiculos: Veiculo[];
+  cliente: ClienteFull;
+}) => {
   return (
     <Card>
       <CardContent className="flex max-h-[70vh] flex-col gap-0 overflow-hidden p-2">

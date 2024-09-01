@@ -132,97 +132,99 @@ const ClientePage = ({ params }: ClientePageProps) => {
   }, [typeOfDoc]);
 
   return (
-    <div className="px-8 pt-8">
-      {isPending && <Loader />}
-      <form
-        onSubmit={handleSubmit}
-        className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
-      >
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">id</label>
-          <input
-            readOnly
-            disabled
-            ref={inputIDRef}
-            type="text"
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Nome</label>
-          <input
-            required
-            ref={inputNameRef}
-            type="text"
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
-          />
-        </div>
-        <div className="gap-1 flex flex-col">
-          <RadioGroup value={typeOfDoc} className="flex flex-row">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem
-                className="text-primary-foreground border-primary-foreground"
-                onClick={handleTypeDocument}
-                value="cpf"
-                id="cpf"
-              />
-              <Label className="text-primary-foreground" htmlFor="cpf">
-                CPF
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem
-                className="text-primary-foreground border-primary-foreground"
-                onClick={handleTypeDocument}
-                value="cnpj"
-                id="cnpj"
-              />
-              <Label className="text-primary-foreground" htmlFor="cnpj">
-                CNPJ
-              </Label>
-            </div>
-          </RadioGroup>
-          <InputMask
-            ref={inputDocumentRef}
-            mask={maskDoc}
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[160px]"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Endereço</label>
-          <input
-            ref={inputAddressRef}
-            type="text"
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Telefone</label>
-          <InputMask
-            ref={inputPhoneRef}
-            mask="+55(99)99999-9999"
-            className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-[200px]"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Imagem</label>
-          <Input
-            disabled
-            ref={inputFileRef}
-            type="file"
-            className="h-8 text-primary-foreground bg-primary border-none p-1"
-          />
-        </div>
-        <div>
-          <Button
-            disabled={isPending}
-            className="w-[100px] bg-primary"
-            type="submit"
-          >
-            Salvar
-          </Button>
-        </div>
-      </form>
+    <div className="flex justify-center">
+      <div className="px-8 pt-8 w-full max-w-[600px]">
+        {isPending && <Loader />}
+        <form
+          onSubmit={handleSubmit}
+          className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
+        >
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">id</label>
+            <input
+              readOnly
+              disabled
+              ref={inputIDRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Nome</label>
+            <input
+              required
+              ref={inputNameRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
+            />
+          </div>
+          <div className="gap-1 flex flex-col">
+            <RadioGroup value={typeOfDoc} className="flex flex-row">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem
+                  className="text-primary-foreground border-primary-foreground"
+                  onClick={handleTypeDocument}
+                  value="cpf"
+                  id="cpf"
+                />
+                <Label className="text-primary-foreground" htmlFor="cpf">
+                  CPF
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem
+                  className="text-primary-foreground border-primary-foreground"
+                  onClick={handleTypeDocument}
+                  value="cnpj"
+                  id="cnpj"
+                />
+                <Label className="text-primary-foreground" htmlFor="cnpj">
+                  CNPJ
+                </Label>
+              </div>
+            </RadioGroup>
+            <InputMask
+              ref={inputDocumentRef}
+              mask={maskDoc}
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[160px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Endereço</label>
+            <input
+              ref={inputAddressRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Telefone</label>
+            <InputMask
+              ref={inputPhoneRef}
+              mask="+55(99)99999-9999"
+              className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-[200px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Imagem</label>
+            <Input
+              disabled
+              ref={inputFileRef}
+              type="file"
+              className="h-8 text-primary-foreground bg-primary border-none p-1"
+            />
+          </div>
+          <div>
+            <Button
+              disabled={isPending}
+              className="w-[100px] bg-primary"
+              type="submit"
+            >
+              Salvar
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -137,96 +137,98 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   }, [data]);
 
   return (
-    <div className="px-8 pt-8">
-      {isPending && <Loader />}
-      <form
-        onSubmit={handleSubmit}
-        className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
-      >
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">id</label>
-          <input
-            readOnly
-            disabled
-            ref={inputIDRef}
-            type="text"
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Cliente</label>
-          <select
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
-            value={selectedCliente}
-            onChange={(e) => setSelectedCliente(parseInt(e.target.value))}
-          >
-            <option value={-1}>Selecione um cliente</option>
-            {clientes?.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Modelo</label>
-          <input
-            required
-            ref={inputModeloRef}
-            type="text"
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Fabricante</label>
-          <input
-            ref={inputFabricanteRef}
-            type="text"
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Placa</label>
-          <InputMask
-            ref={inputPlacaRef}
-            mask="aaa-9*99"
-            className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-[200px]"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Cor</label>
-          <input
-            ref={inputCorRef}
-            type="text"
-            className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-primary-foreground">Eixos</label>
-          <select
-            className="text-primary-foreground h-8 p-1 rounded-sm w-[100px]"
-            name="eixos"
-            id="eixos"
-            ref={selectEixosRef}
-          >
-            <option value={3}>3</option>
-            <option value={6}>6</option>
-            <option value={9}>9</option>
-          </select>
-        </div>
-        <div className="flex gap-10 items-center">
-          <Button
-            disabled={isPending}
-            className="w-[100px] bg-primary"
-            type="submit"
-          >
-            Salvar
-          </Button>
-          <Link className="text-blue-400" href="/veiculos/create">
-            Novo
-          </Link>
-        </div>
-      </form>
+    <div className="flex justify-center">
+      <div className="px-8 pt-8 w-full max-w-[600px]">
+        {isPending && <Loader />}
+        <form
+          onSubmit={handleSubmit}
+          className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
+        >
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">id</label>
+            <input
+              readOnly
+              disabled
+              ref={inputIDRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Cliente</label>
+            <select
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
+              value={selectedCliente}
+              onChange={(e) => setSelectedCliente(parseInt(e.target.value))}
+            >
+              <option value={-1}>Selecione um cliente</option>
+              {clientes?.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Modelo</label>
+            <input
+              required
+              ref={inputModeloRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Fabricante</label>
+            <input
+              ref={inputFabricanteRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Placa</label>
+            <InputMask
+              ref={inputPlacaRef}
+              mask="aaa-9*99"
+              className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-[200px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Cor</label>
+            <input
+              ref={inputCorRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Eixos</label>
+            <select
+              className="text-primary-foreground h-8 p-1 rounded-sm w-[100px]"
+              name="eixos"
+              id="eixos"
+              ref={selectEixosRef}
+            >
+              <option value={3}>3</option>
+              <option value={6}>6</option>
+              <option value={9}>9</option>
+            </select>
+          </div>
+          <div className="flex gap-10 items-center">
+            <Button
+              disabled={isPending}
+              className="w-[100px] bg-primary"
+              type="submit"
+            >
+              Salvar
+            </Button>
+            <Link className="text-blue-400" href="/veiculos/create">
+              Novo
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -13,13 +13,23 @@ import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { ArrowDownIcon, Loader2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { Agendamento, Cliente, Veiculo } from "@prisma/client";
+
+interface ClienteFull extends Cliente {
+  veiculos: Veiculo[];
+}
+
+interface AgendamentoProps extends Agendamento {
+  cliente: ClienteFull;
+  veiculos: Veiculo[];
+}
 
 const Agendamentos = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
 
-  const [agendamentos, setAgendamentos] = useState<CardAgendamentoProps[]>([]);
+  const [agendamentos, setAgendamentos] = useState<AgendamentoProps[]>([]);
   const [loadAllAgendamentos, setLoadAllAgendamentos] =
     useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
@@ -63,25 +73,27 @@ const Agendamentos = () => {
   }, [loadAllAgendamentos, data]);
 
   return (
-    <div className="px-4">
-      {isPending && <Loader />}
-      <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
-        Agendamentos
-      </h2>
-      <div className="mb-3">
-        <Search origin="agendamentos" action={setAgendamentos} />
+    <div className="flex justify-center">
+      <div className="px-4 w-full max-w-[600px]">
+        {isPending && <Loader />}
+        <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
+          Agendamentos
+        </h2>
+        <div className="mb-3">
+          <Search origin="agendamentos" action={setAgendamentos} />
+        </div>
+        <div
+          className={loadAllAgendamentos ? "hidden" : "w-full flex justify-end"}
+        >
+          <Button onClick={() => setLoadAllAgendamentos(true)} className="mb-3">
+            <ArrowDownIcon />
+            Carregar todos agendamentos
+          </Button>
+        </div>
+        {agendamentos.map((agendamento) => (
+          <CardAgendamento key={agendamento.id} agendamento={agendamento} />
+        ))}
       </div>
-      <div
-        className={loadAllAgendamentos ? "hidden" : "w-full flex justify-end"}
-      >
-        <Button onClick={() => setLoadAllAgendamentos(true)} className="mb-3">
-          <ArrowDownIcon />
-          Carregar todos agendamentos
-        </Button>
-      </div>
-      {agendamentos.map((agendamento) => (
-        <CardAgendamento key={agendamento.id} agendamento={agendamento} />
-      ))}
     </div>
   );
 };

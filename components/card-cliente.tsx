@@ -1,13 +1,13 @@
-import { Cliente } from "@prisma/client";
+import { Cliente, Veiculo } from "@prisma/client";
 import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-interface CardClienteProps {
-  cliente: Cliente;
+interface ClienteFull extends Cliente {
+  veiculos: Veiculo[];
 }
 
-const CardCliente = ({ cliente }: CardClienteProps) => {
+const CardCliente = ({ cliente }: { cliente: ClienteFull }) => {
   return (
     <div className="flex flex-row items-center gap-2">
       {cliente.imageUrl ? (
@@ -22,23 +22,34 @@ const CardCliente = ({ cliente }: CardClienteProps) => {
         <UserIcon size={70} />
       )}
       <div className="flex flex-col overflow-hidden">
-        <h3 className="w-[290px] truncate text-2xl">{cliente.name}</h3>
-        <Link
-          href={`https://wa.me//${cliente.phone
-            ?.toString()
-            .replace(/\D/g, "")}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
-          target="_blank"
-          className="flex gap-1"
-        >
-          <Image
-            className="rounded-full"
-            alt="Ícone Whatsapp"
-            src="./wpp-icon.svg"
-            width={15}
-            height={15}
-          />
-          <p className="text-ring">{cliente.phone}</p>
-        </Link>
+        <h3 className="truncate text-lg">{cliente.name}</h3>
+        {cliente.phone && (
+          <Link
+            href={`https://wa.me//${cliente.phone
+              ?.toString()
+              .replace(/\D/g, "")}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
+            target="_blank"
+            className="flex gap-1"
+          >
+            <Image
+              className="rounded-full"
+              alt="Ícone Whatsapp"
+              src="./wpp-icon.svg"
+              width={15}
+              height={15}
+            />
+            <p className="text-ring text-sm">{cliente.phone}</p>
+          </Link>
+        )}
+        {cliente.veiculos.length > 1 ? (
+          <span className="text-xs italic">
+            {cliente.veiculos.length} veículos
+          </span>
+        ) : (
+          <span className="text-xs italic">
+            {cliente.veiculos.length} veículo
+          </span>
+        )}
       </div>
     </div>
   );

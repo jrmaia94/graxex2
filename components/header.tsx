@@ -29,16 +29,16 @@ const Header = () => {
             <Image
               alt="Logo da graxex"
               src="/logo-horizontal.png"
-              width={140}
-              height={140}
+              width={100}
+              height={100}
             />
           </Link>
           <Button
             variant={"ghost"}
             onClick={() => setIsSheetOpen(true)}
-            className="h-[50px] p-0"
+            className="md:h-[30px] m:w-[30px] w-[50px] h-[50px] p-0"
           >
-            <MenuIcon size={50} />
+            <MenuIcon className="w-full h-full" />
           </Button>
           <Sheet open={isSheetOpen} onOpenChange={(e) => setIsSheetOpen(e)}>
             <SheetContent className="w-[300px]">

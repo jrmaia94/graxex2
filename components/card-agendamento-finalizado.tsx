@@ -34,23 +34,24 @@ const CardAgendamentoFinalizado = ({
             <UserIcon size={50} />
           )}
           <div className="overflow-hidden">
-            <h3 className="truncate text-3xl">{agendamento.cliente.name}</h3>
-            <Link
-              href={`https://wa.me//${agendamento.cliente.phone}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
-              target="_blank"
-              className="flex gap-1"
-            >
-              <Image
-                className="rounded-full"
-                alt="Ícone Whatsapp"
-                src="./wpp-icon.svg"
-                width={15}
-                height={15}
-              />
-              <p className="">{agendamento.cliente.phone}</p>
-            </Link>
-
-            <p className="text-sm italic">
+            <h3 className="truncate text-lg">{agendamento.cliente.name}</h3>
+            {agendamento.cliente.phone && (
+              <Link
+                href={`https://wa.me//${agendamento.cliente.phone}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
+                target="_blank"
+                className="flex gap-1"
+              >
+                <Image
+                  className="rounded-full"
+                  alt="Ícone Whatsapp"
+                  src="./wpp-icon.svg"
+                  width={15}
+                  height={15}
+                />
+                <p className="">{agendamento.cliente.phone}</p>
+              </Link>
+            )}
+            <p className="text-xs italic">
               {agendamento.veiculos.length > 1
                 ? `${agendamento.veiculos.length} veículos`
                 : `${agendamento.veiculos.length} veículo`}

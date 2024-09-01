@@ -35,49 +35,51 @@ const PageVeiculos = () => {
     });
   }, [data]);
   return (
-    <div className="px-4">
-      {isPending && <Loader />}
-      <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
-        Veiculos
-      </h2>
-      <div className="mb-3">
-        <Search origin="veiculos" action={setVeiculos} />
-      </div>
-      <div className="flex flex-col gap-1">
-        {veiculos?.map((veiculo) => (
-          <Card key={veiculo.id}>
-            <CardContent className="p-2 flex justify-between">
-              <CardVeiculo veiculo={veiculo} />
-              <div className="flex flex-col justify-center gap-5 px-4">
-                <Link href={`/veiculos/${veiculo.id}`} className="p-0 m-0">
-                  <Edit size={20} />
-                </Link>
-                <Button
-                  onClick={() => {
-                    data?.user &&
-                      deleteVeiculoById(veiculo.id, data.user)
-                        .then((res) => {
-                          toast.success(
-                            `Veículo com o id ${veiculo.id} foi excluído!`
-                          );
-                          setTimeout(() => {
-                            window.location.reload();
-                          }, 1000);
-                        })
-                        .catch((err) => {
-                          console.log(err);
-                          toast.error("Não foi possível deletar o veículo!");
-                        });
-                  }}
-                  variant="ghost"
-                  className="p-0 m-0 h-5"
-                >
-                  <Trash2Icon size={20} />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="flex justify-center">
+      <div className="px-4 w-full max-w-[600px]">
+        {isPending && <Loader />}
+        <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
+          Veiculos
+        </h2>
+        <div className="mb-3">
+          <Search origin="veiculos" action={setVeiculos} />
+        </div>
+        <div className="flex flex-col gap-1">
+          {veiculos?.map((veiculo) => (
+            <Card key={veiculo.id}>
+              <CardContent className="p-2 flex justify-between">
+                <CardVeiculo veiculo={veiculo} />
+                <div className="flex flex-col justify-center gap-5 px-4">
+                  <Link href={`/veiculos/${veiculo.id}`} className="p-0 m-0">
+                    <Edit size={20} />
+                  </Link>
+                  <Button
+                    onClick={() => {
+                      data?.user &&
+                        deleteVeiculoById(veiculo.id, data.user)
+                          .then((res) => {
+                            toast.success(
+                              `Veículo com o id ${veiculo.id} foi excluído!`
+                            );
+                            setTimeout(() => {
+                              window.location.reload();
+                            }, 1000);
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                            toast.error("Não foi possível deletar o veículo!");
+                          });
+                    }}
+                    variant="ghost"
+                    className="p-0 m-0 h-5"
+                  >
+                    <Trash2Icon size={20} />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );

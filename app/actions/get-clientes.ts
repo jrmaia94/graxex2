@@ -34,6 +34,9 @@ export const getSomeClientes = async (name: string, user: User) => {
 export const getAllClientes = async (user: User) => {
   if (user.perfil) {
     const clientes = await prisma.cliente.findMany({
+      include: {
+        veiculos: true,
+      },
       orderBy: {
         name: "asc",
       },
