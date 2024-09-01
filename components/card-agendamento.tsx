@@ -108,7 +108,7 @@ const CardAgendamento = ({
           <Button
             size="xs"
             variant="ghost"
-            className="absolute bottom-3 right-1"
+            className="absolute bottom-2 right-1"
             onClick={() => deleteAgendamento(agendamento.id)}
           >
             <Trash2 size={20} />
@@ -119,7 +119,7 @@ const CardAgendamento = ({
             <Button
               size="xs"
               variant="ghost"
-              className="absolute right-1 top-3"
+              className="absolute right-1 top-2"
             >
               <EyeIcon size={20} />
             </Button>
