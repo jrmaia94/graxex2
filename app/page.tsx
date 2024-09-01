@@ -12,10 +12,13 @@ import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import CardAgendamento from "@/components/card-agendamento";
 import CardAgendamentoFinalizado from "@/components/card-agendamento-finalizado";
 import Loader from "@/components/loader";
-import { main } from "./actions/seed";
 
-export interface CardAgendamentoProps extends Agendamento {
-  cliente: Cliente;
+interface ClienteFull extends Cliente {
+  veiculos: Veiculo[];
+}
+
+interface AgendamentoProps extends Agendamento {
+  cliente: ClienteFull;
   veiculos: Veiculo[];
 }
 
@@ -23,10 +26,10 @@ const Home = () => {
   const {} = useTransition();
   const [isPending, startTransition] = useTransition();
   const [agendamentosFuturos, setAgendamentosFuturos] = useState<
-    CardAgendamentoProps[]
+    AgendamentoProps[]
   >([]);
   const [agendamentosFinalizados, setAgendamentosFinalizados] = useState<
-    CardAgendamentoProps[]
+    AgendamentoProps[]
   >([]);
   const { data }: { data: any } = useSession({
     required: true,
@@ -70,16 +73,6 @@ const Home = () => {
           });
       });
   }, [data]);
-
-  useEffect(() => {
-    /*     main()
-      .then(() => prisma.$disconnect())
-      .catch(async (e) => {
-        console.error(e);
-        await prisma.$disconnect();
-        process.exit(1);
-      }); */
-  }, []);
 
   return (
     <div className="flex justify-center">

@@ -8,7 +8,6 @@ import {
 } from "../actions/get-agendamentos";
 import { toast } from "sonner";
 import CardAgendamento from "@/components/card-agendamento";
-import { CardAgendamentoProps } from "../page";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { ArrowDownIcon, Loader2Icon } from "lucide-react";
