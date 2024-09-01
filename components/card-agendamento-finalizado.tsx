@@ -10,13 +10,19 @@ import {
   DialogContent,
   DialogTrigger,
 } from "./ui/dialog";
-import { CardAgendamentoProps } from "@/app/page";
 //import CardAgendamentoFull from "./card-agendamento-full";
+interface ClienteFull extends Cliente {
+  veiculos: Veiculo[];
+}
 
+interface AgendamentoProps extends Agendamento {
+  cliente: ClienteFull;
+  veiculos: Veiculo[];
+}
 const CardAgendamentoFinalizado = ({
   agendamento,
 }: {
-  agendamento: CardAgendamentoProps;
+  agendamento: AgendamentoProps;
 }) => {
   return (
     <Card>
