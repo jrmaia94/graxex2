@@ -63,6 +63,31 @@ export const getClienteById = async (id: number, user: User) => {
   }
 };
 
+export const getFullClienteById = async (id: number, user: User) => {
+  if (user.perfil) {
+    const cliente = await prisma.cliente.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        veiculos: {
+          include: {
+            agendamentos: {
+              include: {
+                agendamento: true,
+              },
+            },
+          },
+        },
+        agendamentos: true,
+      },
+    });
+    return cliente;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
+};
+
 /* export const getAgendamentosFinalizados = async () => {
   const agendamentos = await prisma.agendamento.findMany({
     include: {

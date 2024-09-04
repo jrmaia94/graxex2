@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "./ui/dialog";
+import CardAgendamentoFull from "./card-agendamento-full";
 //import CardAgendamentoFull from "./card-agendamento-full";
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -93,11 +94,11 @@ const CardAgendamentoFinalizado = ({
           <DialogContent className="left-1/2 top-1/2 min-h-[100px] w-[90%] p-5">
             <DialogHeader>Detalhes sobre o agendamento</DialogHeader>
             <div className="w-[100%]">
-              {/*               <CardAgendamentoFull
+              <CardAgendamentoFull
                 agendamento={agendamento}
-                cliente={cliente}
-                veiculos={veiculos}
-              /> */}
+                cliente={agendamento.cliente}
+                veiculos={agendamento.veiculos}
+              />
             </div>
           </DialogContent>
         </Dialog>

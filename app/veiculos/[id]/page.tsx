@@ -1,26 +1,33 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import InputMask from "react-input-mask";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState, useTransition } from "react";
 
 import { toast } from "sonner";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { updateVeiculo, UpdateVeiculo } from "@/app/actions/update-veiculo";
+import { updateVeiculo } from "@/app/actions/update-veiculo";
 import { createVeiculo } from "@/app/actions/post-veiculo";
 import { getVeiculoById } from "@/app/actions/get-veiculos";
 import { Cliente, Veiculo } from "@prisma/client";
 import { getAllClientes } from "@/app/actions/get-clientes";
 import Loader from "@/components/loader";
 import Link from "next/link";
+import SendImage from "@/components/send-image";
+import { ComboboxClientes } from "@/components/combox-cliente";
 
 interface VeiculoPageProps {
   params: {
     id: string | number;
   };
+}
+
+interface VeiculoFoto {
+  modelo: string;
+  marca: string;
+  cor: string;
+  empresa: string;
+  placa: string;
 }
 
 const VeiculoPage = ({ params }: VeiculoPageProps) => {
@@ -31,8 +38,11 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const [veiculo, setVeiculo] = useState<Veiculo>();
-  const [clientes, setClientes] = useState<Cliente[]>();
+  const [veiculoFoto, setVeiculoFoto] = useState<VeiculoFoto | null>(null);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [selectedCliente, setSelectedCliente] = useState<number>(-1);
+
+  const [isCreate, setIsCreate] = useState(false);
 
   // Controle do formulário
   const inputIDRef = useRef<any>(null);
@@ -95,18 +105,22 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   // Lida com o carregamento da página com parâmetros
   useEffect(() => {
     startTransition(() => {
-      params.id !== "create" &&
+      if (params.id !== "create") {
+        setIsCreate(false);
         data?.user &&
-        getVeiculoById(parseInt(params.id.toString()), data.user)
-          .then((res) => {
-            if (!res) toast.info("Cliente não encontrado!");
-            if (res) setVeiculo(res);
-            //console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error("Ocorreu um erro na buscar do cliente!");
-          });
+          getVeiculoById(parseInt(params.id.toString()), data.user)
+            .then((res) => {
+              if (!res) toast.info("Cliente não encontrado!");
+              if (res) setVeiculo(res);
+              //console.log(res);
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error("Ocorreu um erro na buscar do cliente!");
+            });
+      } else {
+        setIsCreate(true);
+      }
     });
   }, [params, data]);
 
@@ -136,6 +150,17 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         });
   }, [data]);
 
+  useEffect(() => {
+    veiculoFoto &&
+      startTransition(() => {
+        inputModeloRef.current.value = veiculoFoto?.modelo;
+        inputFabricanteRef.current.value = veiculoFoto?.marca;
+        inputPlacaRef.current.value = veiculoFoto?.placa;
+        inputCorRef.current.value = veiculoFoto?.cor;
+        //inputCorRef.current.value = veiculoFoto?.empresa;
+      });
+  }, [veiculoFoto]);
+
   return (
     <div className="flex justify-center">
       <div className="px-8 pt-8 w-full max-w-[600px]">
@@ -144,6 +169,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
           onSubmit={handleSubmit}
           className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
         >
+          {isCreate && <SendImage setVeiculoFoto={setVeiculoFoto} />}
           <div className="flex flex-col">
             <label className="text-primary-foreground">id</label>
             <input
@@ -156,18 +182,27 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
           </div>
           <div className="flex flex-col">
             <label className="text-primary-foreground">Cliente</label>
-            <select
-              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
-              value={selectedCliente}
-              onChange={(e) => setSelectedCliente(parseInt(e.target.value))}
-            >
-              <option value={-1}>Selecione um cliente</option>
-              {clientes?.map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.name}
-                </option>
-              ))}
-            </select>
+            {!isCreate && (
+              <select
+                className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
+                value={selectedCliente}
+                onChange={(e) => setSelectedCliente(parseInt(e.target.value))}
+              >
+                <option value={-1}>Selecione um cliente</option>
+                {clientes?.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {isCreate && (
+              <ComboboxClientes
+                selectedCliente={selectedCliente}
+                setSelectedCliente={setSelectedCliente}
+                clientes={clientes}
+              />
+            )}
           </div>
           <div className="flex flex-col">
             <label className="text-primary-foreground">Modelo</label>

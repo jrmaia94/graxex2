@@ -14,6 +14,13 @@ import { useSession } from "next-auth/react";
 import { deleteClienteById } from "../actions/delete-clientes";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/loader";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -26,6 +33,20 @@ const Clientes = () => {
   const [isPending, startTransition] = useTransition();
   const [clientes, setClientes] = useState<ClienteFull[]>([]);
   const router = useRouter();
+
+  function deleteCliente(id: number) {
+    deleteClienteById(id, data.user)
+      .then((res) => {
+        toast.success(`Cliente ${res.name} deletado com sucesso`);
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Erro ao deletar cliente!");
+      });
+  }
 
   useEffect(() => {
     data?.user &&
@@ -57,34 +78,31 @@ const Clientes = () => {
                 <div className="w-[85%]">
                   <CardCliente cliente={cliente} />
                 </div>
-                <div className="w-[15%] flex flex-col items-center justify-center gap-5 px-4">
-                  <Link href={`/clientes/${cliente.id}`} className="p-0 m-0">
-                    <Edit size={20} />
-                  </Link>
-                  <Button
-                    onClick={() => {
-                      deleteClienteById(
-                        parseInt(cliente.id.toString()),
-                        data.user
-                      )
-                        .then((res) => {
-                          toast.success(
-                            `Cliente ${res.name} deletado com sucesso`
-                          );
-                          setTimeout(() => {
-                            window.location.reload();
-                          }, 1000);
-                        })
-                        .catch((err) => {
-                          console.log(err);
-                          toast.error("Erro ao deletar cliente!");
-                        });
-                    }}
-                    variant="ghost"
-                    className="p-0 m-0 h-5"
-                  >
-                    <Trash2Icon size={20} />
-                  </Button>
+                <div className="w-[15%] flex flex-col items-center justify-end gap-5 px-4">
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button variant="ghost" className="p-0 m-0 h-5" asChild>
+                        <Trash2Icon size={20} />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[250px] flex flex-col items-center">
+                      <DialogHeader>
+                        <DialogTitle>Atenção!</DialogTitle>
+                      </DialogHeader>
+                      <p>Deseja mesmo excluir</p>
+                      <div className="flex w-full justify-around">
+                        <Button
+                          onClick={() => {
+                            deleteCliente(parseInt(cliente.id.toString()));
+                          }}
+                          variant="default"
+                          className="w-[60%]"
+                        >
+                          Sim
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardContent>
             </Card>

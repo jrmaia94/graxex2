@@ -22,7 +22,9 @@ const CardCliente = ({ cliente }: { cliente: ClienteFull }) => {
         <UserIcon size={70} />
       )}
       <div className="flex flex-col overflow-hidden">
-        <h3 className="truncate text-lg">{cliente.name}</h3>
+        <Link href={`/clientes/${cliente.id}`}>
+          <h3 className="truncate text-lg">{cliente.name}</h3>
+        </Link>
         {cliente.phone && (
           <Link
             href={`https://wa.me//${cliente.phone
@@ -34,22 +36,24 @@ const CardCliente = ({ cliente }: { cliente: ClienteFull }) => {
             <Image
               className="rounded-full"
               alt="Ícone Whatsapp"
-              src="./wpp-icon.svg"
+              src="/wpp-icon.svg"
               width={15}
               height={15}
             />
             <p className="text-ring text-sm">{cliente.phone}</p>
           </Link>
         )}
-        {cliente.veiculos.length > 1 ? (
-          <span className="text-xs italic">
-            {cliente.veiculos.length} veículos
-          </span>
-        ) : (
-          <span className="text-xs italic">
-            {cliente.veiculos.length} veículo
-          </span>
-        )}
+        <Link href={`/dashboard/${cliente.id}`}>
+          {cliente.veiculos.length > 1 ? (
+            <span className="text-xs italic">
+              {cliente.veiculos.length} veículos
+            </span>
+          ) : (
+            <span className="text-xs italic">
+              {cliente.veiculos.length} veículo
+            </span>
+          )}
+        </Link>
       </div>
     </div>
   );
