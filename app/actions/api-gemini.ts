@@ -3,7 +3,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Access your API key (see "Set up your API key" above)
-const genAI =
+const genAI: any =
   process.env.GEMINI_API_KEY &&
   new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
