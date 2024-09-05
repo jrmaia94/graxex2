@@ -74,7 +74,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         clienteId: selectedCliente,
         modelo: clearFields(inputModeloRef.current?.value) || "",
         fabricante: clearFields(inputFabricanteRef.current?.value),
-        placa: clearFields(inputPlacaRef.current?.value) || "",
+        placa: clearFields(inputPlacaRef.current?.value)?.toUpperCase() || "",
         cor: clearFields(inputCorRef.current.value),
         frota: clearFields(inputFrotaRef.current.value),
         observacao: clearFields(inputObsRef.current.value),
