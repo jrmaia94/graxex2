@@ -34,6 +34,8 @@ const SendImage = ({
           [...Array.from(inputRef.current?.files)].map(fileToGenerativePart)
         ));
 
+      console.log(imageParts);
+
       imageParts &&
         sendImage(imageParts)
           .then((res) => {
