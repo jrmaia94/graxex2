@@ -120,6 +120,8 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                         modelo: selectedVeiculo.modelo,
                         numEixos: selectedVeiculo.numEixos,
                         clienteId: selectedVeiculo.clienteId,
+                        frota: selectedVeiculo.frota,
+                        observacao: selectedVeiculo.observacao,
                       }}
                     />
                   </div>
