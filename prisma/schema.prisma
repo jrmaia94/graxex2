@@ -82,6 +82,8 @@ model Veiculo {
   imageUrl     String?
   placa        String                    @unique
   cor          String?
+  frota        String?
+  observacao   String?
   numEixos     Int
   clienteId    Int
   cliente      Cliente                   @relation(fields: [clienteId], references: [id])

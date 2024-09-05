@@ -24,10 +24,11 @@ interface VeiculoPageProps {
 
 interface VeiculoFoto {
   modelo: string;
-  marca: string;
+  fabricante: string;
   cor: string;
   empresa: string;
   placa: string;
+  numero_da_frota: string;
 }
 
 const VeiculoPage = ({ params }: VeiculoPageProps) => {
@@ -52,6 +53,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const inputCorRef = useRef<any>(null);
   const selectEixosRef = useRef<any>(null);
   const inputDocumentRef = useRef<any>(null);
+  const inputFrotaRef = useRef<any>(null);
+  const inputObsRef = useRef<any>(null);
 
   // Lida com o envio do formulário
   const handleSubmit = (e: any) => {
@@ -72,7 +75,9 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         modelo: clearFields(inputModeloRef.current?.value) || "",
         fabricante: clearFields(inputFabricanteRef.current?.value),
         placa: clearFields(inputPlacaRef.current?.value) || "",
-        cor: clearFields(inputCorRef.current?.value),
+        cor: clearFields(inputCorRef.current.value),
+        frota: clearFields(inputFrotaRef.current.value),
+        observacao: clearFields(inputObsRef.current.value),
         numEixos: parseInt(selectEixosRef.current?.value),
       };
 
@@ -154,10 +159,10 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
     veiculoFoto &&
       startTransition(() => {
         inputModeloRef.current.value = veiculoFoto?.modelo;
-        inputFabricanteRef.current.value = veiculoFoto?.marca;
+        inputFabricanteRef.current.value = veiculoFoto?.fabricante;
         inputPlacaRef.current.value = veiculoFoto?.placa;
         inputCorRef.current.value = veiculoFoto?.cor;
-        //inputCorRef.current.value = veiculoFoto?.empresa;
+        inputFrotaRef.current.value = veiculoFoto?.numero_da_frota;
       });
   }, [veiculoFoto]);
 
@@ -233,6 +238,22 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
             <label className="text-primary-foreground">Cor</label>
             <input
               ref={inputCorRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Frota</label>
+            <input
+              ref={inputFrotaRef}
+              type="text"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Obs</label>
+            <input
+              ref={inputObsRef}
               type="text"
               className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
             />
