@@ -117,7 +117,6 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
             .then((res) => {
               if (!res) toast.info("Cliente não encontrado!");
               if (res) setVeiculo(res);
-              //console.log(res);
             })
             .catch((err) => {
               console.log(err);
@@ -139,6 +138,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
       inputPlacaRef.current.value = veiculo.placa;
       inputCorRef.current.value = veiculo.cor;
       selectEixosRef.current.value = veiculo.numEixos;
+      inputFrotaRef.current.value = veiculo.frota;
+      inputObsRef.current.value = veiculo.observacao;
     }
   }, [veiculo]);
 
@@ -210,18 +211,18 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
             )}
           </div>
           <div className="flex flex-col">
-            <label className="text-primary-foreground">Modelo</label>
+            <label className="text-primary-foreground">Fabricante</label>
             <input
-              required
-              ref={inputModeloRef}
+              ref={inputFabricanteRef}
               type="text"
               className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-primary-foreground">Fabricante</label>
+            <label className="text-primary-foreground">Modelo</label>
             <input
-              ref={inputFabricanteRef}
+              required
+              ref={inputModeloRef}
               type="text"
               className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
             />
@@ -232,6 +233,9 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
               ref={inputPlacaRef}
               mask="aaa-9*99"
               className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-[200px]"
+              onBlur={(e) =>
+                (e.target.value = e.target.value.toString().toUpperCase())
+              }
             />
           </div>
           <div className="flex flex-col">

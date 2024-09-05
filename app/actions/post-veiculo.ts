@@ -21,8 +21,8 @@ const dataSchema = z.object({
   fabricante: z.string().min(2).nullable(),
   placa: z.string().regex(/\D{3}\-\d\w\d{2}/gm),
   cor: z.string(),
-  frota: z.string(),
-  observacao: z.string(),
+  frota: z.string().nullable(),
+  observacao: z.string().nullable(),
   numEixos: z.number(),
 });
 
