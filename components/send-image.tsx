@@ -1,10 +1,11 @@
 "use client";
 
 import { sendImage } from "@/app/actions/api-gemini";
-import React, { SetStateAction, useRef, useTransition } from "react";
+import React, { SetStateAction, useRef, useState, useTransition } from "react";
 import Loader from "./loader";
 import { toast } from "sonner";
 import { Input } from "./ui/input";
+import imageCompression from "browser-image-compression";
 
 const SendImage = ({
   setVeiculoFoto,
@@ -12,6 +13,7 @@ const SendImage = ({
   setVeiculoFoto: SetStateAction<any>;
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedImage, setSelectedImage] = useState("");
 
   const [isPending, startTransition] = useTransition();
 
@@ -26,31 +28,39 @@ const SendImage = ({
     };
   }
 
-  function click() {
+  async function click(e: any) {
     startTransition(async () => {
-      const imageParts =
-        inputRef.current?.files &&
-        (await Promise.all(
-          [...Array.from(inputRef.current?.files)].map(fileToGenerativePart)
-        ));
+      const imageFile = e.target.files[0];
 
-      console.log(imageParts);
-
-      imageParts &&
-        sendImage(imageParts)
-          .then((res) => {
-            if (JSON.parse(res).code === 400) {
-              toast.error(
-                "Não foi possível identificar o veículo na imagem enviada"
-              );
-            } else {
-              setVeiculoFoto(JSON.parse(res));
-            }
-          })
-          .catch((err) => {
-            toast.error("Houve um erro no envio da imagem");
-            console.log(err);
-          });
+      const options = {
+        maxSizeMB: 3,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+      try {
+        const compressedFile = await imageCompression(imageFile, options);
+        const imageParts = await Promise.all(
+          [compressedFile].map(fileToGenerativePart)
+        );
+        imageParts &&
+          sendImage(imageParts)
+            .then((res) => {
+              if (JSON.parse(res).code === 400) {
+                toast.error(
+                  "Não foi possível identificar o veículo na imagem enviada"
+                );
+              } else {
+                setVeiculoFoto(JSON.parse(res));
+              }
+            })
+            .catch((err) => {
+              toast.error("Houve um erro no envio da imagem");
+              console.log(err);
+            });
+      } catch (error) {
+        toast.error("Ocorreu um erro na compressão da imagem");
+        console.log(error);
+      }
     });
   }
 
