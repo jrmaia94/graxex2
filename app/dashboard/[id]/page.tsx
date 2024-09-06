@@ -41,13 +41,81 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
   });
 
   const [isPending, startTransition] = useTransition();
-  const [timeHoldClick, setTimeHoldClick] = useState();
 
   const [cliente, setCliente] = useState<ClienteFull | null>(null);
   const [selectedVeiculos, setSelectedVeiculos] = useState<VeiculoFull[]>([]);
   const [selectedVeiculo, setSelectedVeiculo] = useState<VeiculoFull | null>(
     null
   );
+
+  const ultAgendamento = (veiculo: VeiculoFull) => {
+    if (veiculo.agendamentos.length === 0) {
+      return "Nunca foi atendido";
+    } else if (veiculo.agendamentos.length === 1) {
+      return veiculo.agendamentos[0].agendamento.serviceCompleted
+        ? Intl.DateTimeFormat("pt-br", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(veiculo.agendamentos[0].agendamento.serviceCompleted)
+        : "Nunca foi atendido";
+    } else if (veiculo.agendamentos.length > 1) {
+      let wasDone = false;
+      veiculo.agendamentos.forEach((item) =>
+        item.agendamento.serviceCompleted ? (wasDone = true) : (wasDone = false)
+      );
+      if (wasDone) {
+        return Intl.DateTimeFormat("pt-br", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(
+          veiculo.agendamentos
+            .sort((a, b) => {
+              let value1 = a.agendamento.serviceCompleted?.getTime() || 0;
+              let value2 = b.agendamento.serviceCompleted?.getTime() || 0;
+              return value2 - value1;
+            })[0]
+            .agendamento.serviceCompleted?.getTime()
+        );
+      } else {
+        return "Nunca foi atendido";
+      }
+    }
+  };
+
+  const diffBetweenDates = (date: Date | string | undefined) => {
+    if (date) {
+      let today = new Date(Date.now()).getTime();
+      let dateConfigure = new Date(
+        `${date.toString().substring(6)}/
+          ${date.toString().substring(3, 5)}/
+          ${date.toString().substring(0, 2)}`
+      );
+      return Math.round(
+        (today - dateConfigure.getTime()) / 1000 / 60 / 60 / 24
+      );
+    } else {
+      return -1;
+    }
+  };
+
+  const numDias = (date: Date | string | undefined) => {
+    if (date) {
+      let num = diffBetweenDates(date);
+      if (num === 0) {
+        return <p className="text-xs w-[27%] py-2">{num} dias</p>;
+      } else if (num === 1) {
+        return <p className="text-xs w-[27%] py-2">{num} dias</p>;
+      } else if (num > 1 && num < 25) {
+        return <p className="text-xs w-[27%] py-2">{num} dias</p>;
+      } else if (num >= 25) {
+        return <p className="text-xs w-[27%] py-2 text-red-400">{num} dias</p>;
+      }
+    } else {
+      return "";
+    }
+  };
 
   useEffect(() => {
     if (data?.user && params.id) {
@@ -79,7 +147,15 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                 <h2 className="mb-3 mt-1 text-sm font-bold text-ring">
                   Veículos cadastrados
                 </h2>
-                <ScrollArea>
+                <ScrollArea className="h-72">
+                  <div className="flex w-full items-center">
+                    <span className="text-xs w-[12%]">Frota</span>
+                    <span className="text-xs w-[38%]">Veiculo</span>
+                    <span className="text-xs w-[23%]">Placa</span>
+                    <span className="text-xs w-[27%]">
+                      Dias desde o ult. atendimento
+                    </span>
+                  </div>
                   {cliente.veiculos.map((veiculo) => (
                     <div
                       className="hover:cursor-pointer"
@@ -97,38 +173,26 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                         })
                       }
                     >
-                      <div className="block sm:hidden h-[200px]">
-                        <p className="text-xs py-2">
-                          {veiculo.fabricante} {veiculo.placa}
+                      <div className="flex gap-2 w-full items-center">
+                        <p className="text-xs py-2 w-[12%]">{veiculo.frota}</p>
+                        <p className="text-xs py-2 w-[38%]">
+                          {veiculo.fabricante?.toUpperCase()}
                         </p>
-                      </div>
-                      <div className="sm:block hidden">
-                        <CardVeiculo veiculo={veiculo} />
+                        <p className="text-xs py-2 w-[23%]">{veiculo.placa}</p>
+                        {ultAgendamento(veiculo) === "Nunca foi atendido" ? (
+                          <p className="text-xs py-2 text-red-400 w-[27%]">
+                            {ultAgendamento(veiculo)}
+                          </p>
+                        ) : (
+                          numDias(ultAgendamento(veiculo))
+                        )}
                       </div>
                     </div>
                   ))}
                 </ScrollArea>
-                {selectedVeiculo && (
-                  <div className="block sm:hidden">
-                    <CardVeiculo
-                      veiculo={{
-                        id: selectedVeiculo.id,
-                        placa: selectedVeiculo.placa,
-                        cor: selectedVeiculo.cor,
-                        fabricante: selectedVeiculo.fabricante,
-                        imageUrl: selectedVeiculo.imageUrl,
-                        modelo: selectedVeiculo.modelo,
-                        numEixos: selectedVeiculo.numEixos,
-                        clienteId: selectedVeiculo.clienteId,
-                        frota: selectedVeiculo.frota,
-                        observacao: selectedVeiculo.observacao,
-                      }}
-                    />
-                  </div>
-                )}
               </CardContent>
             </Card>
-            {/* Informação do veículo selecionado */}
+            {/* Informação do veículo selecionado
             <Card className="w-full sm:w-[30%]">
               <CardContent className="flex-col px-2 gap-2 w-full flex">
                 <h2 className="mb-3 mt-1 text-sm font-bold text-ring">

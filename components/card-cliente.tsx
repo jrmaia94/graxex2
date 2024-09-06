@@ -21,7 +21,7 @@ const CardCliente = ({ cliente }: { cliente: ClienteFull }) => {
       ) : (
         <UserIcon size={70} />
       )}
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col overflow-hidden gap-1">
         <Link href={`/clientes/${cliente.id}`}>
           <h3 className="truncate text-lg">{cliente.name}</h3>
         </Link>
@@ -45,11 +45,11 @@ const CardCliente = ({ cliente }: { cliente: ClienteFull }) => {
         )}
         <Link href={`/dashboard/${cliente.id}`}>
           {cliente.veiculos.length > 1 ? (
-            <span className="text-xs italic">
+            <span className="text-sm italic">
               {cliente.veiculos.length} veículos
             </span>
           ) : (
-            <span className="text-xs italic">
+            <span className="text-sm italic">
               {cliente.veiculos.length} veículo
             </span>
           )}
