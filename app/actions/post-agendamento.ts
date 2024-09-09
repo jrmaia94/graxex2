@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { User, Veiculo } from "@prisma/client";
+import { Agendamento, User, Veiculo } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 const dataSchema = z.object({
@@ -27,6 +27,7 @@ const dataSchema = z.object({
 });
 
 export const createAgendamento = async (agendamento: any, user: User) => {
+  console.log(agendamento);
   if (user.perfil) {
     if (dataSchema.safeParse(agendamento).success) {
       try {

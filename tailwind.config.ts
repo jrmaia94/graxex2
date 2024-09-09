@@ -54,6 +54,7 @@ const config = {
         card: {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
+          selected: "var(--card-selected)",
         },
       },
       borderRadius: {

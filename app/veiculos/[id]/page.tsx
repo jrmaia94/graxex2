@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { updateVeiculo } from "@/app/actions/update-veiculo";
 import { createVeiculo } from "@/app/actions/post-veiculo";
-import { getVeiculoById } from "@/app/actions/get-veiculos";
+import { getAllVeiculos, getVeiculoById } from "@/app/actions/get-veiculos";
 import { Cliente, Veiculo } from "@prisma/client";
 import { getAllClientes } from "@/app/actions/get-clientes";
 import Loader from "@/components/loader";
@@ -39,6 +39,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const [veiculo, setVeiculo] = useState<Veiculo>();
+  const [fabricantes, setFabricantes] = useState<string[]>([]);
+  const [modelos, setModelos] = useState<string[]>([]);
   const [veiculoFoto, setVeiculoFoto] = useState<VeiculoFoto | null>(null);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [selectedCliente, setSelectedCliente] = useState<number>(-1);
@@ -145,7 +147,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
 
   // Lida com a mascara do input CPF/CNPJ
   useEffect(() => {
-    data?.user &&
+    if (data?.user) {
       getAllClientes(data.user)
         .then((res) => {
           setClientes(res);
@@ -154,6 +156,25 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
           console.log(err);
           toast.error("Não foi possível carregar os clientes");
         });
+
+      getAllVeiculos(data.user)
+        .then((res) => {
+          let fabs = [];
+          let models = [];
+          for (let item of res) {
+            item.fabricante && fabs.push(item.fabricante.toUpperCase());
+            item.modelo && models.push(item.modelo.toUpperCase());
+          }
+          fabs = [...new Set(fabs)];
+          models = [...new Set(models)];
+          setFabricantes(fabs);
+          setModelos(models);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Não foi possível carregar os veículos");
+        });
+    }
   }, [data]);
 
   useEffect(() => {
@@ -216,16 +237,28 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
               ref={inputFabricanteRef}
               type="text"
               className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
+              list="list-fabricante"
             />
+            <datalist id="list-fabricante">
+              {fabricantes.map((item, index) => {
+                return <option value={item} key={index}></option>;
+              })}
+            </datalist>
           </div>
           <div className="flex flex-col">
             <label className="text-primary-foreground">Modelo</label>
             <input
+              list="list-modelos"
               required
               ref={inputModeloRef}
               type="text"
               className="h-8 bg-primary text-primary-foreground p-1 rounded-sm"
             />
+            <datalist id="list-modelos">
+              {modelos.map((item, index) => {
+                return <option value={item} key={index}></option>;
+              })}
+            </datalist>
           </div>
           <div className="flex flex-col">
             <label className="text-primary-foreground">Placa</label>

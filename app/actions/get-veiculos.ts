@@ -2,19 +2,47 @@
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 
-export const getSomeVeiculos = async (name: string, user: User) => {
+export const getSomeVeiculos = async (param: string, user: User) => {
   if (user.perfil) {
     const veiculos = await prisma.veiculo.findMany({
       include: {
         cliente: true,
       },
       where: {
-        cliente: {
-          name: {
-            contains: name,
-            mode: "insensitive",
+        OR: [
+          {
+            cliente: {
+              name: {
+                contains: param,
+                mode: "insensitive",
+              },
+            },
           },
-        },
+          {
+            placa: {
+              mode: "insensitive",
+              contains: param,
+            },
+          },
+          {
+            fabricante: {
+              mode: "insensitive",
+              contains: param,
+            },
+          },
+          {
+            frota: {
+              mode: "insensitive",
+              contains: param,
+            },
+          },
+          {
+            modelo: {
+              mode: "insensitive",
+              contains: param,
+            },
+          },
+        ],
       },
       orderBy: {
         id: "asc",

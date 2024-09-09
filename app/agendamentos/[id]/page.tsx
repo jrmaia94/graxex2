@@ -9,6 +9,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -141,7 +142,6 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             .then((res) => {
               let arrayVeiculos: SchemaVeiculo[] = [];
               res?.veiculos.map((veiculo) => {
-                console.log(agendamento);
                 let thisPrice: any = agendamento?.pricePerVeiculo.find(
                   (item: any) => {
                     if (item?.veiculoId === veiculo.id) {

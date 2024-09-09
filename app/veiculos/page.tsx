@@ -19,7 +19,7 @@ const PageVeiculos = () => {
     required: true,
   });
   const [isPending, startTransition] = useTransition();
-  const [veiculos, setVeiculos] = useState<Veiculo[]>();
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
 
   useEffect(() => {
     startTransition(() => {
@@ -34,6 +34,9 @@ const PageVeiculos = () => {
           });
     });
   }, [data]);
+
+  useEffect(() => {}, [veiculos]);
+
   return (
     <div className="flex justify-center">
       <div className="px-4 w-full max-w-[600px]">
@@ -41,7 +44,7 @@ const PageVeiculos = () => {
         <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
           Veiculos
         </h2>
-        <div className="mb-3">
+        <div className="mb-3 flex w-full gap-2">
           <Search origin="veiculos" action={setVeiculos} />
         </div>
         <div className="flex flex-col gap-1">

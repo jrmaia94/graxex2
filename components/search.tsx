@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { Agendamento, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import { getSomeVeiculos } from "@/app/actions/get-veiculos";
 
 const formSchema = z.object({
   param: z.string().trim(),
@@ -29,20 +30,31 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
   });
 
   const handleSubmit = (formData: z.infer<typeof formSchema>) => {
-    data?.user &&
-      getSomeClientes(formData.param, data.user)
-        .then((res) => {
-          // Lidando com os casos de quando o Search é chamado de outras páginas
-          switch (origin) {
-            case "clientes":
+    if (data?.user) {
+      switch (origin) {
+        case "clientes":
+          getSomeClientes(formData.param, data.user)
+            .then((res) => {
               return action(res);
-            case "veiculos":
-              let veiculos: Veiculo[] = [];
-              res.map((cliente) =>
-                cliente.veiculos.map((veiculo) => veiculos.push(veiculo))
-              );
-              return action(veiculos);
-            case "agendamentos":
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error("Não foi possível buscar os clientes");
+            });
+          break;
+        case "veiculos":
+          getSomeVeiculos(formData.param, data.user)
+            .then((res) => {
+              return action(res);
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error("Não foi possível buscar os veículos");
+            });
+          break;
+        case "agendamentos":
+          getSomeClientes(formData.param, data.user)
+            .then((res) => {
               let agendamentos: Agendamento[] = [];
               res.map((cliente) => {
                 cliente.agendamentos.map((agendamento) =>
@@ -50,18 +62,23 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
                 );
               });
               return action(agendamentos);
-            default:
-              break;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Erro ao buscar clientes!");
-        });
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error("Não foi possível buscar os clientes");
+            });
+          break;
+        default:
+          break;
+      }
+    }
   };
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex gap-2">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="flex gap-2 w-full"
+      >
         <FormField
           control={form.control}
           name="param"

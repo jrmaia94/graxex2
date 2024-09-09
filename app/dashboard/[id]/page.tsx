@@ -15,6 +15,11 @@ import Loader from "@/components/loader";
 import CardVeiculo from "@/components/card-veiculo";
 import CardCliente from "@/components/card-cliente";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { CircleCheckBig, FileText } from "lucide-react";
+import Image from "next/image";
+import { createAgendamento } from "@/app/actions/post-agendamento";
+import { DialogAgendamento } from "@/components/dialog-agendamento";
 
 interface DashboardClienteProps {
   params: {
@@ -47,6 +52,9 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
   const [selectedVeiculo, setSelectedVeiculo] = useState<VeiculoFull | null>(
     null
   );
+
+  const [isDialogAgendamentoOpen, setIsDialogAgendamentoOpen] =
+    useState<boolean>(false);
 
   const ultAgendamento = (veiculo: VeiculoFull) => {
     if (veiculo.agendamentos.length === 0) {
@@ -143,9 +151,23 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
           <div className="flex w-full flex-col gap-2 items-center sm:items-start sm:flex-row">
             {/* Lista com veículos */}
             <Card className="w-full sm:w-[40%]">
-              <CardContent className="h-full flex flex-col px-2 gap-2 w-full min-w-[300px]">
+              <CardContent className="h-full flex flex-col px-2 gap-2 w-full min-w-[300px] relative">
+                <div className="flex items-center justify-center absolute right-0 py-1 px-2 gap-1">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      e.target.checked
+                        ? setSelectedVeiculos(cliente.veiculos)
+                        : setSelectedVeiculos([]);
+                    }}
+                  />
+                  <p className="text-xs italic">marcar todos</p>
+                </div>
                 <h2 className="mb-3 mt-1 text-sm font-bold text-ring">
-                  Veículos cadastrados
+                  Veículos cadastrados{" "}
+                  <span className="italic text-xs text-clip font-normal">
+                    --{cliente.veiculos.length} veículo(s)--
+                  </span>
                 </h2>
                 <ScrollArea className="h-72">
                   <div className="flex w-full items-center">
@@ -158,7 +180,11 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                   </div>
                   {cliente.veiculos.map((veiculo) => (
                     <div
-                      className="hover:cursor-pointer"
+                      className={
+                        selectedVeiculos.find((item) => item.id === veiculo.id)
+                          ? "select-none transition-all bg-card-selected text-primary hover:cursor-pointer my-1 rounded-md px-1"
+                          : "select-none transition-all hover:cursor-pointer my-1 rounded-md px-1 bg-slate-700"
+                      }
                       key={veiculo.id}
                       onClick={() => setSelectedVeiculo(veiculo)}
                       onDoubleClick={() =>
@@ -176,11 +202,11 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                       <div className="flex gap-2 w-full items-center">
                         <p className="text-xs py-2 w-[12%]">{veiculo.frota}</p>
                         <p className="text-xs py-2 w-[38%]">
-                          {veiculo.fabricante?.toUpperCase()}
+                          {veiculo.modelo?.toUpperCase()}
                         </p>
                         <p className="text-xs py-2 w-[23%]">{veiculo.placa}</p>
                         {ultAgendamento(veiculo) === "Nunca foi atendido" ? (
-                          <p className="text-xs py-2 text-red-400 w-[27%]">
+                          <p className="text-xs py-2 text-red-400 font-bold w-[27%]">
                             {ultAgendamento(veiculo)}
                           </p>
                         ) : (
@@ -213,26 +239,71 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
             </Card>
             {/* Veículos selecionados */}
             <Card className="w-full sm:w-[30%] min-w-[300px]">
-              <CardContent className="flex flex-col min-h-[300px] px-2 gap-2 w-full">
-                <h2 className="mb-3 mt-1 text-sm font-bold text-ring">
-                  Veículos para agendamento
-                </h2>
-                {selectedVeiculos.map((veiculo) => (
-                  <div
-                    className="hover:cursor-pointer"
-                    key={veiculo.id}
-                    onDoubleClick={() =>
-                      setSelectedVeiculos((array) => {
-                        const newArray = [...array];
-                        return newArray.filter(
-                          (item) => item.id !== veiculo.id
-                        );
-                      })
-                    }
+              <CardContent className="flex flex-col min-h-[300px] px-2 gap-2 w-full relative">
+                <div className="flex absolute right-0 p-1 gap-1">
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    className="rounded-full bg-transparent hidden"
                   >
-                    <CardVeiculo veiculo={veiculo} />
-                  </div>
-                ))}
+                    <Image
+                      alt="Icon PDF"
+                      src="/pdf_icon.svg"
+                      width={20}
+                      height={20}
+                    />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    className="rounded-full bg-transparent"
+                    onClick={() => setIsDialogAgendamentoOpen(true)}
+                  >
+                    <CircleCheckBig />
+                  </Button>
+                  <DialogAgendamento
+                    setIsOpen={setIsDialogAgendamentoOpen}
+                    isOpen={isDialogAgendamentoOpen}
+                    cliente={cliente}
+                    veiculos={selectedVeiculos}
+                  />
+                </div>
+                <h2 className="mb-3 mt-1 text-sm font-bold text-ring">
+                  Veículos para atendimento
+                </h2>
+                <ScrollArea className="h-72">
+                  {selectedVeiculos.map((veiculo) => (
+                    <div
+                      className="select-none hover:cursor-pointer bg-card-selected rounded-md mb-1 px-2"
+                      key={veiculo.id}
+                      onDoubleClick={() =>
+                        setSelectedVeiculos((array) => {
+                          const newArray = [...array];
+                          return newArray.filter(
+                            (item) => item.id !== veiculo.id
+                          );
+                        })
+                      }
+                    >
+                      <CardVeiculo veiculo={veiculo} />
+                      <div className="w-full">
+                        {" "}
+                        {ultAgendamento(veiculo) === "Nunca foi atendido" ? (
+                          <p className="text-xs py-2 text-red-400 font-bold">
+                            {ultAgendamento(veiculo)}
+                          </p>
+                        ) : (
+                          <div className="flex gap-3">
+                            <p className="text-xs py-2 font-bold">
+                              {ultAgendamento(veiculo)}
+                            </p>
+                            {numDias(ultAgendamento(veiculo))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
