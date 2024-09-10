@@ -32,6 +32,27 @@ interface AgendamentoFull extends Agendamento {
   }[];
 }
 
+function calculatePrice(eixos: number) {
+  switch (eixos) {
+    case 9:
+      return 110;
+    case 8:
+      return 100;
+    case 7:
+      return 90;
+    case 6:
+      return 80;
+    case 5:
+      return 75;
+    case 4:
+      return 70;
+    case 3:
+      return 60;
+    case 2:
+      return 50;
+  }
+}
+
 const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
@@ -160,13 +181,13 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                     isChecked: true,
                     price: thisPrice.price
                       ? thisPrice.price
-                      : veiculo.numEixos * 10,
+                      : calculatePrice(veiculo.numEixos) || 0,
                   });
                 } else {
                   arrayVeiculos.push({
                     veiculo: veiculo,
                     isChecked: false,
-                    price: veiculo.numEixos * 10,
+                    price: calculatePrice(veiculo.numEixos) || 0,
                   });
                 }
               });

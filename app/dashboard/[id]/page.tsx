@@ -20,6 +20,7 @@ import { CircleCheckBig, FileText } from "lucide-react";
 import Image from "next/image";
 import { createAgendamento } from "@/app/actions/post-agendamento";
 import { DialogAgendamento } from "@/components/dialog-agendamento";
+import { generate_PDF } from "@/app/actions/generate-PDF.js";
 
 interface DashboardClienteProps {
   params: {
@@ -150,7 +151,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
           </div>
           <div className="flex w-full flex-col gap-2 items-center sm:items-start sm:flex-row">
             {/* Lista com veículos */}
-            <Card className="w-full sm:w-[40%]">
+            <Card className="w-full sm:w-[40%] print:hidden">
               <CardContent className="h-full flex flex-col px-2 gap-2 w-full min-w-[300px] relative">
                 <div className="flex items-center justify-center absolute right-0 py-1 px-2 gap-1">
                   <input
@@ -244,7 +245,13 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                   <Button
                     variant="outline"
                     size="xs"
-                    className="rounded-full bg-transparent hidden"
+                    className="rounded-full bg-transparent"
+                    onClick={() =>
+                      generate_PDF({
+                        ...cliente,
+                        veiculos: [...selectedVeiculos],
+                      })
+                    }
                   >
                     <Image
                       alt="Icon PDF"

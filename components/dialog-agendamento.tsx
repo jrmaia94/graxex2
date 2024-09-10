@@ -96,6 +96,27 @@ export const DialogAgendamento = ({
     });
   };
 
+  function calculatePrice(eixos: number) {
+    switch (eixos) {
+      case 9:
+        return 110;
+      case 8:
+        return 100;
+      case 7:
+        return 90;
+      case 6:
+        return 80;
+      case 5:
+        return 75;
+      case 4:
+        return 70;
+      case 3:
+        return 60;
+      case 2:
+        return 50;
+    }
+  }
+
   useEffect(() => {
     setVeiculos(() => {
       let newArray: SchemaVeiculo[] = [];
@@ -103,10 +124,10 @@ export const DialogAgendamento = ({
       selectedVeiculos.forEach((item) => {
         newArray.push({
           isChecked: true,
-          price: item.numEixos * 10,
+          price: calculatePrice(item.numEixos) || 0,
           veiculo: item,
         });
-        sum += item.numEixos * 10;
+        sum += calculatePrice(item.numEixos) || 0;
       });
       setPrice(sum);
       return newArray;
@@ -147,7 +168,6 @@ export const DialogAgendamento = ({
                         if (obj.veiculo.id === parseInt(e.target.value))
                           obj.isChecked = e.target.checked;
                       });
-                      console.log(e.target.checked);
                       return newObjs;
                     });
                   }}
@@ -157,7 +177,7 @@ export const DialogAgendamento = ({
                   defaultValue={Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
-                  }).format(item.veiculo.numEixos * 10)}
+                  }).format(calculatePrice(item.veiculo.numEixos) || 0)}
                   onChange={(e) => {
                     setVeiculos((objs) => {
                       let newObjs = [...objs];

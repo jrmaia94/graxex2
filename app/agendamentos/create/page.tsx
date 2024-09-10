@@ -19,6 +19,27 @@ interface SchemaVeiculo {
   price: number;
 }
 
+function calculatePrice(eixos: number) {
+  switch (eixos) {
+    case 9:
+      return 110;
+    case 8:
+      return 100;
+    case 7:
+      return 90;
+    case 6:
+      return 80;
+    case 5:
+      return 75;
+    case 4:
+      return 70;
+    case 3:
+      return 60;
+    case 2:
+      return 50;
+  }
+}
+
 const AgendamentoPage = () => {
   const { data }: { data: any } = useSession({
     required: true,
@@ -77,7 +98,7 @@ const AgendamentoPage = () => {
                 arrayVeiculos.push({
                   veiculo: veiculo,
                   isChecked: true,
-                  price: veiculo.numEixos * 10,
+                  price: calculatePrice(veiculo.numEixos) || 0,
                 });
               });
               setVeiculos(arrayVeiculos || []);
@@ -221,7 +242,7 @@ const AgendamentoPage = () => {
                     defaultValue={Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
-                    }).format(item.veiculo.numEixos * 10)}
+                    }).format(item.price)}
                     onChange={(e) => {
                       setVeiculos((objs) => {
                         let newObjs = [...objs];
