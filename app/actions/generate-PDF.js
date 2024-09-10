@@ -1,10 +1,40 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import myFont from "../../public/fonts/AkcelerAalt.ttf";
+import myFontBold from "../../public/fonts/AkcelerAalt-Bold.ttf";
 
-export const generate_PDF = (data) => {
-  console.log(data);
+function convertArrayBufferToBase64(arrayBuffer) {
+  const chunkSize = 1024; // Ajustar o tamanho do chunk conforme necessário
+  let base64String = "";
+
+  for (let i = 0; i < arrayBuffer.byteLength; i += chunkSize) {
+    const chunk = arrayBuffer.slice(i, i + chunkSize);
+    base64String += btoa(
+      String.fromCharCode.apply(null, new Uint8Array(chunk))
+    );
+  }
+
+  return base64String;
+}
+
+const getBase64 = async (file) => {
+  const response = await fetch(file);
+  const arrayBuffer = await response.arrayBuffer();
+  const base64String = convertArrayBufferToBase64(arrayBuffer);
+  return base64String;
+};
+
+export const generate_PDF = async (data) => {
   // Cria um novo documento PDF
   const doc = new jsPDF();
+
+  /* const fontBase64 = await getBase64(myFont);
+  const fontBase64Bold = await getBase64(myFontBold); */
+
+  /* doc.addFont(fontBase64, "graxexFont", "normal", "normal");
+  doc.addFont(fontBase64Bold, "graxexFont", "normal", "bold"); */
+
+  doc.setFont("helvetica", "normal", "normal");
 
   const size = (num) => {
     return doc.setFontSize(num);
@@ -15,7 +45,7 @@ export const generate_PDF = (data) => {
       case "normal":
         return doc.setFont("helvetica", "normal", "normal");
       case "bold":
-        return doc.setFont("helvetica", "normal", "bold");
+        return doc.setFont("helvetica", "normal", "normal");
     }
   };
 
@@ -30,16 +60,16 @@ export const generate_PDF = (data) => {
   // Cabeçalho
   let inicioCabecalho = 30;
   size(24);
-  weight("bold");
+  //weight("bold");
   doc.text("Graxex Lubrificação", 95, inicioCabecalho);
   size(12);
-  weight("bold");
+  //weight("bold");
   doc.text("CNPJ:", 95, inicioCabecalho + 5);
-  weight("normal");
+  //weight("normal");
   doc.text("55.520.215/0001-25", 108, inicioCabecalho + 5);
-  weight("bold");
+  //weight("bold");
   doc.text("Telefone:", 95, inicioCabecalho + 10);
-  weight("normal");
+  //weight("normal");
   doc.text("(64)9.9203-2083", 114, inicioCabecalho + 10);
 
   // Título
@@ -54,6 +84,7 @@ export const generate_PDF = (data) => {
       align: "center",
     }
   );
+
   doc.setDrawColor(200, 200, 200);
 
   // Cabeçalho cliente
@@ -154,6 +185,7 @@ export const generate_PDF = (data) => {
 
     return [
       item.placa,
+      item.frota,
       `${item.fabricante}\n${item.modelo}`,
       dataUltAgend,
       numDias,
@@ -163,7 +195,7 @@ export const generate_PDF = (data) => {
   let inicioTabela = 100;
 
   autoTable(doc, {
-    head: [["Placa", "Veículo", "Ultimo atendimento", "Dias"]],
+    head: [["Placa", "Frota", "Veículo", "Ultimo atendimento", "Dias"]],
     body: dados,
     tableWidth: doc.internal.pageSize.getWidth() - 40,
     startY: inicioTabela,
@@ -182,10 +214,10 @@ export const generate_PDF = (data) => {
       0: {
         fontStyle: "bold",
       },
-      1: {
+      2: {
         cellWidth: 65,
       },
-      3: {
+      4: {
         fontStyle: "bold",
         textColor: [238, 78, 54],
       },
