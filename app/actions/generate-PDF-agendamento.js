@@ -5,7 +5,7 @@ import "../../public/fonts/AkcelerAalt-bold";
 import "../../public/fonts/AkcelerAalt-Medium-normal";
 import "../../public/fonts/Satisfy-Regular-normal";
 
-export const generate_PDF = (data) => {
+export const generate_PDF_Agendamento = (data) => {
   // Cria um novo documento PDF
   const doc = new jsPDF({
     orientation: "p",
@@ -64,7 +64,7 @@ export const generate_PDF = (data) => {
   doc.setFontSize(24);
   weight("bold");
   doc.text(
-    "Relatório de Atendimento de Frota",
+    "Relatório de Atendimento da Frota",
     doc.internal.pageSize.getWidth() / 2,
     65,
     {
@@ -88,28 +88,28 @@ export const generate_PDF = (data) => {
   doc.text("Cliente:", 22, inicioCabecalhoCliente + 7);
   weight("bold");
   doc.text(
-    data.name,
+    data.cliente.name,
     label.getTextWidth("Cliente:") + 22 + 2,
     inicioCabecalhoCliente + 7
   );
 
-  if (data.CPFCNPJ && data.CPFCNPJ !== "") {
+  if (data.cliente.CPFCNPJ && data.cliente.CPFCNPJ !== "") {
     weight("normal");
     doc.text("CNPJ/CPF:", 22, inicioCabecalhoCliente + 13);
     weight("bold");
     doc.text(
-      data.CPFCNPJ || "",
+      data.cliente.CPFCNPJ || "",
       label.getTextWidth("CNPJ/CPF:") + 22 + 2,
       inicioCabecalhoCliente + 13
     );
   }
 
-  if (data.address && data.address !== "") {
+  if (data.cliente.address && data.cliente.address !== "") {
     weight("normal");
     doc.text("Endereço:", 22, inicioCabecalhoCliente + 19);
     weight("bold");
     doc.text(
-      data.address || "",
+      data.cliente.address || "",
       label.getTextWidth("Endereço:") + 22 + 2,
       inicioCabecalhoCliente + 19
     );
@@ -122,103 +122,36 @@ export const generate_PDF = (data) => {
     inicioCabecalhoCliente + 23
   );
 
+  console.log(data);
+
   // Tabela
-  const dados = data.veiculos.map((item) => {
-    let dataUltAgend = "--";
-    let numDias = 0;
-    if (item.agendamentos.length === 0) {
-      dataUltAgend = "--";
-      numDias = "Nunca foi atendido";
-    } else if (item.agendamentos.length === 1) {
-      if (item.agendamentos[0].agendamento.serviceCompleted) {
-        dataUltAgend = Intl.DateTimeFormat("pt-br", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }).format(item.agendamentos[0].agendamento.serviceCompleted);
-        numDias = parseInt(
-          (new Date(Date.now()) -
-            new Date(item.agendamentos[0].agendamento.serviceCompleted)) /
-            1000 /
-            60 /
-            60 /
-            24
-        );
-      } else {
-        dataUltAgend = "";
-        numDias = "Nunca foi atendido";
-      }
-    } else if (item.agendamentos.length > 1) {
-      let agendamentosCompleted = [];
-      item.agendamentos.forEach((item) => {
-        if (item.agendamento.serviceCompleted) {
-          agendamentosCompleted.push(item.agendamento);
-        }
-      });
+  const dados = data.agendamento.veiculos.map((item) => {
+    let price = Intl.NumberFormat("pt-br", {
+      style: "currency",
+      currency: "BRL",
+    })
+      .format(
+        data.agendamento.pricePerVeiculo.find(
+          (itemPP) => itemPP.veiculoId === item.id
+        ).price
+      )
+      .replace("R$", "")
+      .trim();
 
-      if (agendamentosCompleted.length > 0) {
-        dataUltAgend = Intl.DateTimeFormat("pt-br", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(
-          agendamentosCompleted
-            .sort((a, b) => {
-              return b - a;
-            })[0]
-            .serviceCompleted.getTime()
-        );
-        numDias = parseInt(
-          (new Date(Date.now()) -
-            new Date(
-              agendamentosCompleted.sort((a, b) => {
-                return b - a;
-              })[0].serviceCompleted
-            )) /
-            1000 /
-            60 /
-            60 /
-            24
-        );
-      } else {
-        dataUltAgend = "Nunca foi atendido";
-        numDias = "";
-      }
-    }
-
+    console.log(price);
     return [
       item.placa,
       item.frota,
       `${item.fabricante}\n${item.modelo}`,
-      dataUltAgend,
-      numDias,
+      `R$ ${price}`,
+      item.observacao || "",
     ];
   });
 
   let inicioTabela = inicioCabecalhoCliente + 30;
 
-  /*   doc.autoTable({
-    dados: dados,
-    afterPageContent: function (data) {
-      // Calcular a posição do rodapé
-      const str = `"Nossa missão é levar conveniência, aumentar a durabilidade e maximizar sua eficiência."`;
-      const pageSize = doc.internal.pageSize;
-      const pageHeight = pageSize.height
-        ? pageSize.height
-        : pageSize.getHeight();
-      const position = pageHeight - 20; // Ajustar a posição conforme necessário
-
-      // Adicionar o rodapé
-      doc.setFontSize(15);
-      doc.setFont("Satisfy-Regular", "normal", "normal");
-      doc.text(str, 20, position, {
-        maxWidth: doc.internal.pageSize.getWidth() - 40,
-      });
-    },
-  }); */
-
   autoTable(doc, {
-    head: [["Placa", "Frota", "Veículo", "Ultimo atendimento", "Dias"]],
+    head: [["Placa", "Frota", "Veículo", "Preço", "Obs"]],
     body: dados,
     tableWidth: doc.internal.pageSize.getWidth() - 40,
     startY: inicioTabela,
@@ -228,6 +161,29 @@ export const generate_PDF = (data) => {
       font: "AkcelerAalt",
       halign: "center",
       valign: "middle",
+    },
+    foot: [
+      [
+        "",
+        "",
+        "",
+        "TOTAL",
+        `R$ ${Intl.NumberFormat("pt-br", {
+          style: "currency",
+          currency: "BRL",
+        })
+          .format(data.agendamento.price)
+          .replace("R$", "")
+          .trim()}`,
+      ],
+    ],
+    showHead: "firstPage",
+    showFoot: "lastPage",
+    footStyles: {
+      halign: "right",
+      valign: "middle",
+      font: "AkcelerAalt-Medium",
+      fillColor: [242, 133, 54],
     },
     headStyles: {
       halign: "center",
@@ -242,8 +198,12 @@ export const generate_PDF = (data) => {
       2: {
         cellWidth: 65,
       },
+      3: {
+        cellWidth: 30,
+      },
       4: {
-        font: "AkcelerAalt-Medium",
+        font: "AkcelerAalt",
+        fontSize: 10,
         textColor: [238, 78, 54],
       },
     },
@@ -269,18 +229,5 @@ export const generate_PDF = (data) => {
       });
     },
   });
-
-  size(10);
-  doc.setTextColor(238, 78, 54);
-  //doc.text(
-  //  `"Nossa missão é levar conveniência, aumentar a durabilidade e maximizar sua eficiência."`,
-  //  doc.internal.pageSize.getWidth() / 2,
-  //  doc.internal.pageSize.getHeight() - 20,
-  //  {
-  //    maxWidth: doc.internal.pageSize.getWidth() - 40,
-  //    align: "center",
-  //  }
-  //);
-
   window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
 };

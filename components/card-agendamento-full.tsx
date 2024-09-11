@@ -5,6 +5,9 @@ import CardVeiculo from "./card-veiculo";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Edit } from "lucide-react";
 import Link from "next/link";
+import { Button } from "./ui/button";
+import Image from "next/image";
+import { generate_PDF_Agendamento } from "@/app/actions/generate-PDF-agendamento";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -23,9 +26,32 @@ const CardAgendamentoFull = ({
     <Card>
       <CardContent className="flex max-h-[70vh] flex-col gap-0 overflow-hidden p-2">
         <div className="flex w-full justify-end py-1 pe-2 relative">
-          <Link href={`/agendamentos/${agendamento.id}`}>
-            <Edit className="absolute top-1 left-1" />
-          </Link>
+          <div className="absolute top-0 left-1 flex gap-1">
+            <Link
+              className="flex items-center"
+              href={`/agendamentos/${agendamento.id}`}
+            >
+              <Edit />
+            </Link>
+            <Button
+              variant="outline"
+              size="xs"
+              className="rounded-full bg-transparent"
+              onClick={() =>
+                generate_PDF_Agendamento({
+                  cliente: cliente,
+                  agendamento: agendamento,
+                })
+              }
+            >
+              <Image
+                alt="Icon PDF"
+                src="/pdf_icon.svg"
+                width={20}
+                height={20}
+              />
+            </Button>
+          </div>
           <p className="text-lg italic">
             {Intl.DateTimeFormat("pt-BR", {
               day: "2-digit",

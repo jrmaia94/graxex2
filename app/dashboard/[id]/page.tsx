@@ -145,13 +145,13 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
     <div className="flex flex-col p-4">
       {isPending && <Loader />}
       {cliente && (
-        <div className="">
-          <div>
+        <div className="w-full flex flex-col md:items-center">
+          <div className="md:max-w-[864px] md:w-full">
             <CardCliente cliente={cliente} />
           </div>
-          <div className="flex w-full flex-col gap-2 items-center sm:items-start sm:flex-row">
+          <div className="flex flex-col gap-2 md:max-w-[864px] md:w-full items-center md:items-start md:flex-row">
             {/* Lista com veículos */}
-            <Card className="w-full sm:w-[40%] print:hidden">
+            <Card className="w-full md:w-[57%] print:hidden">
               <CardContent className="h-full flex flex-col px-2 gap-2 w-full min-w-[300px] relative">
                 <div className="flex items-center justify-center absolute right-0 py-1 px-2 gap-1">
                   <input
@@ -220,7 +220,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
               </CardContent>
             </Card>
             {/* Informação do veículo selecionado
-            <Card className="w-full sm:w-[30%]">
+            <Card className="w-full md:w-[30%]">
               <CardContent className="flex-col px-2 gap-2 w-full flex">
                 <h2 className="mb-3 mt-1 text-sm font-bold text-ring">
                   Agendamentos do veículo
@@ -239,7 +239,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
               </CardContent>
             </Card>
             {/* Veículos selecionados */}
-            <Card className="w-full sm:w-[30%] min-w-[300px]">
+            <Card className="w-full md:w-[43%]">
               <CardContent className="flex flex-col min-h-[300px] px-2 gap-2 w-full relative">
                 <div className="flex absolute right-0 p-1 gap-1">
                   <Button
