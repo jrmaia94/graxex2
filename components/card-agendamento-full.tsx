@@ -69,7 +69,7 @@ const CardAgendamentoFull = ({
           <ScrollArea className="h-72 w-full rounded-md border-none">
             {veiculos.map((veiculo) => (
               <div key={veiculo.id} className="border-b border-solid p-2">
-                <CardVeiculo veiculo={veiculo} />
+                <CardVeiculo veiculo={{ ...veiculo, cliente: cliente }} />
               </div>
             ))}
             <ScrollBar />

@@ -8,7 +8,11 @@ export const getAgendamentosFuturos = async (user: User) => {
       include: {
         cliente: {
           include: {
-            veiculos: true,
+            veiculos: {
+              include: {
+                cliente: true,
+              },
+            },
           },
         },
         veiculos: {
@@ -41,7 +45,11 @@ export const getAgendamentosFinalizados = async (user: User) => {
       include: {
         cliente: {
           include: {
-            veiculos: true,
+            veiculos: {
+              include: {
+                cliente: true,
+              },
+            },
           },
         },
         veiculos: {
@@ -114,7 +122,9 @@ export const getAgendamentoById = async (id: number, user: User) => {
         cliente: true,
         veiculos: {
           include: {
-            veiculo: true,
+            veiculo: {
+              include: { cliente: true },
+            },
           },
         },
       },
