@@ -13,6 +13,8 @@ import Link from "next/link";
 import { Agendamento, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { getSomeVeiculos } from "@/app/actions/get-veiculos";
+import { useTransition } from "react";
+import Loader from "./loader";
 
 const formSchema = z.object({
   param: z.string().trim(),
@@ -22,6 +24,7 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,50 +34,53 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
 
   const handleSubmit = (formData: z.infer<typeof formSchema>) => {
     if (data?.user) {
-      switch (origin) {
-        case "clientes":
-          getSomeClientes(formData.param, data.user)
-            .then((res) => {
-              return action(res);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Não foi possível buscar os clientes");
-            });
-          break;
-        case "veiculos":
-          getSomeVeiculos(formData.param, data.user)
-            .then((res) => {
-              return action(res);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Não foi possível buscar os veículos");
-            });
-          break;
-        case "agendamentos":
-          getSomeClientes(formData.param, data.user)
-            .then((res) => {
-              let agendamentos: Agendamento[] = [];
-              res.map((cliente) => {
-                cliente.agendamentos.map((agendamento) =>
-                  agendamentos.push(agendamento)
-                );
+      startTransition(() => {
+        switch (origin) {
+          case "clientes":
+            getSomeClientes(formData.param, data.user)
+              .then((res) => {
+                return action(res);
+              })
+              .catch((err) => {
+                console.log(err);
+                toast.error("Não foi possível buscar os clientes");
               });
-              return action(agendamentos);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Não foi possível buscar os clientes");
-            });
-          break;
-        default:
-          break;
-      }
+            break;
+          case "veiculos":
+            getSomeVeiculos(formData.param, data.user)
+              .then((res) => {
+                return action(res);
+              })
+              .catch((err) => {
+                console.log(err);
+                toast.error("Não foi possível buscar os veículos");
+              });
+            break;
+          case "agendamentos":
+            getSomeClientes(formData.param, data.user)
+              .then((res) => {
+                let agendamentos: Agendamento[] = [];
+                res.map((cliente) => {
+                  cliente.agendamentos.map((agendamento) =>
+                    agendamentos.push(agendamento)
+                  );
+                });
+                return action(agendamentos);
+              })
+              .catch((err) => {
+                console.log(err);
+                toast.error("Não foi possível buscar os clientes");
+              });
+            break;
+          default:
+            break;
+        }
+      });
     }
   };
   return (
     <Form {...form}>
+      {isPending && <Loader />}
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
         className="flex gap-2 w-full"

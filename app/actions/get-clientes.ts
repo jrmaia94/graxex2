@@ -77,6 +77,7 @@ export const getFullClienteById = async (id: number, user: User) => {
                 agendamento: true,
               },
             },
+            cliente: true,
           },
         },
         agendamentos: true,

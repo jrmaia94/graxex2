@@ -13,7 +13,11 @@ export const getAgendamentosFuturos = async (user: User) => {
         },
         veiculos: {
           include: {
-            veiculo: true,
+            veiculo: {
+              include: {
+                cliente: true,
+              },
+            },
           },
         },
       },
@@ -42,7 +46,11 @@ export const getAgendamentosFinalizados = async (user: User) => {
         },
         veiculos: {
           include: {
-            veiculo: true,
+            veiculo: {
+              include: {
+                cliente: true,
+              },
+            },
           },
         },
       },
@@ -68,11 +76,21 @@ export const getAllAgendamentos = async (user: User) => {
       include: {
         veiculos: {
           include: {
-            veiculo: true,
+            veiculo: {
+              include: {
+                cliente: true,
+              },
+            },
           },
         },
         cliente: {
-          include: { veiculos: true },
+          include: {
+            veiculos: {
+              include: {
+                cliente: true,
+              },
+            },
+          },
         },
       },
       orderBy: {

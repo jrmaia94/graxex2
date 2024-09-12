@@ -34,6 +34,7 @@ interface AgendamentosPorVeiculosFull extends AgendamentosPorVeiculos {
 
 interface VeiculoFull extends Veiculo {
   agendamentos: AgendamentosPorVeiculosFull[];
+  cliente: Cliente;
 }
 
 interface ClienteFull extends Cliente {
@@ -217,25 +218,6 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                     </div>
                   ))}
                 </ScrollArea>
-              </CardContent>
-            </Card>
-            {/* Informação do veículo selecionado
-            <Card className="w-full md:w-[30%]">
-              <CardContent className="flex-col px-2 gap-2 w-full flex">
-                <h2 className="mb-3 mt-1 text-sm font-bold text-ring">
-                  Agendamentos do veículo
-                </h2>
-                {cliente.veiculos
-                  .find((veiculo) => veiculo.id === selectedVeiculo?.id)
-                  ?.agendamentos.map((item, index) => (
-                    <p key={index}>
-                      {Intl.DateTimeFormat("pt-BR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      }).format(item.agendamento.date)}
-                    </p>
-                  ))}
               </CardContent>
             </Card>
             {/* Veículos selecionados */}

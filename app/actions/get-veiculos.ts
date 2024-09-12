@@ -60,6 +60,9 @@ export const getAllVeiculos = async (user: User) => {
       orderBy: {
         clienteId: "asc",
       },
+      include: {
+        cliente: true,
+      },
     });
     return veiculos;
   } else {
@@ -73,10 +76,32 @@ export const getVeiculoById = async (id: number, user: User) => {
       where: {
         id: id,
       },
+      include: {
+        cliente: true,
+      },
     });
     return veiculo;
   } else {
     throw Error("Usuário não autorizado!");
+  }
+};
+
+export const getFullVeiculoById = async (id: number, user: User) => {
+  if (user.perfil) {
+    const veiculo = await prisma.veiculo.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        agendamentos: {
+          include: {
+            agendamento: true,
+          },
+        },
+        cliente: true,
+      },
+    });
+    return veiculo;
   }
 };
 

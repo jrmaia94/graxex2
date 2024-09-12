@@ -5,8 +5,12 @@ import { getAllClientes, getClienteById } from "@/app/actions/get-clientes";
 import { updateAgendamento } from "@/app/actions/update-agendamento";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
+import { JsonValue } from "@prisma/client/runtime/library";
+import { CircleAlert } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +21,7 @@ interface SchemaVeiculo {
   veiculo: Veiculo;
   isChecked: boolean;
   price: number;
+  observacao: string;
 }
 
 interface UpdateAgendamentoPageProps {
@@ -75,18 +80,34 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
 
   type UpdatedAgendamento = Pick<
     Agendamento,
-    "clienteId" | "date" | "serviceCompleted" | "id"
+    "clienteId" | "date" | "serviceCompleted" | "id" | "pricePerVeiculo"
   >;
 
   interface PricePerVeiculo {
     veiculoId: number;
     price: number;
+    observacao: string;
   }
   const formSubmit = (e: any) => {
     e.preventDefault();
 
     startTransition(() => {
       if (selectedCliente?.id) {
+        const selectedVeiculos: Veiculo[] = [];
+        veiculos.forEach((item) => {
+          item.isChecked && selectedVeiculos.push(item.veiculo);
+        });
+        let prices: JsonValue = [];
+        veiculos.forEach((item) => {
+          if (item.isChecked) {
+            prices.push({
+              price: item.price,
+              veiculoId: item.veiculo.id,
+              observacao: item.observacao,
+            });
+          }
+        });
+
         const updatedAgendamento: UpdatedAgendamento = {
           id: parseInt(idRef.current.value),
           clienteId: selectedCliente.id,
@@ -94,11 +115,8 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
           serviceCompleted: isDone
             ? new Date(new Date(dateIsDoneRef.current.value).setUTCHours(12))
             : null,
+          pricePerVeiculo: prices,
         };
-        const selectedVeiculos: Veiculo[] = [];
-        veiculos.forEach((item) => {
-          item.isChecked && selectedVeiculos.push(item.veiculo);
-        });
 
         data?.user &&
           updateAgendamento(updatedAgendamento, selectedVeiculos, data.user)
@@ -179,6 +197,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                   arrayVeiculos.push({
                     veiculo: veiculo,
                     isChecked: true,
+                    observacao: thisPrice.observacao,
                     price: thisPrice.price
                       ? thisPrice.price
                       : calculatePrice(veiculo.numEixos) || 0,
@@ -187,6 +206,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                   arrayVeiculos.push({
                     veiculo: veiculo,
                     isChecked: false,
+                    observacao: "",
                     price: calculatePrice(veiculo.numEixos) || 0,
                   });
                 }
@@ -331,6 +351,42 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                     type="text"
                     className="h-7 max-w-[100px] rounded-sm text-primary-foreground me-2 text-end px-1"
                   />
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        className="p-0 me-2 hover:bg-transparent hover:text-yellow-400"
+                        asChild
+                      >
+                        <CircleAlert />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent aria-describedby="">
+                      <div className="flex flex-col gap-1 items-end">
+                        <label className="w-full">
+                          Observações sobre o veículo
+                        </label>
+                        <Input
+                          defaultValue={item.observacao}
+                          className="bg-primary text-primary-foreground"
+                          type="text"
+                          id={item.veiculo.id.toString()}
+                          onBlur={(e) => {
+                            setVeiculos((objs) => {
+                              let newObjs = [...objs];
+                              newObjs.forEach((obj) => {
+                                if (obj.veiculo.id === parseInt(e.target.id)) {
+                                  obj.observacao = e.target.value;
+                                }
+                              });
+                              return newObjs;
+                            });
+                          }}
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <span className="text-wrap truncate">
                     {item.veiculo.fabricante} - {item.veiculo.modelo}
                   </span>

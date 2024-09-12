@@ -3,23 +3,34 @@
 import Search from "@/components/search";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2Icon } from "lucide-react";
+import { EyeIcon, Trash2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Veiculo } from "@prisma/client";
+import { Cliente, Veiculo } from "@prisma/client";
 import CardVeiculo from "@/components/card-veiculo";
 import { getAllVeiculos } from "../actions/get-veiculos";
 import { deleteVeiculoById } from "../actions/delete-veiculos";
 import Loader from "@/components/loader";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import CardVeiculoFull from "@/components/card-veiculo-full";
+
+interface VeiculoFull extends Veiculo {
+  cliente: Cliente;
+}
 
 const PageVeiculos = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
   const [isPending, startTransition] = useTransition();
-  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
+  const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
 
   useEffect(() => {
     startTransition(() => {
@@ -35,8 +46,6 @@ const PageVeiculos = () => {
     });
   }, [data]);
 
-  useEffect(() => {}, [veiculos]);
-
   return (
     <div className="flex justify-center">
       <div className="px-4 w-full max-w-[600px]">
@@ -50,12 +59,9 @@ const PageVeiculos = () => {
         <div className="flex flex-col gap-1">
           {veiculos?.map((veiculo) => (
             <Card key={veiculo.id}>
-              <CardContent className="p-2 flex justify-between">
+              <CardContent className="p-2 h-20 flex justify-between">
                 <CardVeiculo veiculo={veiculo} />
-                <div className="flex flex-col justify-center gap-5 px-4">
-                  <Link href={`/veiculos/${veiculo.id}`} className="p-0 m-0">
-                    <Edit size={20} />
-                  </Link>
+                <div className="relative flex flex-col justify-center gap-2 px-4">
                   <Button
                     onClick={() => {
                       data?.user &&
@@ -74,10 +80,29 @@ const PageVeiculos = () => {
                           });
                     }}
                     variant="ghost"
-                    className="p-0 m-0 h-5"
+                    className="p-0 m-0 h-5 absolute right-1 bottom-1"
                   >
                     <Trash2Icon size={20} />
                   </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        className="p-0 m-0 h-5 absolute right-1 top-1"
+                      >
+                        <EyeIcon size={20} />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="left-1/2 top-1/2 max-h-[600px] w-[90%] p-5">
+                      <DialogHeader>
+                        <DialogTitle></DialogTitle>
+                      </DialogHeader>
+                      <div className="w-[100%]">
+                        <CardVeiculoFull veiculo={veiculo} />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardContent>
             </Card>

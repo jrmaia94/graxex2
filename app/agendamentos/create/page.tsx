@@ -4,9 +4,18 @@ import { getAllClientes, getClienteById } from "@/app/actions/get-clientes";
 import { createAgendamento } from "@/app/actions/post-agendamento";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
+import { CircleAlert } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +26,7 @@ interface SchemaVeiculo {
   veiculo: Veiculo;
   isChecked: boolean;
   price: number;
+  observacao: string;
 }
 
 function calculatePrice(eixos: number) {
@@ -99,6 +109,7 @@ const AgendamentoPage = () => {
                   veiculo: veiculo,
                   isChecked: true,
                   price: calculatePrice(veiculo.numEixos) || 0,
+                  observacao: "",
                 });
               });
               setVeiculos(arrayVeiculos || []);
@@ -120,6 +131,7 @@ const AgendamentoPage = () => {
           prices.push({
             veiculoId: item.veiculo.id,
             price: item.price,
+            observacao: item.observacao,
           });
         }
       });
@@ -218,9 +230,12 @@ const AgendamentoPage = () => {
             <span>marcar todos</span>
           </div>
           <ScrollArea className="h-[150px] w-full max-w-[500px] rounded-md border border-primary p-2 mb-2">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
               {veiculos.map((item) => (
-                <div key={item.veiculo.id} className="h-6 flex w-full">
+                <div
+                  key={item.veiculo.id}
+                  className="h-fit flex items-center w-full"
+                >
                   <input
                     checked={item.isChecked}
                     type="checkbox"
@@ -271,6 +286,42 @@ const AgendamentoPage = () => {
                     type="text"
                     className="h-7 max-w-[100px] rounded-sm text-primary-foreground me-2 text-end px-1"
                   />
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        className="p-0 me-2 hover:bg-transparent hover:text-yellow-400"
+                        asChild
+                      >
+                        <CircleAlert />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent aria-describedby="">
+                      <div className="flex flex-col gap-1 items-end">
+                        <label className="w-full">
+                          Observações sobre o veículo
+                        </label>
+                        <Input
+                          defaultValue={item.observacao}
+                          className="bg-primary text-primary-foreground"
+                          type="text"
+                          id={item.veiculo.id.toString()}
+                          onBlur={(e) => {
+                            setVeiculos((objs) => {
+                              let newObjs = [...objs];
+                              newObjs.forEach((obj) => {
+                                if (obj.veiculo.id === parseInt(e.target.id)) {
+                                  obj.observacao = e.target.value;
+                                }
+                              });
+                              return newObjs;
+                            });
+                          }}
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <span className="text-wrap truncate">
                     {item.veiculo.fabricante} - {item.veiculo.modelo}
                   </span>

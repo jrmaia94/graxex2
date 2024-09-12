@@ -6,6 +6,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,11 +25,13 @@ import { JsonValue } from "@prisma/client/runtime/library";
 import { createAgendamento } from "@/app/actions/post-agendamento";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { CircleAlert } from "lucide-react";
 
 interface SchemaVeiculo {
   veiculo: Veiculo;
   isChecked: boolean;
   price: number;
+  observacao: string;
 }
 
 export const DialogAgendamento = ({
@@ -61,6 +64,7 @@ export const DialogAgendamento = ({
           prices.push({
             veiculoId: item.veiculo.id,
             price: item.price,
+            observacao: item.observacao,
           });
         }
       });
@@ -126,6 +130,7 @@ export const DialogAgendamento = ({
           isChecked: true,
           price: calculatePrice(item.numEixos) || 0,
           veiculo: item,
+          observacao: "",
         });
         sum += calculatePrice(item.numEixos) || 0;
       });
@@ -153,9 +158,12 @@ export const DialogAgendamento = ({
           <CardCliente cliente={cliente} />
         </div>
         <ScrollArea className="h-[150px] w-full max-w-[500px] rounded-md border border-primary p-2">
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             {veiculos.map((item) => (
-              <div key={item.veiculo.id} className="h-6 flex w-full">
+              <div
+                key={item.veiculo.id}
+                className="h-fit flex items-center w-full"
+              >
                 <input
                   checked={item.isChecked}
                   type="checkbox"
@@ -206,6 +214,42 @@ export const DialogAgendamento = ({
                   type="text"
                   className="h-7 max-w-[100px] rounded-sm text-primary-foreground me-2 text-end px-1"
                 />
+                <Dialog>
+                  <DialogTrigger>
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      className="p-0 me-2 hover:bg-transparent hover:text-yellow-400"
+                      asChild
+                    >
+                      <CircleAlert />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent aria-describedby="">
+                    <div className="flex flex-col gap-1 items-end">
+                      <label className="w-full">
+                        Observações sobre o veículo
+                      </label>
+                      <Input
+                        defaultValue={item.observacao}
+                        className="bg-primary text-primary-foreground"
+                        type="text"
+                        id={item.veiculo.id.toString()}
+                        onBlur={(e) => {
+                          setVeiculos((objs) => {
+                            let newObjs = [...objs];
+                            newObjs.forEach((obj) => {
+                              if (obj.veiculo.id === parseInt(e.target.id)) {
+                                obj.observacao = e.target.value;
+                              }
+                            });
+                            return newObjs;
+                          });
+                        }}
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
                 <span className="text-wrap truncate">
                   {item.veiculo.fabricante} - {item.veiculo.modelo}
                 </span>
