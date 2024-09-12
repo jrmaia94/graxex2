@@ -75,18 +75,32 @@ const Home = () => {
   }, [data]);
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full max-w-[920px] flex flex-col items-center">
+    <div className="flex justify-center mt-[90px]">
+      <div className="w-full max-w-[920px] flex flex-col items-center relative">
         {isPending && <Loader />}
-        <Image
-          alt="Foto graxex"
-          src="/background.jpeg"
-          className="max-h-[300px] w-full object-cover opacity-80"
-          height={1000}
-          width={1000}
-        />
+        {/*         <div
+          className="
+          absolute
+          opacity-40
+          rounded-full
+          top-[-150px]
+          right-0
+          flex
+          align-bottom
+          overflow-hidden
+          w-[250px]
+          h-[450px]"
+        >
+          <Image
+            alt="Foto graxex"
+            src="/background.jpeg"
+            className="object-none "
+            width={600}
+            height={600}
+          />
+        </div> */}
         <div className="px-4 w-full max-w-[600px]">
-          <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
+          {/*           <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
             Agendamentos
           </h2>
           <ScrollArea className="h-72 whitespace-nowrap">
@@ -98,11 +112,11 @@ const Home = () => {
               );
             })}
             <ScrollBar className="bg-ring rounded-xl" />
-          </ScrollArea>
+          </ScrollArea> */}
           <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
             Pre-Agendamentos
           </h2>
-          <ScrollArea className="h-72 whitespace-nowrap">
+          <ScrollArea className="h-[600px] whitespace-nowrap">
             {agendamentosFinalizados.map((agendamento) => {
               return (
                 <div className="pb-2" key={agendamento.id}>

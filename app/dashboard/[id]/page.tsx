@@ -143,7 +143,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
   }, [params, data]);
 
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex flex-col p-4 mt-[90px]">
       {isPending && <Loader />}
       {cliente && (
         <div className="w-full flex flex-col md:items-center">

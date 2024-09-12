@@ -181,7 +181,7 @@ const AgendamentoPage = () => {
   };
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-[90px]">
       <div className="px-8 pt-8 w-full max-w-[600px]">
         {isPending && <Loader />}
         <form className="flex flex-col" onSubmit={(e) => e.stopPropagation()}>

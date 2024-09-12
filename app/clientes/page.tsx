@@ -62,7 +62,7 @@ const Clientes = () => {
       });
   }, [data]);
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-[90px]">
       <div className="px-4 w-full max-w-[600px]">
         {isPending && <Loader />}
         <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">

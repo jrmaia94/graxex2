@@ -189,7 +189,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   }, [veiculoFoto]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-[90px]">
       <div className="px-8 pt-8 w-full max-w-[600px]">
         {isPending && <Loader />}
         <form

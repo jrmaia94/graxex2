@@ -47,16 +47,18 @@ const PageVeiculos = () => {
   }, [data]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-[90px]">
       <div className="px-4 w-full max-w-[600px]">
         {isPending && <Loader />}
-        <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
-          Veiculos
-        </h2>
-        <div className="mb-3 flex w-full gap-2">
-          <Search origin="veiculos" action={setVeiculos} />
+        <div className="w-full left-0 top-[90px] px-4 z-10 bg-gray-800/[.97] fixed flex flex-col">
+          <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
+            Veiculos
+          </h2>
+          <div className="mb-3 flex w-full gap-2">
+            <Search origin="veiculos" action={setVeiculos} />
+          </div>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 mt-[120px]">
           {veiculos?.map((veiculo) => (
             <Card key={veiculo.id}>
               <CardContent className="p-2 h-20 flex justify-between">

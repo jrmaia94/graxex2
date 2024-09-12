@@ -22,7 +22,7 @@ const Header = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   return (
-    <Card className="border-none">
+    <Card className="border-none h-[90px] z-50 fixed top-0 left-0 w-full bg-gray-800/[.97]">
       <CardContent className="p-5">
         <div className="flex flex-row items-center justify-between">
           <Link href="/">
