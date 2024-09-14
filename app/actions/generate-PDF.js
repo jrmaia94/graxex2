@@ -124,7 +124,6 @@ export const generate_PDF = (data) => {
 
   // Tabela
   const dados = data.veiculos.map((item) => {
-    console.log(item);
     let dataUltAgend = "--";
     let numDias = 0;
     if (item.agendamentos.length === 0) {
