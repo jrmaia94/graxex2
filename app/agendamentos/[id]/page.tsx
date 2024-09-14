@@ -1,20 +1,18 @@
 "use client";
 
-import { getAgendamentoById } from "@/app/actions/get-agendamentos";
-import { getAllClientes, getClienteById } from "@/app/actions/get-clientes";
 import { updateAgendamento } from "@/app/actions/update-agendamento";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { AgendamentoFull, DataContext } from "@/providers/store";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
 import { CircleAlert } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useContext, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 interface SchemaVeiculo {
@@ -28,13 +26,6 @@ interface UpdateAgendamentoPageProps {
   params: {
     id: string;
   };
-}
-
-interface AgendamentoFull extends Agendamento {
-  cliente: Cliente;
-  veiculos: {
-    veiculo: Veiculo;
-  }[];
 }
 
 function calculatePrice(eixos: number) {
@@ -62,6 +53,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
   const idRef = useRef<any>(null);
   const clienteRef = useRef<any>(null);
   const dateRef = useRef<any>(null);
@@ -71,7 +63,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
 
   const [agendamento, setAgendamento] = useState<AgendamentoFull | null>();
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [selectedCliente, setSelectedCliente] = useState<Cliente>();
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
   const [veiculos, setVeiculos] = useState<SchemaVeiculo[]>([]);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
@@ -83,11 +75,6 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
     "clienteId" | "date" | "serviceCompleted" | "id" | "pricePerVeiculo"
   >;
 
-  interface PricePerVeiculo {
-    veiculoId: number;
-    price: number;
-    observacao: string;
-  }
   const formSubmit = (e: any) => {
     e.preventDefault();
 
@@ -134,17 +121,41 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
 
   useEffect(() => {
     startTransition(() => {
-      data?.user &&
-        getAllClientes(data.user)
+      if (data?.user && dados?.clientes && dados?.agendamentos && params.id) {
+        setClientes(dados.clientes);
+        let localAgendamento = dados.agendamentos.find(
+          (item) => item.id === parseInt(params.id.toString())
+        );
+
+        setAgendamento(localAgendamento);
+        setSelectedCliente(localAgendamento?.cliente || null);
+        /*         getAllClientes(data.user)
           .then((res) => {
             setClientes(res);
           })
           .catch((err) => {
             console.log(err);
-            toast.error("Não possível buscar os clientes!");
-          });
+            }); */
+      } else {
+        toast.error("Não possível encontrar dados cadastrados!");
+      }
     });
-  }, [data]);
+  }, [data, dados, params]);
+
+  /*   useEffect(() => {
+    if (params.id) {
+      data?.user &&
+        getAgendamentoById(parseInt(params.id), data.user)
+          .then((res) => {
+            setAgendamento(res);
+            setSelectedCliente(res?.cliente);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Não foi possível encontrar o cliente!");
+          });
+    }
+  }, [params, data]); */
 
   useEffect(() => {
     setPrice(agendamento?.price || 0);
@@ -174,66 +185,59 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
       dateIsDoneRef.current.value = dateIsDoneFormat;
     }
 
-    selectedCliente &&
-      startTransition(() => {
-        data?.user &&
-          getClienteById(selectedCliente.id, data.user)
-            .then((res) => {
-              let arrayVeiculos: SchemaVeiculo[] = [];
-              res?.veiculos.map((veiculo) => {
-                let thisPrice: any = agendamento?.pricePerVeiculo.find(
-                  (item: any) => {
-                    if (item?.veiculoId === veiculo.id) {
-                      return item;
-                    }
+    if (selectedCliente) {
+      if (data?.user && dados?.clientes) {
+        startTransition(() => {
+          let localCliente = dados.clientes.find(
+            (item) => item.id === selectedCliente.id
+          );
+          let arrayVeiculos: SchemaVeiculo[] = [];
+          if (localCliente) {
+            localCliente.veiculos.map((veiculo) => {
+              let thisPrice: any = agendamento?.pricePerVeiculo.find(
+                (item: any) => {
+                  if (item?.veiculoId === veiculo.id) {
+                    return item;
                   }
-                );
-                if (
-                  agendamento?.veiculos.find(
-                    (e) => e.veiculo.id === veiculo.id
-                  ) &&
-                  thisPrice
-                ) {
-                  arrayVeiculos.push({
-                    veiculo: veiculo,
-                    isChecked: true,
-                    observacao: thisPrice.observacao,
-                    price: thisPrice.price
-                      ? thisPrice.price
-                      : calculatePrice(veiculo.numEixos) || 0,
-                  });
-                } else {
-                  arrayVeiculos.push({
-                    veiculo: veiculo,
-                    isChecked: false,
-                    observacao: "",
-                    price: calculatePrice(veiculo.numEixos) || 0,
-                  });
                 }
-              });
-              setVeiculos(arrayVeiculos || []);
-            })
+              );
+              if (
+                agendamento?.veiculos.find(
+                  (e) => e.veiculo.id === veiculo.id
+                ) &&
+                thisPrice
+              ) {
+                arrayVeiculos.push({
+                  veiculo: veiculo,
+                  isChecked: true,
+                  observacao: thisPrice.observacao,
+                  price: thisPrice.price
+                    ? thisPrice.price
+                    : calculatePrice(veiculo.numEixos) || 0,
+                });
+              } else {
+                arrayVeiculos.push({
+                  veiculo: veiculo,
+                  isChecked: false,
+                  observacao: "",
+                  price: calculatePrice(veiculo.numEixos) || 0,
+                });
+              }
+            });
+            setVeiculos(arrayVeiculos || []);
+          }
+          /*         getClienteById(selectedCliente.id, data.user)
+            .then((res) => {})
             .catch((err) => {
               console.log(err);
               toast.error("Erro ao buscar cliente!");
-            });
-      });
-  }, [selectedCliente, agendamento, data]);
-
-  useEffect(() => {
-    if (params.id) {
-      data?.user &&
-        getAgendamentoById(parseInt(params.id), data.user)
-          .then((res) => {
-            setAgendamento(res);
-            setSelectedCliente(res?.cliente);
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error("Não foi possível encontrar o cliente!");
-          });
+            }); */
+        });
+      } else {
+        toast.error("Não possível encontrar dados cadastrados!");
+      }
     }
-  }, [params, data]);
+  }, [selectedCliente, agendamento, dados, data]);
 
   useEffect(() => {
     let sum = 0;
@@ -268,7 +272,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             ref={clienteRef}
             value={selectedCliente?.id}
             onChange={() =>
-              setSelectedCliente(clientes.find((cliente) => cliente.id))
+              setSelectedCliente(clientes.find((cliente) => cliente.id) || null)
             }
             name="cliente"
             className="px-1 h-7 text-primary-foreground rounded-sm mb-2"

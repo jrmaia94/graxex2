@@ -1,25 +1,19 @@
 "use client";
 
-import { getAllClientes, getClienteById } from "@/app/actions/get-clientes";
 import { createAgendamento } from "@/app/actions/post-agendamento";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { DataContext } from "@/providers/store";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
 import { CircleAlert } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useContext, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 interface SchemaVeiculo {
@@ -54,6 +48,8 @@ const AgendamentoPage = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+
+  const { data: dados } = useContext(DataContext);
   const clienteRef = useRef<any>(null);
   const dateRef = useRef<any>(null);
   const dateIsDoneRef = useRef<any>(null);
@@ -75,17 +71,19 @@ const AgendamentoPage = () => {
 
   useEffect(() => {
     startTransition(() => {
-      data?.user &&
-        getAllClientes(data.user)
+      if (dados && dados.clientes && data?.user) {
+        setClientes(dados.clientes);
+        /* getAllClientes(data.user)
           .then((res) => {
             setClientes(res);
           })
           .catch((err) => {
             console.log(err);
             toast.error("Não possível buscar os clientes!");
-          });
+          }); */
+      }
     });
-  }, [data]);
+  }, [data, dados]);
 
   useEffect(() => {
     let sum = 0;
@@ -98,28 +96,33 @@ const AgendamentoPage = () => {
   }, [veiculos]);
 
   useEffect(() => {
-    selectedCliente > 0 &&
-      startTransition(() => {
-        data?.user &&
-          getClienteById(selectedCliente, data.user)
-            .then((res) => {
-              let arrayVeiculos: SchemaVeiculo[] = [];
-              res?.veiculos.map((veiculo) => {
-                arrayVeiculos.push({
-                  veiculo: veiculo,
-                  isChecked: true,
-                  price: calculatePrice(veiculo.numEixos) || 0,
-                  observacao: "",
-                });
-              });
-              setVeiculos(arrayVeiculos || []);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Erro ao buscar cliente!");
+    startTransition(() => {
+      if (selectedCliente > 0 && data?.user && dados?.clientes) {
+        let localCLiente = dados.clientes.find(
+          (item) => item.id === selectedCliente
+        );
+        if (localCLiente) {
+          let arrayVeiculos: SchemaVeiculo[] = [];
+          localCLiente?.veiculos.map((veiculo) => {
+            arrayVeiculos.push({
+              veiculo: veiculo,
+              isChecked: true,
+              price: calculatePrice(veiculo.numEixos) || 0,
+              observacao: "",
             });
-      });
-  }, [selectedCliente, data]);
+          });
+          setVeiculos(arrayVeiculos || []);
+        }
+        /* getClienteById(selectedCliente, data.user)
+          .then((res) => {
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Erro ao buscar cliente!");
+          }); */
+      }
+    });
+  }, [selectedCliente, data, dados]);
 
   const onClickFormSubmit = (e: any) => {
     e.preventDefault();

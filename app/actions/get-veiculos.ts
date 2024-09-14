@@ -62,6 +62,9 @@ export const getAllVeiculos = async (user: User) => {
       },
       include: {
         cliente: true,
+        agendamentos: {
+          include: { agendamento: true },
+        },
       },
     });
     return veiculos;

@@ -2,19 +2,15 @@
 
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import CardVeiculo from "./card-veiculo";
-import { useEffect, useState, useTransition } from "react";
+import { useContext, useEffect, useState, useTransition } from "react";
 import Loader from "./loader";
 import { getFullVeiculoById } from "@/app/actions/get-veiculos";
 import { useSession } from "next-auth/react";
-
-interface VeiculoFull extends Veiculo {
-  agendamentos: {
-    agendamentoId: number;
-    veiculoId: number;
-    agendamento: Agendamento;
-  }[];
-  cliente: Cliente;
-}
+import { Button } from "./ui/button";
+import { CircleCheckBig } from "lucide-react";
+import { DialogAgendamento } from "./dialog-agendamento";
+import { ClienteFull, DataContext, VeiculoFull } from "@/providers/store";
+import { toast } from "sonner";
 
 const CardVeiculoFull = ({
   veiculo: importedVeiculo,
@@ -24,20 +20,36 @@ const CardVeiculoFull = ({
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
+
   const [veiculo, setVeiculo] = useState<VeiculoFull>();
   const [isPending, startTransition] = useTransition();
+  const [isDialogAgendamentoOpen, setIsDialogAgendamentoOpen] =
+    useState<boolean>(false);
+  const [cliente, setCliente] = useState<ClienteFull | null>(null);
+  const [selectedVeiculos, setSelectedVeiculos] = useState<VeiculoFull[]>([]);
 
   useEffect(() => {
     startTransition(() => {
-      getFullVeiculoById(importedVeiculo.id, data.user)
-        .then((res) => {
-          res && setVeiculo(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      if (data && dados?.veiculos) {
+        let localVeiculo = dados.veiculos.find(
+          (item) => item.id === importedVeiculo.id
+        );
+        if (localVeiculo) {
+          setVeiculo(localVeiculo);
+          setSelectedVeiculos([localVeiculo]);
+          setCliente(
+            dados.clientes.find((item) => item.id === localVeiculo.clienteId) ||
+              null
+          );
+        } else {
+          toast.error(
+            `Não foi possível localizar o veiculo com id ${importedVeiculo.id}`
+          );
+        }
+      }
     });
-  }, [importedVeiculo, data]);
+  }, [importedVeiculo, data, dados]);
   return (
     <div className="flex flex-col">
       {isPending && <Loader />}
@@ -66,6 +78,22 @@ const CardVeiculoFull = ({
       ) : (
         <p className="text-red-500 text-sm mt-3">Nunca foi atendido</p>
       )}
+      <div className="flex justify-end">
+        <Button
+          variant="default"
+          size="xs"
+          className="w-fit"
+          onClick={() => setIsDialogAgendamentoOpen(true)}
+        >
+          Cadastrar atendimento
+        </Button>
+        <DialogAgendamento
+          setIsOpen={setIsDialogAgendamentoOpen}
+          isOpen={isDialogAgendamentoOpen}
+          cliente={cliente}
+          veiculos={selectedVeiculos}
+        />
+      </div>
     </div>
   );
 };

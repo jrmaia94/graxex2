@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  Agendamento,
-  AgendamentosPorVeiculos,
-  Cliente,
-  Veiculo,
-} from "@prisma/client";
+import { Agendamento, AgendamentosPorVeiculos, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useTransition } from "react";
-import { getFullClienteById } from "../../actions/get-clientes";
+import { useContext, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import Loader from "@/components/loader";
@@ -18,9 +12,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { CircleCheckBig, FileText } from "lucide-react";
 import Image from "next/image";
-import { createAgendamento } from "@/app/actions/post-agendamento";
 import { DialogAgendamento } from "@/components/dialog-agendamento";
 import { generate_PDF } from "@/app/actions/generate-PDF.js";
+import { ClienteFull, DataContext, VeiculoFull } from "@/providers/store";
 
 interface DashboardClienteProps {
   params: {
@@ -28,68 +22,56 @@ interface DashboardClienteProps {
   };
 }
 
-interface AgendamentosPorVeiculosFull extends AgendamentosPorVeiculos {
-  agendamento: Agendamento;
-}
-
-interface VeiculoFull extends Veiculo {
-  agendamentos: AgendamentosPorVeiculosFull[];
-  cliente: Cliente;
-}
-
-interface ClienteFull extends Cliente {
-  veiculos: VeiculoFull[];
-  agendamentos: Agendamento[];
-}
-
 const DashboardCliente = ({ params }: DashboardClienteProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
 
   const [isPending, startTransition] = useTransition();
 
   const [cliente, setCliente] = useState<ClienteFull | null>(null);
-  const [selectedVeiculos, setSelectedVeiculos] = useState<VeiculoFull[]>([]);
-  const [selectedVeiculo, setSelectedVeiculo] = useState<VeiculoFull | null>(
-    null
-  );
+  const [selectedVeiculos, setSelectedVeiculos] = useState<Veiculo[]>([]);
 
   const [isDialogAgendamentoOpen, setIsDialogAgendamentoOpen] =
     useState<boolean>(false);
 
-  const ultAgendamento = (veiculo: VeiculoFull) => {
-    if (veiculo.agendamentos.length === 0) {
-      return "Nunca foi atendido";
-    } else if (veiculo.agendamentos.length === 1) {
-      return veiculo.agendamentos[0].agendamento.serviceCompleted
-        ? Intl.DateTimeFormat("pt-br", {
+  const ultAgendamento = (veiculo: VeiculoFull | undefined) => {
+    if (veiculo) {
+      if (veiculo.agendamentos.length === 0) {
+        return "Nunca foi atendido";
+      } else if (veiculo.agendamentos.length === 1) {
+        return veiculo.agendamentos[0].agendamento.serviceCompleted
+          ? Intl.DateTimeFormat("pt-br", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            }).format(veiculo.agendamentos[0].agendamento.serviceCompleted)
+          : "Nunca foi atendido";
+      } else if (veiculo.agendamentos.length > 1) {
+        let wasDone = false;
+        veiculo.agendamentos.forEach((item) =>
+          item.agendamento.serviceCompleted
+            ? (wasDone = true)
+            : (wasDone = false)
+        );
+        if (wasDone) {
+          return Intl.DateTimeFormat("pt-br", {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-          }).format(veiculo.agendamentos[0].agendamento.serviceCompleted)
-        : "Nunca foi atendido";
-    } else if (veiculo.agendamentos.length > 1) {
-      let wasDone = false;
-      veiculo.agendamentos.forEach((item) =>
-        item.agendamento.serviceCompleted ? (wasDone = true) : (wasDone = false)
-      );
-      if (wasDone) {
-        return Intl.DateTimeFormat("pt-br", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(
-          veiculo.agendamentos
-            .sort((a, b) => {
-              let value1 = a.agendamento.serviceCompleted?.getTime() || 0;
-              let value2 = b.agendamento.serviceCompleted?.getTime() || 0;
-              return value2 - value1;
-            })[0]
-            .agendamento.serviceCompleted?.getTime()
-        );
-      } else {
-        return "Nunca foi atendido";
+          }).format(
+            veiculo.agendamentos
+              .sort((a, b) => {
+                let value1 = a.agendamento.serviceCompleted?.getTime() || 0;
+                let value2 = b.agendamento.serviceCompleted?.getTime() || 0;
+                return value2 - value1;
+              })[0]
+              .agendamento.serviceCompleted?.getTime()
+          );
+        } else {
+          return "Nunca foi atendido";
+        }
       }
     }
   };
@@ -128,19 +110,26 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
   };
 
   useEffect(() => {
-    if (data?.user && params.id) {
+    if (data?.user && params.id && dados?.clientes) {
       startTransition(() => {
-        getFullClienteById(parseInt(params.id), data.user)
+        let localCliente = dados.clientes.find(
+          (item) => item.id === parseInt(params.id.toString())
+        );
+        localCliente
+          ? setCliente(localCliente)
+          : toast.error(
+              `Não foi possível buscar o cliente com id ${params.id}!`
+            );
+        /* getFullClienteById(parseInt(params.id), data.user)
           .then((res) => {
             setCliente(res);
           })
           .catch((err) => {
             console.log(err);
-            toast.error("Não foi possível buscar o cliente!");
-          });
+          }); */
       });
     }
-  }, [params, data]);
+  }, [params, data, dados]);
 
   return (
     <div className="flex flex-col p-4 mt-[90px]">
@@ -188,7 +177,6 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                           : "select-none transition-all hover:cursor-pointer my-1 rounded-md px-1 bg-slate-700"
                       }
                       key={veiculo.id}
-                      onClick={() => setSelectedVeiculo(veiculo)}
                       onDoubleClick={() =>
                         setSelectedVeiculos((array) => {
                           const newArray = [...array];
@@ -207,12 +195,24 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                           {veiculo.modelo?.toUpperCase()}
                         </p>
                         <p className="text-xs py-2 w-[23%]">{veiculo.placa}</p>
-                        {ultAgendamento(veiculo) === "Nunca foi atendido" ? (
+                        {ultAgendamento(
+                          dados?.veiculos.find((item) => item.id === veiculo.id)
+                        ) === "Nunca foi atendido" ? (
                           <p className="text-xs py-2 text-red-400 font-bold w-[27%]">
-                            {ultAgendamento(veiculo)}
+                            {ultAgendamento(
+                              dados?.veiculos.find(
+                                (item) => item.id === veiculo.id
+                              )
+                            )}
                           </p>
                         ) : (
-                          numDias(ultAgendamento(veiculo))
+                          numDias(
+                            ultAgendamento(
+                              dados?.veiculos.find(
+                                (item) => item.id === veiculo.id
+                              )
+                            )
+                          )
                         )}
                       </div>
                     </div>
@@ -274,19 +274,39 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                         })
                       }
                     >
-                      <CardVeiculo veiculo={veiculo} />
+                      <CardVeiculo
+                        veiculo={dados?.veiculos.find(
+                          (item) => item.id === veiculo.id
+                        )}
+                      />
                       <div className="w-full">
                         {" "}
-                        {ultAgendamento(veiculo) === "Nunca foi atendido" ? (
+                        {ultAgendamento(
+                          dados?.veiculos.find((item) => item.id === veiculo.id)
+                        ) === "Nunca foi atendido" ? (
                           <p className="text-xs py-2 text-red-400 font-bold">
-                            {ultAgendamento(veiculo)}
+                            {ultAgendamento(
+                              dados?.veiculos.find(
+                                (item) => item.id === veiculo.id
+                              )
+                            )}
                           </p>
                         ) : (
                           <div className="flex gap-3">
                             <p className="text-xs py-2 font-bold">
-                              {ultAgendamento(veiculo)}
+                              {ultAgendamento(
+                                dados?.veiculos.find(
+                                  (item) => item.id === veiculo.id
+                                )
+                              )}
                             </p>
-                            {numDias(ultAgendamento(veiculo))}
+                            {numDias(
+                              ultAgendamento(
+                                dados?.veiculos.find(
+                                  (item) => item.id === veiculo.id
+                                )
+                              )
+                            )}
                           </div>
                         )}
                       </div>

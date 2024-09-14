@@ -1,7 +1,7 @@
 "use client";
 
 import Search from "@/components/search";
-import { useEffect, useState, useTransition } from "react";
+import { useContext, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CardVeiculoFull from "@/components/card-veiculo-full";
+import { DataContext } from "@/providers/store";
 
 interface VeiculoFull extends Veiculo {
   cliente: Cliente;
@@ -29,10 +30,17 @@ const PageVeiculos = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
 
   useEffect(() => {
+    startTransition(() => {
+      dados && dados.veiculos && setVeiculos(dados.veiculos);
+    });
+  }, [dados]);
+
+  /*   useEffect(() => {
     startTransition(() => {
       data?.user &&
         getAllVeiculos(data.user)
@@ -44,7 +52,7 @@ const PageVeiculos = () => {
             toast.error("Erro ano buscar veiculos!");
           });
     });
-  }, [data]);
+  }, [data]); */
 
   return (
     <div className="flex justify-center mt-[90px]">

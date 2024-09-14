@@ -3,7 +3,7 @@
 import CardCliente from "@/components/card-cliente";
 import Search from "@/components/search";
 import { Cliente, Veiculo } from "@prisma/client";
-import { useEffect, useState, useTransition } from "react";
+import { useContext, useEffect, useState, useTransition } from "react";
 import { getAllClientes } from "../actions/get-clientes";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DataContext } from "@/providers/store";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -30,9 +31,9 @@ const Clientes = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [clientes, setClientes] = useState<ClienteFull[]>([]);
-  const router = useRouter();
 
   function deleteCliente(id: number) {
     deleteClienteById(id, data.user)
@@ -49,6 +50,12 @@ const Clientes = () => {
   }
 
   useEffect(() => {
+    startTransition(() => {
+      dados && dados.clientes && setClientes(dados.clientes);
+    });
+  }, [dados]);
+
+  /*   useEffect(() => {
     data?.user &&
       startTransition(() => {
         getAllClientes(data.user)
@@ -60,7 +67,8 @@ const Clientes = () => {
             toast.error("Erro ao buscar clientes!");
           });
       });
-  }, [data]);
+  }, [data]); */
+
   return (
     <div className="flex justify-center mt-[90px]">
       <div className="px-4 w-full max-w-[600px]">

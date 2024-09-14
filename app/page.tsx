@@ -1,17 +1,11 @@
 "use client";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
-import { useEffect, useState, useTransition } from "react";
-import {
-  getAgendamentosFinalizados,
-  getAgendamentosFuturos,
-} from "./actions/get-agendamentos";
-import { toast } from "sonner";
+import { useContext, useEffect, useState, useTransition } from "react";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
-import CardAgendamento from "@/components/card-agendamento";
 import CardAgendamentoFinalizado from "@/components/card-agendamento-finalizado";
 import Loader from "@/components/loader";
+import { DataContext } from "@/providers/store";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -34,8 +28,9 @@ const Home = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     data?.user &&
       startTransition(() => {
         getAgendamentosFuturos(data.user)
@@ -72,7 +67,23 @@ const Home = () => {
             );
           });
       });
-  }, [data]);
+  }, [data]); */
+
+  useEffect(() => {
+    if (dados) {
+      if (dados.agendamentos) {
+        startTransition(() => {
+          setAgendamentosFinalizados((array: any) => {
+            let newArray = [...array];
+            newArray = [
+              ...dados.agendamentos.filter((item) => item.serviceCompleted),
+            ];
+            return newArray;
+          });
+        });
+      }
+    }
+  }, [dados]);
 
   return (
     <div className="flex justify-center mt-[90px]">

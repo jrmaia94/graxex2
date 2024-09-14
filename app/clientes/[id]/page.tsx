@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import InputMask from "react-input-mask";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useContext, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { createCliente } from "@/app/actions/post-cliente";
 import { updateCliente, UpdateCliente } from "@/app/actions/update-cliente";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/loader";
+import { DataContext } from "@/providers/store";
 
 interface ClientePageProps {
   params: {
@@ -24,6 +25,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
 
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -96,20 +98,30 @@ const ClientePage = ({ params }: ClientePageProps) => {
   // Lida com o carregamento da página com parâmetros
   useEffect(() => {
     startTransition(() => {
-      params.id !== "create" &&
-        data?.user &&
-        getClienteById(parseInt(params.id.toString()), data.user)
-          .then((res) => {
-            if (!res) toast.info("Cliente não encontrado!");
-            if (res) setCliente(res);
-            //console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error("Ocorreu um erro na buscar do cliente!");
-          });
+      if (dados && dados.clientes) {
+        if (params.id !== "create" && data?.user) {
+          let localCliente = dados.clientes.find(
+            (item) => item.id === parseInt(params.id.toString())
+          );
+          localCliente
+            ? setCliente(localCliente)
+            : toast.error(
+                `Não foi possível encontrar o cliente com id ${params.id}!`
+              );
+
+          /* getClienteById(parseInt(params.id.toString()), data.user)
+            .then((res) => {
+              if (!res) toast.info("Cliente não encontrado!");
+              if (res) setCliente(res);
+              //console.log(res);
+            })
+            .catch((err) => {
+              console.log(err);
+            }); */
+        }
+      }
     });
-  }, [params, data]);
+  }, [params, data, dados]);
 
   // Atualiza inputs com os dados do cliente encontrado
   useEffect(() => {

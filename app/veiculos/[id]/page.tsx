@@ -2,19 +2,18 @@
 import { Button } from "@/components/ui/button";
 import InputMask from "react-input-mask";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useContext, useEffect, useRef, useState, useTransition } from "react";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { updateVeiculo } from "@/app/actions/update-veiculo";
 import { createVeiculo } from "@/app/actions/post-veiculo";
-import { getAllVeiculos, getVeiculoById } from "@/app/actions/get-veiculos";
 import { Cliente, Veiculo } from "@prisma/client";
-import { getAllClientes } from "@/app/actions/get-clientes";
 import Loader from "@/components/loader";
 import Link from "next/link";
 import SendImage from "@/components/send-image";
 import { ComboboxClientes } from "@/components/combox-cliente";
+import { DataContext } from "@/providers/store";
 
 interface VeiculoPageProps {
   params: {
@@ -36,6 +35,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const { data: dados } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const [veiculo, setVeiculo] = useState<Veiculo>();
@@ -112,23 +112,45 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   // Lida com o carregamento da página com parâmetros
   useEffect(() => {
     startTransition(() => {
-      if (params.id !== "create") {
-        setIsCreate(false);
-        data?.user &&
-          getVeiculoById(parseInt(params.id.toString()), data.user)
-            .then((res) => {
-              if (!res) toast.info("Cliente não encontrado!");
-              if (res) setVeiculo(res);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Ocorreu um erro na buscar do cliente!");
-            });
-      } else {
-        setIsCreate(true);
+      if (dados && dados.agendamentos && dados.clientes && dados.veiculos) {
+        setClientes(dados.clientes);
+        let fabs = [];
+        let models = [];
+        for (let item of dados.veiculos) {
+          item.fabricante && fabs.push(item.fabricante.toUpperCase());
+          item.modelo && models.push(item.modelo.toUpperCase());
+        }
+        fabs = [...new Set(fabs)];
+        models = [...new Set(models)];
+        setFabricantes(fabs);
+        setModelos(models);
+        if (params.id !== "create") {
+          setIsCreate(false);
+          if (data?.user) {
+            let localVeiculo = dados.veiculos.find(
+              (item) => item.id === parseInt(params.id.toString())
+            );
+            localVeiculo
+              ? setVeiculo(localVeiculo)
+              : toast.error(
+                  `Não foi possível encontrar o veiculo com id ${params.id}!`
+                );
+            /* getVeiculoById(parseInt(params.id.toString()), data.user)
+              .then((res) => {
+                if (!res) toast.info("Cliente não encontrado!");
+                if (res) setVeiculo(res);
+              })
+              .catch((err) => {
+                console.log(err);
+                toast.error("Ocorreu um erro na buscar do cliente!");
+              }); */
+          }
+        } else {
+          setIsCreate(true);
+        }
       }
     });
-  }, [params, data]);
+  }, [params, data, dados]);
 
   // Atualiza inputs com os dados do cliente encontrado
   useEffect(() => {
@@ -146,7 +168,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   }, [veiculo]);
 
   // Lida com a mascara do input CPF/CNPJ
-  useEffect(() => {
+  /*   useEffect(() => {
     if (data?.user) {
       getAllClientes(data.user)
         .then((res) => {
@@ -175,7 +197,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
           toast.error("Não foi possível carregar os veículos");
         });
     }
-  }, [data]);
+  }, [data]); */
 
   useEffect(() => {
     veiculoFoto &&

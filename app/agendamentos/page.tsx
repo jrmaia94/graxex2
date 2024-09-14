@@ -1,18 +1,13 @@
 "use client";
 
 import Search from "@/components/search";
-import { useEffect, useState, useTransition } from "react";
-import {
-  getAgendamentosFuturos,
-  getAllAgendamentos,
-} from "../actions/get-agendamentos";
+import { useContext, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import CardAgendamento from "@/components/card-agendamento";
 import Loader from "@/components/loader";
-import { Button } from "@/components/ui/button";
-import { ArrowDownIcon, Loader2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
+import { DataContext } from "@/providers/store";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -28,12 +23,12 @@ const Agendamentos = () => {
     required: true,
   });
 
+  const { data: dados } = useContext(DataContext);
+
   const [agendamentos, setAgendamentos] = useState<AgendamentoProps[]>([]);
-  const [loadAllAgendamentos, setLoadAllAgendamentos] =
-    useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
+  /*   useEffect(() => {
     startTransition(() => {
       if (loadAllAgendamentos) {
         data?.user &&
@@ -69,8 +64,23 @@ const Agendamentos = () => {
             });
       }
     });
-  }, [loadAllAgendamentos, data]);
+  }, [loadAllAgendamentos, data]); */
 
+  useEffect(() => {
+    if (dados) {
+      if (dados.agendamentos) {
+        startTransition(() => {
+          const newObj = dados.agendamentos.map((e) => {
+            return {
+              ...e,
+              veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
+            };
+          });
+          setAgendamentos(newObj);
+        });
+      }
+    }
+  }, [dados]);
   return (
     <div className="flex justify-center mt-[90px]">
       <div className="px-4 w-full max-w-[600px]">
@@ -80,14 +90,6 @@ const Agendamentos = () => {
         </h2>
         <div className="mb-3">
           <Search origin="agendamentos" action={setAgendamentos} />
-        </div>
-        <div
-          className={loadAllAgendamentos ? "hidden" : "w-full flex justify-end"}
-        >
-          <Button onClick={() => setLoadAllAgendamentos(true)} className="mb-3">
-            <ArrowDownIcon />
-            Carregar todos agendamentos
-          </Button>
         </div>
         {agendamentos.map((agendamento) => (
           <CardAgendamento key={agendamento.id} agendamento={agendamento} />

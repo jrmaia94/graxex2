@@ -36,6 +36,7 @@ export const getAllClientes = async (user: User) => {
     const clientes = await prisma.cliente.findMany({
       include: {
         veiculos: true,
+        agendamentos: true,
       },
       orderBy: {
         name: "asc",
