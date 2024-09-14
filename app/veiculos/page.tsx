@@ -30,7 +30,7 @@ const PageVeiculos = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados } = useContext(DataContext);
+  const { data: dados, setData } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
 
@@ -77,12 +77,28 @@ const PageVeiculos = () => {
                       data?.user &&
                         deleteVeiculoById(veiculo.id, data.user)
                           .then((res) => {
+                            setData((prevData) => {
+                              const newData = { ...prevData };
+                              let index = newData.veiculos.findIndex(
+                                (item) => item.id === res.id
+                              );
+                              if (index > 0) {
+                                newData.veiculos.splice(index, 1);
+                                let indexInCliente = newData.clientes
+                                  .find((item) => item.id === res.clienteId)
+                                  ?.veiculos.findIndex(
+                                    (item) => item.id === res.id
+                                  );
+                                indexInCliente &&
+                                  newData.clientes
+                                    .find((item) => item.id === res.clienteId)
+                                    ?.veiculos.splice(indexInCliente, 1);
+                              }
+                              return newData;
+                            });
                             toast.success(
                               `Veículo com o id ${veiculo.id} foi excluído!`
                             );
-                            setTimeout(() => {
-                              window.location.reload();
-                            }, 1000);
                           })
                           .catch((err) => {
                             console.log(err);

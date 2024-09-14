@@ -108,8 +108,10 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
         data?.user &&
           updateAgendamento(updatedAgendamento, selectedVeiculos, data.user)
             .then((res) => {
-              console.log(res);
               toast.success("Agendamento alterado com sucesso!");
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
             })
             .catch((err) => {
               console.log(err);

@@ -31,7 +31,7 @@ const Clientes = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados } = useContext(DataContext);
+  const { data: dados, setData } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [clientes, setClientes] = useState<ClienteFull[]>([]);
 
@@ -39,9 +39,14 @@ const Clientes = () => {
     deleteClienteById(id, data.user)
       .then((res) => {
         toast.success(`Cliente ${res.name} deletado com sucesso`);
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        setData((prevData) => {
+          const newData = { ...prevData };
+          let index = newData.clientes.findIndex((item) => item.id === res.id);
+          if (index > 0) {
+            newData.clientes.splice(index, 1);
+          }
+          return newData;
+        });
       })
       .catch((err) => {
         console.log(err);

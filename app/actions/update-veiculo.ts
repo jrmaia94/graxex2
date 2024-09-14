@@ -29,6 +29,9 @@ export const updateVeiculo = async (veiculo: UpdateVeiculo, user: User) => {
             id: veiculo.id,
           },
           data: data,
+          include: {
+            cliente: true,
+          },
         });
         return updatedVeiculo;
       } catch (error) {

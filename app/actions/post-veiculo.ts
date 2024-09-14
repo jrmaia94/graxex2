@@ -32,6 +32,9 @@ export const createVeiculo = async (veiculo: CreateVeiculo, user: User) => {
       try {
         const createdVeiculo = await prisma.veiculo.create({
           data: veiculo,
+          include: {
+            cliente: true,
+          },
         });
         return createdVeiculo;
       } catch (error) {

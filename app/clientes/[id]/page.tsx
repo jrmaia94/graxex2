@@ -25,7 +25,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados } = useContext(DataContext);
+  const { data: dados, setData } = useContext(DataContext);
 
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -69,29 +69,58 @@ const ClientePage = ({ params }: ClientePageProps) => {
         //image: inputFileRef.current?.value,
       };
 
-      params.id === "create"
-        ? data?.user &&
-          createCliente(cadCliente, data.user)
-            .then((res) => {
-              toast.success("Cliente cadastrado com sucesso!");
-              router.push(`/clientes/${res.id}`);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Erro ao cadastrar cliente!");
-            })
-        : data?.user &&
-          updateCliente(
-            { id: parseInt(params.id.toString()), ...cadCliente },
-            data.user
-          )
-            .then((res) => {
-              toast.success("Cliente atualizado!");
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Erro ao atualizar o cliente!");
+      if (params.id === "create" && data.user) {
+        createCliente(cadCliente, data.user)
+          .then((res) => {
+            setData((prevData) => {
+              const newData = { ...prevData };
+              if (!newData.clientes.find((item) => item.id === res.id)) {
+                newData.clientes.push({
+                  ...res,
+                  veiculos: [],
+                  agendamentos: [],
+                });
+              }
+              return newData;
             });
+            toast.success("Cliente cadastrado com sucesso!");
+            setTimeout(() => {
+              router.push(`/clientes/${res.id}`);
+            }, 300);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Erro ao cadastrar cliente!");
+          });
+      } else if (data.user && params.id !== "create") {
+        updateCliente(
+          { id: parseInt(params.id.toString()), ...cadCliente },
+          data.user
+        )
+          .then((res) => {
+            let preventRepeat = 0;
+            setData((prevData) => {
+              preventRepeat += 1;
+              const newData = { ...prevData };
+              if (!(preventRepeat > 1)) {
+                let index = newData.clientes.findIndex(
+                  (item) => item.id === res.id
+                );
+                newData.clientes.splice(index, 1, {
+                  ...res,
+                  veiculos: [...prevData.clientes[index].veiculos],
+                  agendamentos: [...prevData.clientes[index].agendamentos],
+                });
+              }
+              return newData;
+            });
+            toast.success("Cliente atualizado!");
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Erro ao atualizar o cliente!");
+          });
+      }
     });
   };
 
@@ -148,7 +177,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
       <div className="px-8 pt-8 w-full max-w-[600px]">
         {isPending && <Loader />}
         <form
-          onSubmit={handleSubmit}
+          onSubmit={() => {}}
           className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
         >
           <div className="flex flex-col">
@@ -229,6 +258,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
           <div>
             <Button
               disabled={isPending}
+              onClick={handleSubmit}
               className="w-[100px] bg-primary"
               type="submit"
             >

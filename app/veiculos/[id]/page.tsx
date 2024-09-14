@@ -35,7 +35,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados } = useContext(DataContext);
+  const { data: dados, setData } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const [veiculo, setVeiculo] = useState<Veiculo>();
@@ -87,6 +87,19 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         ? data?.user &&
           createVeiculo(cadVeiculo, data.user)
             .then((res) => {
+              let preventRepeat = 0;
+              setData((prevData) => {
+                preventRepeat += 1;
+                const newData = { ...prevData };
+                if (preventRepeat <= 1) {
+                  let newVeiculo = { ...res, agendamentos: [] };
+                  newData.veiculos.push(newVeiculo);
+                  newData.clientes
+                    .find((item) => item.id === res.clienteId)
+                    ?.veiculos.push(newVeiculo);
+                }
+                return newData;
+              });
               toast.success("Veículo cadastrado com sucesso!");
               router.push(`/veiculos/${res.id}`);
             })
@@ -100,6 +113,21 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
             data.user
           )
             .then((res) => {
+              let preventRepeat = 0;
+              setData((prevData) => {
+                preventRepeat += 1;
+                const newData = { ...prevData };
+                if (preventRepeat <= 1) {
+                  let index = newData.veiculos.findIndex(
+                    (item) => item.id === res.id
+                  );
+                  newData.veiculos.splice(index, 1, {
+                    ...res,
+                    agendamentos: [...prevData.veiculos[index].agendamentos],
+                  });
+                }
+                return newData;
+              });
               toast.success("Veículo atualizado!");
             })
             .catch((err) => {

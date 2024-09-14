@@ -172,9 +172,10 @@ const AgendamentoPage = () => {
         )
           .then((res) => {
             toast.success("Agendamento criado com sucesso!");
+            router.push(`/agendamentos/${res.id}`);
             setTimeout(() => {
-              router.push(`/agendamentos/${res.id}`);
-            }, 1000);
+              window.location.reload();
+            }, 500);
           })
           .catch((err) => {
             console.log(err);
