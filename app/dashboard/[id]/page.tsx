@@ -31,7 +31,8 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
   const [isPending, startTransition] = useTransition();
 
   const [cliente, setCliente] = useState<ClienteFull | null>(null);
-  const [selectedVeiculos, setSelectedVeiculos] = useState<Veiculo[]>([]);
+  const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
+  const [selectedVeiculos, setSelectedVeiculos] = useState<VeiculoFull[]>([]);
 
   const [isDialogAgendamentoOpen, setIsDialogAgendamentoOpen] =
     useState<boolean>(false);
@@ -120,6 +121,15 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
           : toast.error(
               `Não foi possível buscar o cliente com id ${params.id}!`
             );
+
+        let localVeiculos = dados.veiculos.filter(
+          (item) => item.clienteId === parseInt(params.id.toString())
+        );
+        localVeiculos
+          ? setVeiculos(localVeiculos)
+          : toast.error(
+              `Não foi possível encontrar os veiculos do cliente com id ${params.id}!`
+            );
         /* getFullClienteById(parseInt(params.id), data.user)
           .then((res) => {
             setCliente(res);
@@ -148,7 +158,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                     type="checkbox"
                     onChange={(e) => {
                       e.target.checked
-                        ? setSelectedVeiculos(cliente.veiculos)
+                        ? setSelectedVeiculos(veiculos)
                         : setSelectedVeiculos([]);
                     }}
                   />
@@ -169,10 +179,10 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                       Dias desde o ult. atendimento
                     </span>
                   </div>
-                  {cliente.veiculos.map((veiculo) => (
+                  {veiculos?.map((veiculo) => (
                     <div
                       className={
-                        selectedVeiculos.find((item) => item.id === veiculo.id)
+                        selectedVeiculos?.find((item) => item.id === veiculo.id)
                           ? "select-none transition-all bg-card-selected text-primary hover:cursor-pointer my-1 rounded-md px-1"
                           : "select-none transition-all hover:cursor-pointer my-1 rounded-md px-1 bg-slate-700"
                       }
@@ -228,12 +238,12 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                     variant="outline"
                     size="xs"
                     className="rounded-full bg-transparent"
-                    onClick={() =>
+                    onClick={() => {
                       generate_PDF({
                         ...cliente,
                         veiculos: [...selectedVeiculos],
-                      })
-                    }
+                      });
+                    }}
                   >
                     <Image
                       alt="Icon PDF"
