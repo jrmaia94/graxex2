@@ -15,6 +15,7 @@ import Image from "next/image";
 import { DialogAgendamento } from "@/components/dialog-agendamento";
 import { generate_PDF } from "@/app/actions/generate-PDF.js";
 import { ClienteFull, DataContext, VeiculoFull } from "@/providers/store";
+import { Input } from "@/components/ui/input";
 
 interface DashboardClienteProps {
   params: {
@@ -110,41 +111,57 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
     }
   };
 
-  useEffect(() => {
-    if (data?.user && params.id && dados?.clientes) {
-      startTransition(() => {
-        let localCliente = dados.clientes.find(
-          (item) => item.id === parseInt(params.id.toString())
-        );
-        localCliente
-          ? setCliente(localCliente)
-          : toast.error(
-              `Não foi possível buscar o cliente com id ${params.id}!`
-            );
+  const sortArrayVeiculos = (veiculos: VeiculoFull[]) => {
+    return veiculos.sort((a: any, b: any) => {
+      if (a.placa > b.placa) {
+        return 1;
+      } else if (a.placa < b.placa) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+  };
 
-        let localVeiculos = dados.veiculos.filter(
-          (item) => item.clienteId === parseInt(params.id.toString())
-        );
-        localVeiculos
-          ? setVeiculos(localVeiculos)
-          : toast.error(
-              `Não foi possível encontrar os veiculos do cliente com id ${params.id}!`
-            );
-        /* getFullClienteById(parseInt(params.id), data.user)
-          .then((res) => {
-            setCliente(res);
-          })
-          .catch((err) => {
-            console.log(err);
-          }); */
-      });
+  useEffect(() => {
+    if (dados && dados.clientes && data) {
+      if (data?.user && params.id) {
+        startTransition(() => {
+          let localCliente = dados.clientes.find(
+            (item) => item.id === parseInt(params.id.toString())
+          );
+          localCliente
+            ? setCliente(localCliente)
+            : toast.error(
+                `Não foi possível buscar o cliente com id ${params.id}!`
+              );
+
+          let localVeiculos = sortArrayVeiculos(
+            dados.veiculos.filter(
+              (item) => item.clienteId === parseInt(params.id.toString())
+            )
+          );
+          localVeiculos
+            ? setVeiculos(localVeiculos)
+            : toast.error(
+                `Não foi possível encontrar os veiculos do cliente com id ${params.id}!`
+              );
+          /* getFullClienteById(parseInt(params.id), data.user)
+            .then((res) => {
+              setCliente(res);
+            })
+            .catch((err) => {
+              console.log(err);
+            }); */
+        });
+      }
     }
   }, [params, data, dados]);
 
   return (
     <div className="flex flex-col p-4 mt-[90px]">
       {isPending && <Loader />}
-      {cliente && (
+      {dados && cliente && (
         <div className="w-full flex flex-col md:items-center">
           <div className="md:max-w-[864px] md:w-full">
             <CardCliente cliente={cliente} />
@@ -179,6 +196,40 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                       Dias desde o ult. atendimento
                     </span>
                   </div>
+                  <Input
+                    className="bg-primary border-none h-8 w-[50%] text-primary-foreground"
+                    placeholder="Buscar veículo"
+                    onChange={(e) => {
+                      let localVeiculos =
+                        dados &&
+                        dados.veiculos.filter(
+                          (item) =>
+                            item.clienteId === parseInt(params.id.toString())
+                        );
+
+                      if (localVeiculos) {
+                        localVeiculos = localVeiculos.filter((item) => {
+                          if (
+                            item.placa
+                              .toLowerCase()
+                              .includes(e.target.value.toLowerCase()) ||
+                            item.fabricante
+                              ?.toLowerCase()
+                              .includes(e.target.value.toLowerCase()) ||
+                            item.modelo
+                              .toLowerCase()
+                              .includes(e.target.value.toLowerCase()) ||
+                            item.frota
+                              ?.toLowerCase()
+                              .includes(e.target.value.toLowerCase())
+                          ) {
+                            return item;
+                          }
+                        });
+                        setVeiculos(localVeiculos);
+                      }
+                    }}
+                  />
                   {veiculos?.map((veiculo) => (
                     <div
                       className={

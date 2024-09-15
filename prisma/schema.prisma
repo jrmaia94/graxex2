@@ -45,6 +45,7 @@ model User {
   password      String?
   emailVerified DateTime? @map("email_verified")
   perfil        Boolean   @default(false)
+  accessLevel   Json?
   image         String?
   accounts      Account[]
   sessions      Session[]

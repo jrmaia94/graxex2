@@ -1,6 +1,7 @@
 "use server";
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 export const getAgendamentosFuturos = async (user: User) => {
   if (user.perfil) {

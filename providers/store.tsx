@@ -3,7 +3,6 @@
 import { getAllAgendamentos } from "@/app/actions/get-agendamentos";
 import { getAllClientes } from "@/app/actions/get-clientes";
 import { getAllVeiculos } from "@/app/actions/get-veiculos";
-import Loader from "@/components/loader";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import {
@@ -54,7 +53,6 @@ export const DataContext = createContext<DataProviderProps>({
 
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: session }: { data: any } = useSession({ required: true });
-
   const [data, setData] = useState<DataProps>({
     clientes: [],
     veiculos: [],

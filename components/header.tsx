@@ -16,9 +16,10 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import { useState } from "react";
 import { itemsMenu } from "@/constants/nav-menu";
 import ItemMenu from "./item-menu";
+import { UserFull } from "@/app/actions/get-users";
 
 const Header = () => {
-  const { data } = useSession();
+  const { data }: { data: any } = useSession({ required: true });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   return (
@@ -87,13 +88,27 @@ const Header = () => {
                     </Button>
                   </div>
                 )}
-                {itemsMenu.map((item, index) => (
-                  <ItemMenu
-                    action={setIsSheetOpen}
-                    key={index}
-                    itemMenu={item}
-                  />
-                ))}
+                {itemsMenu.map((item, index) => {
+                  if (item.href === "/config") {
+                    if (data?.user?.accessLevel?.admin) {
+                      return (
+                        <ItemMenu
+                          action={setIsSheetOpen}
+                          key={index}
+                          itemMenu={item}
+                        />
+                      );
+                    }
+                  } else {
+                    return (
+                      <ItemMenu
+                        action={setIsSheetOpen}
+                        key={index}
+                        itemMenu={item}
+                      />
+                    );
+                  }
+                })}
               </div>
             </SheetContent>
           </Sheet>

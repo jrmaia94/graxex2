@@ -162,7 +162,7 @@ export const DialogAgendamento = ({
             {veiculos.map((item) => (
               <div
                 key={item.veiculo.id}
-                className="h-fit flex items-center w-full"
+                className="h-fit flex items-center w-full text-nowrap truncate overflow-hidden"
               >
                 <input
                   checked={item.isChecked}
@@ -250,8 +250,9 @@ export const DialogAgendamento = ({
                     </div>
                   </DialogContent>
                 </Dialog>
-                <span className="text-wrap truncate">
-                  {item.veiculo.fabricante} - {item.veiculo.modelo}
+                <span className="text-nowrap text-sm truncate overflow-hidden">
+                  {item.veiculo.placa} - {item.veiculo.fabricante} -{" "}
+                  {item.veiculo.modelo}
                 </span>
               </div>
             ))}

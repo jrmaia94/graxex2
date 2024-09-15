@@ -17,6 +17,6 @@ export const itemsMenu: ItemsMenuOptions[] = [
   },
   {
     title: "Configurações",
-    href: "/configs",
+    href: "/config",
   },
 ];

@@ -49,6 +49,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             },
           });
           token.perfil = user?.perfil;
+          token.accessLevel = user?.accessLevel;
         } else if (id) {
           const user = await prisma.user.findUnique({
             where: {
@@ -56,6 +57,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             },
           });
           token.perfil = user?.perfil;
+          token.accessLevel = user?.accessLevel;
         }
       }
       return token;
@@ -63,6 +65,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async session({ session, token }: { session: any; token: any }) {
       session.user.id = token.sub || "";
       session.user.perfil = token.perfil;
+      session.user.accessLevel = token.accessLevel;
 
       return session;
     },
