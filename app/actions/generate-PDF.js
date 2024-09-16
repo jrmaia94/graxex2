@@ -294,7 +294,7 @@ export const generate_PDF = (data) => {
   //  }
   //);
 
-  window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
+  //window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
   setTimeout(() => {
     doc.save(
       `Situação de frota - ${data.name} - ${Intl.DateTimeFormat("pt-br", {

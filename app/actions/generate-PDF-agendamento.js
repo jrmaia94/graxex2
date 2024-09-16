@@ -239,7 +239,7 @@ export const generate_PDF_Agendamento = (data) => {
       });
     },
   });
-  window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
+  //window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
   setTimeout(() => {
     doc.save(
       `Relatório de Serviço - ${data.cliente.name} - ${Intl.DateTimeFormat(
