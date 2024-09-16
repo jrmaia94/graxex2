@@ -4,7 +4,7 @@ import { getAllAgendamentos } from "@/app/actions/get-agendamentos";
 import { getAllClientes } from "@/app/actions/get-clientes";
 import { getAllVeiculos } from "@/app/actions/get-veiculos";
 import Loader from "@/components/loader";
-import { Agendamento, Cliente, Veiculo } from "@prisma/client";
+import { Agendamento, Cliente, User, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import {
   createContext,
@@ -42,6 +42,7 @@ export interface DataProps {
   clientes: ClienteFull[];
   veiculos: VeiculoFull[];
   agendamentos: AgendamentoFull[];
+  users: User[];
 }
 
 export interface DataProviderProps {
@@ -60,6 +61,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     clientes: [],
     veiculos: [],
     agendamentos: [],
+    users: [],
   });
 
   useEffect(() => {

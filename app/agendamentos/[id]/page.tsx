@@ -306,7 +306,10 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
           <ScrollArea className="h-[150px] w-full max-w-[500px] rounded-md border border-primary p-2 mb-2">
             <div className="flex flex-col gap-3">
               {veiculos.map((item) => (
-                <div key={item.veiculo.id} className="h-6 flex w-full">
+                <div
+                  key={item.veiculo.id}
+                  className="h-6 flex w-full items-center"
+                >
                   <input
                     checked={item.isChecked}
                     type="checkbox"
@@ -393,8 +396,9 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                       </div>
                     </DialogContent>
                   </Dialog>
-                  <span className="text-wrap truncate">
-                    {item.veiculo.fabricante} - {item.veiculo.modelo}
+                  <span className="text-wrap truncate text-sm">
+                    {item.veiculo.placa} - {item.veiculo.fabricante} -{" "}
+                    {item.veiculo.modelo}
                   </span>
                 </div>
               ))}

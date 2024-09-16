@@ -187,7 +187,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                     --{cliente.veiculos.length} veículo(s)--
                   </span>
                 </h2>
-                <ScrollArea className="h-72">
+                <div>
                   <div className="flex w-full items-center">
                     <span className="text-xs w-[12%]">Frota</span>
                     <span className="text-xs w-[38%]">Veiculo</span>
@@ -230,6 +230,8 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                       }
                     }}
                   />
+                </div>
+                <ScrollArea className="h-72">
                   {veiculos?.map((veiculo) => (
                     <div
                       className={

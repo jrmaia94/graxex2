@@ -326,8 +326,9 @@ const AgendamentoPage = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
-                  <span className="text-wrap truncate">
-                    {item.veiculo.fabricante} - {item.veiculo.modelo}
+                  <span className="text-wrap truncate text-sm">
+                    {item.veiculo.placa} - {item.veiculo.fabricante} -{" "}
+                    {item.veiculo.modelo}
                   </span>
                 </div>
               ))}
