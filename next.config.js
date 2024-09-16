@@ -21,6 +21,12 @@ module.exports = {
       {
         hostname: "example.com",
       },
+      {
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        hostname: "instagram.frvd4-1.fna.fbcdn.net",
+      },
     ],
   },
   experimental: {
