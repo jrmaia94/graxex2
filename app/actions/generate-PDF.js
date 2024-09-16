@@ -66,7 +66,7 @@ export const generate_PDF = (data) => {
   doc.text(
     "Relatório de Atendimento de Frota",
     doc.internal.pageSize.getWidth() / 2,
-    65,
+    inicioCabecalho + 35,
     {
       align: "center",
     }
@@ -120,6 +120,18 @@ export const generate_PDF = (data) => {
     inicioCabecalhoCliente + 23,
     doc.internal.pageSize.getWidth() - 20,
     inicioCabecalhoCliente + 23
+  );
+
+  size(12);
+  weight("normal");
+
+  doc.text(
+    Intl.DateTimeFormat("pt-br", { dateStyle: "full" }).format(
+      new Date(Date.now())
+    ),
+    doc.internal.pageSize.getWidth() - 20,
+    inicioCabecalhoCliente + 30,
+    { align: "right" }
   );
 
   // Tabela
@@ -195,7 +207,7 @@ export const generate_PDF = (data) => {
     ];
   });
 
-  let inicioTabela = inicioCabecalhoCliente + 30;
+  let inicioTabela = inicioCabecalhoCliente + 32;
 
   /*   doc.autoTable({
     dados: dados,
@@ -283,4 +295,15 @@ export const generate_PDF = (data) => {
   //);
 
   window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
+  setTimeout(() => {
+    doc.save(
+      `Situação de frota - ${data.name} - ${Intl.DateTimeFormat("pt-br", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+        .format(new Date(Date.now()).setUTCHours(12))
+        .replace(/\//g, "_")}`
+    );
+  }, 400);
 };

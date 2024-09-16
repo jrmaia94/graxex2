@@ -122,7 +122,17 @@ export const generate_PDF_Agendamento = (data) => {
     inicioCabecalhoCliente + 23
   );
 
-  console.log(data);
+  size(12);
+  weight("normal");
+
+  doc.text(
+    Intl.DateTimeFormat("pt-br", { dateStyle: "full" }).format(
+      new Date(Date.now())
+    ),
+    doc.internal.pageSize.getWidth() - 20,
+    inicioCabecalhoCliente + 30,
+    { align: "right" }
+  );
 
   // Tabela
   const dados = data.agendamento.veiculos.map((item) => {
@@ -148,7 +158,7 @@ export const generate_PDF_Agendamento = (data) => {
     ];
   });
 
-  let inicioTabela = inicioCabecalhoCliente + 30;
+  let inicioTabela = inicioCabecalhoCliente + 32;
 
   autoTable(doc, {
     head: [["Placa", "Frota", "Veículo", "Preço", "Obs"]],
@@ -230,4 +240,18 @@ export const generate_PDF_Agendamento = (data) => {
     },
   });
   window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
+  setTimeout(() => {
+    doc.save(
+      `Relatório de Serviço - ${data.cliente.name} - ${Intl.DateTimeFormat(
+        "pt-br",
+        {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }
+      )
+        .format(new Date(Date.now()).setUTCHours(12))
+        .replace(/\//g, "_")}`
+    );
+  }, 400);
 };

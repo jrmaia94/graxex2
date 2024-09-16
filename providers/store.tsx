@@ -3,6 +3,7 @@
 import { getAllAgendamentos } from "@/app/actions/get-agendamentos";
 import { getAllClientes } from "@/app/actions/get-clientes";
 import { getAllVeiculos } from "@/app/actions/get-veiculos";
+import Loader from "@/components/loader";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import {
@@ -11,6 +12,7 @@ import {
   SetStateAction,
   useEffect,
   useState,
+  useTransition,
 } from "react";
 
 export interface ClienteFull extends Cliente {
@@ -53,6 +55,7 @@ export const DataContext = createContext<DataProviderProps>({
 
 export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: session }: { data: any } = useSession({ required: true });
+  const [isPending, startTransition] = useTransition();
   const [data, setData] = useState<DataProps>({
     clientes: [],
     veiculos: [],
@@ -60,50 +63,53 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   useEffect(() => {
-    if (session) {
-      if (session.user) {
-        getAllClientes(session.user)
-          .then((res: any) => {
-            setData((prevData) => {
-              const newData = { ...prevData };
-              newData.clientes = res;
-              return newData;
+    startTransition(() => {
+      if (session) {
+        if (session.user) {
+          getAllClientes(session.user)
+            .then((res: any) => {
+              setData((prevData) => {
+                const newData = { ...prevData };
+                newData.clientes = res;
+                return newData;
+              });
+            })
+            .catch((err) => {
+              console.log(err);
             });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
 
-        getAllVeiculos(session.user)
-          .then((res: any) => {
-            setData((prevData) => {
-              const newData = { ...prevData };
-              newData.veiculos = res;
-              return newData;
+          getAllVeiculos(session.user)
+            .then((res: any) => {
+              setData((prevData) => {
+                const newData = { ...prevData };
+                newData.veiculos = res;
+                return newData;
+              });
+            })
+            .catch((err) => {
+              console.log(err);
             });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
 
-        getAllAgendamentos(session.user)
-          .then((res: any) => {
-            setData((prevData) => {
-              const newData = { ...prevData };
-              newData.agendamentos = res;
-              return newData;
+          getAllAgendamentos(session.user)
+            .then((res: any) => {
+              setData((prevData) => {
+                const newData = { ...prevData };
+                newData.agendamentos = res;
+                return newData;
+              });
+            })
+            .catch((err) => {
+              console.log(err);
             });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        }
       }
-    }
+    });
   }, [session]);
 
   return (
     <DataContext.Provider value={{ data: data, setData: setData }}>
-      {children}
+      {isPending && <Loader />}
+      {!isPending && children}
     </DataContext.Provider>
   );
 };
