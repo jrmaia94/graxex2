@@ -65,7 +65,7 @@ const PageConfig = () => {
       <div className="px-4 w-full max-w-[900px]">
         {isPending && <Loader />}
         <Button className="mt-4" asChild>
-          <Link href={"/config/users"}>Clientes</Link>
+          <Link href={"/config/users"}>Usuários</Link>
         </Button>
       </div>
     </div>

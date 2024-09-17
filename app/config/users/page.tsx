@@ -12,6 +12,8 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CardUser from "@/components/card-user";
+import { read } from "fs";
+import { create } from "domain";
 
 const PageConfig = () => {
   const { data }: { data: any } = useSession({
@@ -33,31 +35,24 @@ const PageConfig = () => {
               newObjs.users = [...res];
               return newObjs;
             });
+            let localUsers: UserFull[] = [];
             res.forEach((user: UserFull) => {
               if (!user.accessLevel) {
-                setUsers((prevObjs) => {
-                  const newObjs = [...prevObjs];
-                  let localUser = newObjs.find((item) => {
-                    return (
-                      item.email === user.email ||
-                      item.username === user.username
-                    );
-                  });
-                  if (localUser) {
-                    localUser.accessLevel = {
-                      read: false,
-                      create: false,
-                      update: false,
-                      delete: false,
-                      admin: false,
-                    };
-                  }
-                  return newObjs;
+                localUsers.push({
+                  ...user,
+                  accessLevel: {
+                    read: false,
+                    create: false,
+                    update: false,
+                    delete: false,
+                    admin: false,
+                  },
                 });
               } else {
-                setUsers(res);
+                localUsers.push(user);
               }
             });
+            setUsers(localUsers);
           })
           .catch((err) => {
             console.log(err);

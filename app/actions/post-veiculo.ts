@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { User, Veiculo } from "@prisma/client";
 import { z } from "zod";
+import { UserFull } from "./get-users";
 
 export type CreateVeiculo = Pick<
   Veiculo,
@@ -26,8 +27,8 @@ const dataSchema = z.object({
   numEixos: z.number(),
 });
 
-export const createVeiculo = async (veiculo: CreateVeiculo, user: User) => {
-  if (user.perfil) {
+export const createVeiculo = async (veiculo: CreateVeiculo, user: UserFull) => {
+  if (user.perfil && user.accessLevel.create) {
     if (dataSchema.safeParse(veiculo).success) {
       try {
         const createdVeiculo = await prisma.veiculo.create({

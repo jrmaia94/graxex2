@@ -14,6 +14,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { toast } from "sonner";
 
 export interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -78,6 +79,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
             })
             .catch((err) => {
               console.log(err);
+              toast.error(err.message);
             });
 
           getAllVeiculos(session.user)
@@ -90,6 +92,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
             })
             .catch((err) => {
               console.log(err);
+              toast.error(err.message);
             });
 
           getAllAgendamentos(session.user)
@@ -102,6 +105,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
             })
             .catch((err) => {
               console.log(err);
+              toast.error(err.message);
             });
         }
       }

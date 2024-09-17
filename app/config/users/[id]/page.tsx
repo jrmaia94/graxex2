@@ -11,6 +11,7 @@ import { DataContext } from "@/providers/store";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface PageEditUserParams {
   params: {
@@ -27,15 +28,28 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
   const [user, setUser] = useState<UserFull | null>(null);
 
   const callUpdateUser = () => {
-    if (user) {
-      console.log(user);
-      /*       updateUser(user, data.user)
+    let localUser: any = { ...user };
+    if (localUser) {
+      if (
+        localUser.accessLevel.read ||
+        localUser.accessLevel.create ||
+        localUser.accessLevel.update ||
+        localUser.accessLevel.delete ||
+        localUser.accessLevel.admin
+      ) {
+        localUser.perfil = true;
+      } else {
+        localUser.perfil = false;
+      }
+      updateUser(localUser, data.user)
         .then((res) => {
-          console.log(res);
+          toast.success("Usuário atualizado com sucesso");
         })
         .catch((err) => {
           console.log(err);
-        }); */
+          toast.error("Não foi possível atualizar o usuário");
+          toast.error(err.message);
+        });
     }
   };
 
@@ -46,6 +60,7 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
           if (dados.users) {
             let localUser = dados.users.find((item) => item.id === params.id);
             if (localUser) {
+              console.log(localUser);
               let obj = {
                 read: false,
                 create: false,
@@ -53,7 +68,9 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
                 delete: false,
                 admin: false,
               };
-              setUser({ ...localUser, accessLevel: obj });
+              !localUser.accessLevel
+                ? setUser({ ...localUser, accessLevel: obj })
+                : setUser({ ...localUser });
             }
           }
         }
@@ -79,13 +96,16 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
                             user.accessLevel ? user.accessLevel[item] : false
                           }
                           onChange={(e) => {
-                            switch (e.target.id) {
-                              case "read":
-                                break;
-
-                              default:
-                                break;
-                            }
+                            setUser((prevUser) => {
+                              if (prevUser) {
+                                const newUser = { ...prevUser };
+                                newUser.accessLevel[e.target.id] =
+                                  e.target.checked;
+                                return newUser;
+                              } else {
+                                return null;
+                              }
+                            });
                           }}
                         />
                         <label>{item}</label>

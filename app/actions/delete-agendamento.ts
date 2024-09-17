@@ -1,10 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { User } from "@prisma/client";
+import { UserFull } from "./get-users";
 
-export const deleteAgendamentoById = async (id: number, user: User) => {
-  if (user.perfil) {
+export const deleteAgendamentoById = async (id: number, user: UserFull) => {
+  if (user.perfil && user.accessLevel.delete) {
     if (id > 0) {
       try {
         await prisma.agendamentosPorVeiculos.deleteMany({

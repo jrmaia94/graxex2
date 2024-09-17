@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 import { z } from "zod";
+import { UserFull } from "./get-users";
 
 const dataSchema = z.object({
   id: z.number(),
@@ -13,9 +14,9 @@ const dataSchema = z.object({
 export const updateAgendamento = async (
   agendamento: any,
   veiculos: any[],
-  user: User
+  user: UserFull
 ) => {
-  if (user.perfil) {
+  if (user.perfil && user.accessLevel.update) {
     const { id, ...data } = agendamento;
     console.log(agendamento);
     if (dataSchema.safeParse(agendamento).success) {

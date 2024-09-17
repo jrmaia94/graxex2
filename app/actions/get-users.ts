@@ -16,7 +16,7 @@ export interface UserFull
     User,
     "email" | "name" | "id" | "perfil" | "username" | "image"
   > {
-  accessLevel: AccessProps | any;
+  accessLevel?: AccessProps | any;
 }
 
 export const getAllUsers = async (user: UserFull) => {

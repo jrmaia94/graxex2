@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { CreateVeiculo } from "./post-veiculo";
 import { User } from "@prisma/client";
+import { UserFull } from "./get-users";
 
 export interface UpdateVeiculo extends CreateVeiculo {
   id: number;
@@ -19,8 +20,8 @@ const dataSchema = z.object({
   numEixos: z.number(),
 });
 
-export const updateVeiculo = async (veiculo: UpdateVeiculo, user: User) => {
-  if (user.perfil) {
+export const updateVeiculo = async (veiculo: UpdateVeiculo, user: UserFull) => {
+  if (user.perfil && user.accessLevel.update) {
     const { id, ...data } = veiculo;
     if (dataSchema.safeParse(veiculo).success) {
       try {

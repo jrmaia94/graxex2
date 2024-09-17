@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { CreateCliente } from "./post-cliente";
 import { User } from "@prisma/client";
+import { UserFull } from "./get-users";
 
 export interface UpdateCliente extends CreateCliente {
   id: number;
@@ -24,8 +25,8 @@ const dataSchema = z.object({
     .nullable(),
 });
 
-export const updateCliente = async (cliente: UpdateCliente, user: User) => {
-  if (user.perfil) {
+export const updateCliente = async (cliente: UpdateCliente, user: UserFull) => {
+  if (user.perfil && user.accessLevel.update) {
     const { id, ...data } = cliente;
     if (dataSchema.safeParse(cliente).success) {
       try {

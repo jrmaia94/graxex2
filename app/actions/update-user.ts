@@ -13,6 +13,10 @@ export const updateUser = async (data: UserFull, user: UserFull) => {
         data: data,
       });
       return user;
+    } else {
+      throw Error("Usuário não autorizado");
     }
+  } else {
+    throw Error("Problema na verificação do usuário");
   }
 };

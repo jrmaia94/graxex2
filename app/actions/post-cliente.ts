@@ -1,7 +1,8 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { Cliente, User } from "@prisma/client";
+import { Cliente } from "@prisma/client";
 import { z } from "zod";
+import { UserFull } from "./get-users";
 
 export type CreateCliente = Pick<
   Cliente,
@@ -23,8 +24,8 @@ const dataSchema = z.object({
     .nullable(),
 });
 
-export const createCliente = async (cliente: CreateCliente, user: User) => {
-  if (user.perfil) {
+export const createCliente = async (cliente: CreateCliente, user: UserFull) => {
+  if (user.perfil && user.accessLevel.create) {
     if (dataSchema.safeParse(cliente).success) {
       try {
         const createdCliente = await prisma.cliente.create({

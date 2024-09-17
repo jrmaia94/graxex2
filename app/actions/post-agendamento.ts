@@ -1,8 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { Agendamento, User, Veiculo } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { UserFull } from "./get-users";
 
 const dataSchema = z.object({
   clienteId: z.number(),
@@ -26,9 +26,9 @@ const dataSchema = z.object({
   serviceCompleted: z.date().nullable(),
 });
 
-export const createAgendamento = async (agendamento: any, user: User) => {
+export const createAgendamento = async (agendamento: any, user: UserFull) => {
   console.log(agendamento);
-  if (user.perfil) {
+  if (user.perfil && user.accessLevel.create) {
     if (dataSchema.safeParse(agendamento).success) {
       try {
         const createdAgendamento = await prisma.agendamento.create({
