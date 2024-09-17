@@ -256,13 +256,21 @@ export const generate_PDF = (data) => {
       },
       4: {
         font: "AkcelerAalt-Medium",
-        textColor: [238, 78, 54],
       },
     },
     alternateRowStyles: {
       fillColor: [225, 225, 225],
     },
-    afterPageContent: function (data) {
+    didParseCell: (data) => {
+      if (data.column.index === 4) {
+        if (data.cell.text[0] === "Nunca foi atendido") {
+          data.cell.styles.textColor = [238, 78, 54];
+        } else if (parseInt(data.cell.text) >= 30) {
+          data.cell.styles.textColor = [238, 78, 54];
+        }
+      }
+    },
+    afterPageContent: function () {
       // Calcular a posição do rodapé
       const str = `"Nossa missão é levar conveniência, aumentar a durabilidade e maximizar sua eficiência."`;
       const pageSize = doc.internal.pageSize;
@@ -294,8 +302,8 @@ export const generate_PDF = (data) => {
   //  }
   //);
 
-  //window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
-  setTimeout(() => {
+  window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
+  /* setTimeout(() => {
     doc.save(
       `Situação de frota - ${data.name} - ${Intl.DateTimeFormat("pt-br", {
         day: "2-digit",
@@ -305,5 +313,5 @@ export const generate_PDF = (data) => {
         .format(new Date(Date.now()).setUTCHours(12))
         .replace(/\//g, "_")}`
     );
-  }, 400);
+  }, 400); */
 };
