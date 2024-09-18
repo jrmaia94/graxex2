@@ -302,8 +302,8 @@ export const generate_PDF = (data) => {
   //  }
   //);
 
-  window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
-  /* setTimeout(() => {
+  //window.open(doc.output("bloburi", { filename: "Relação de atendimentos" }));
+  setTimeout(() => {
     doc.save(
       `Situação de frota - ${data.name} - ${Intl.DateTimeFormat("pt-br", {
         day: "2-digit",
@@ -313,5 +313,5 @@ export const generate_PDF = (data) => {
         .format(new Date(Date.now()).setUTCHours(12))
         .replace(/\//g, "_")}`
     );
-  }, 400); */
+  }, 400);
 };
