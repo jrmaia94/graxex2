@@ -86,8 +86,8 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
           ${date.toString().substring(3, 5)}/
           ${date.toString().substring(0, 2)}`
       );
-      return (
-        Math.round((today - dateConfigure.getTime()) / 1000 / 60 / 60 / 24) - 1
+      return Math.round(
+        (today - dateConfigure.getTime()) / 1000 / 60 / 60 / 24
       );
     } else {
       return -1;
