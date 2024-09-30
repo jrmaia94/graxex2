@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { User } from "@prisma/client";
+import { Agendamento, User } from "@prisma/client";
 import { z } from "zod";
 import { UserFull } from "./get-users";
 
@@ -17,7 +17,6 @@ export const updateAgendamento = async (
   user: UserFull
 ) => {
   if (user.perfil && user.accessLevel.update) {
-    const { id, ...data } = agendamento;
     console.log(agendamento);
     if (dataSchema.safeParse(agendamento).success) {
       try {
@@ -38,9 +37,11 @@ export const updateAgendamento = async (
             id: agendamento.id,
           },
           data: {
-            date: data.date,
-            serviceCompleted: data.serviceCompleted,
-            clienteId: data.clienteId,
+            date: agendamento.date,
+            serviceCompleted: agendamento.serviceCompleted,
+            clienteId: agendamento.clienteId,
+            price: agendamento.price,
+            pricePerVeiculo: agendamento.pricePerVeiculo || [],
           },
         });
 

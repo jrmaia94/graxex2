@@ -72,7 +72,12 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
 
   type UpdatedAgendamento = Pick<
     Agendamento,
-    "clienteId" | "date" | "serviceCompleted" | "id" | "pricePerVeiculo"
+    | "clienteId"
+    | "date"
+    | "serviceCompleted"
+    | "id"
+    | "pricePerVeiculo"
+    | "price"
   >;
 
   const formSubmit = (e: any) => {
@@ -103,6 +108,13 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             ? new Date(new Date(dateIsDoneRef.current.value).setUTCHours(12))
             : null,
           pricePerVeiculo: prices,
+          price: parseFloat(
+            priceRef.current.value
+              .replace("R$", "")
+              .trim()
+              .replaceAll(".", "")
+              .replace(",", ".")
+          ),
         };
 
         data?.user &&
