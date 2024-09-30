@@ -1,11 +1,21 @@
 "use client";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useState, useTransition } from "react";
+import { useContext, useEffect, useTransition } from "react";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
-import CardAgendamentoFinalizado from "@/components/card-agendamento-finalizado";
 import Loader from "@/components/loader";
 import { DataContext } from "@/providers/store";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogContent,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import CardCliente from "@/components/card-cliente";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { getAgendamentosFinalizados } from "./actions/get-agendamentos";
+import { generate_PDF_recibo } from "./actions/generate-PDF-recibo";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -19,127 +29,93 @@ interface AgendamentoProps extends Agendamento {
 const Home = () => {
   const {} = useTransition();
   const [isPending, startTransition] = useTransition();
-  const [agendamentosFuturos, setAgendamentosFuturos] = useState<
-    AgendamentoProps[]
-  >([]);
-  const [agendamentosFinalizados, setAgendamentosFinalizados] = useState<
-    AgendamentoProps[]
-  >([]);
   const { data }: { data: any } = useSession({
     required: true,
   });
   const { data: dados } = useContext(DataContext);
 
-  /*   useEffect(() => {
-    data?.user &&
-      startTransition(() => {
-        getAgendamentosFuturos(data.user)
-          .then((res) => {
-            const newObj = res.map((e) => {
-              return {
-                ...e,
-                veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
-              };
-            });
-            setAgendamentosFuturos(newObj);
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error(
-              `Não foi possível carregar os agendamentos! ${err.message}`
-            );
-          });
+  const clientes = dados?.clientes;
+  const agendamentosFinalizados = dados?.agendamentos;
+  /* useEffect(() => {
+    agendamentosFinalizados &&
+      generate_PDF_recibo(
+        agendamentosFinalizados.find((e) => e.cliente.address !== null)
+      );
+  }, [agendamentosFinalizados]); */
 
-        getAgendamentosFinalizados(data.user)
-          .then((res) => {
-            const newObj = res.map((e) => {
-              return {
-                ...e,
-                veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
-              };
-            });
-            setAgendamentosFinalizados(newObj);
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error(
-              `Não foi possível carregar os agendamentos! ${err.message}`
-            );
-          });
-      });
-  }, [data]); */
+  const emTeste = true;
 
-  useEffect(() => {
-    if (dados) {
-      if (dados.agendamentos) {
-        startTransition(() => {
-          setAgendamentosFinalizados((array: any) => {
-            let newArray = [...array];
-            newArray = [
-              ...dados.agendamentos.filter((item) => item.serviceCompleted),
-            ];
-            return newArray;
-          });
-        });
-      }
-    }
-  }, [dados]);
-
-  return (
+  return !emTeste ? (
     <div className="flex justify-center mt-[90px]">
-      <div className="w-full max-w-[920px] flex flex-col items-center relative">
+      <div className="w-full px-10 max-w-[920px] mx-auto flex flex-wrap justify-center relative gap-2">
         {isPending && <Loader />}
-        {/*         <div
-          className="
-          absolute
-          opacity-40
-          rounded-full
-          top-[-150px]
-          right-0
-          flex
-          align-bottom
-          overflow-hidden
-          w-[250px]
-          h-[450px]"
-        >
-          <Image
-            alt="Foto graxex"
-            src="/background.jpeg"
-            className="object-none "
-            width={600}
-            height={600}
-          />
-        </div> */}
-        <div className="px-4 w-full max-w-[600px]">
-          {/*           <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
-            Agendamentos
-          </h2>
-          <ScrollArea className="h-72 whitespace-nowrap">
-            {agendamentosFuturos.map((agendamento) => {
-              return (
-                <div className="pb-2" key={agendamento.id}>
-                  <CardAgendamento agendamento={agendamento} />
-                </div>
-              );
-            })}
-            <ScrollBar className="bg-ring rounded-xl" />
-          </ScrollArea> */}
-          <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
-            Pre-Agendamentos
-          </h2>
-          <ScrollArea className="h-[600px] whitespace-nowrap">
-            {agendamentosFinalizados.map((agendamento) => {
-              return (
-                <div className="pb-2" key={agendamento.id}>
-                  <CardAgendamentoFinalizado agendamento={agendamento} />
-                </div>
-              );
-            })}
-            <ScrollBar className="bg-ring rounded-xl" />
-          </ScrollArea>
-        </div>
+        {clientes?.map((cliente) => (
+          <Dialog key={cliente.id}>
+            <DialogTrigger asChild>
+              <Button className="w-[150px] h-[80px] overflow-clip whitespace-normal">
+                {cliente.name}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{cliente.name}</DialogTitle>
+              </DialogHeader>
+              <ScrollArea className="h-64 w-full">
+                {cliente.veiculos.map((veiculo) => (
+                  <div key={veiculo.id} className="flex flex-col gap-2">
+                    <div className="gap-2 flex">
+                      <span>{veiculo.frota}</span>
+                      <span>{veiculo.placa}</span>
+                      <span>{veiculo.fabricante}</span>
+                      <span>{veiculo.modelo}</span>
+                    </div>
+                    <div className="gap-2 flex">
+                      <span>
+                        {Intl.DateTimeFormat("pt-br", {
+                          dateStyle: "long",
+                        }).format(
+                          dados?.agendamentos
+                            .find(
+                              (e) =>
+                                e.clienteId === cliente.id &&
+                                e.veiculos
+                                  .map((i) => i.veiculoId)
+                                  .includes(veiculo.id)
+                            )
+                            ?.date.getTime()
+                        )}
+                      </span>
+                      <span>
+                        {Math.round(
+                          (new Date(Date.now()).setHours(6) -
+                            (dados?.agendamentos
+                              .find(
+                                (e) =>
+                                  e.clienteId === cliente.id &&
+                                  e.veiculos
+                                    .map((i) => i.veiculoId)
+                                    .includes(veiculo.id)
+                              )
+                              ?.date.setHours(6) || 0)) /
+                            1000 /
+                            60 /
+                            60 /
+                            24
+                        )}{" "}
+                        dia(s)
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+        ))}
       </div>
     </div>
+  ) : (
+    <></>
   );
 };
 

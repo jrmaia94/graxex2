@@ -148,13 +148,17 @@ export const generate_PDF_Agendamento = (data) => {
       .replace("R$", "")
       .trim();
 
-    console.log(price);
+    let obs =
+      data.agendamento.pricePerVeiculo.find(
+        (itemPP) => itemPP.veiculoId === item.id
+      )?.observacao || item.observacao;
+
     return [
       item.placa,
       item.frota,
       `${item.fabricante}\n${item.modelo}`,
       `R$ ${price}`,
-      item.observacao || "",
+      obs || "",
     ];
   });
 
