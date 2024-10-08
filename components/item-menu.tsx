@@ -2,12 +2,12 @@ import { ItemsMenuOptions } from "@/constants/nav-menu";
 import { Card, CardContent } from "./ui/card";
 import {
   CalendarArrowUp,
+  ListCollapseIcon,
   SettingsIcon,
   TruckIcon,
   User2Icon,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "./ui/button";
 
 const ItemMenu = ({
   itemMenu,
@@ -26,6 +26,8 @@ const ItemMenu = ({
         return <CalendarArrowUp size={30} />;
       case "Configurações":
         return <SettingsIcon size={30} />;
+      case "Relatórios":
+        return <ListCollapseIcon size={30} />;
     }
   };
   return (
@@ -33,7 +35,7 @@ const ItemMenu = ({
       <CardContent className="p-0 flex items-center justify-start w-full">
         <Link
           onClick={() => action(false)}
-          href={itemMenu.href}
+          href={itemMenu.href === "/relatorios" ? "/" : itemMenu.href}
           className="flex gap-2 items-center"
         >
           {itemIcon(itemMenu.title)}

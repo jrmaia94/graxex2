@@ -21,7 +21,7 @@ export const getSomeClientes = async (name: string, user: User) => {
         },
       },
       orderBy: {
-        name: "asc",
+        createdAt: "desc",
       },
     });
 

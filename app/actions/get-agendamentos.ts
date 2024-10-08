@@ -30,7 +30,7 @@ export const getAgendamentosFuturos = async (user: User) => {
         serviceCompleted: null,
       },
       orderBy: {
-        date: "asc",
+        serviceCompleted: "desc",
       },
     });
 
@@ -69,7 +69,7 @@ export const getAgendamentosFinalizados = async (user: User) => {
         },
       },
       orderBy: {
-        serviceCompleted: "asc",
+        serviceCompleted: "desc",
       },
     });
 
@@ -103,7 +103,7 @@ export const getAllAgendamentos = async (user: User) => {
         },
       },
       orderBy: {
-        id: "asc",
+        serviceCompleted: "desc",
       },
     });
 

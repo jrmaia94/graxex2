@@ -21,7 +21,7 @@ const CardCliente = ({ cliente }: { cliente: ClienteFull }) => {
       ) : (
         <UserIcon size={70} />
       )}
-      <div className="flex flex-col overflow-hidden gap-1">
+      <div className="flex flex-col items-start overflow-hidden gap-1">
         <Link href={`/clientes/${cliente.id}`}>
           <h3 className="truncate text-lg">{cliente.name}</h3>
         </Link>
