@@ -95,10 +95,11 @@ const AgendamentoPage = () => {
     });
     setPrice(sum);
 
-    setVisibleVeiculos(() => {
-      const newObj = [...veiculos];
-      return newObj;
-    });
+    visibleVeiculos.length === 0 &&
+      setVisibleVeiculos(() => {
+        const newObj = [...veiculos];
+        return newObj;
+      });
   }, [veiculos]);
 
   useEffect(() => {

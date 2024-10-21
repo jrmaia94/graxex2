@@ -263,10 +263,11 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
     });
     setPrice(sum);
 
-    setVisibleVeiculos(() => {
-      const newObj = [...veiculos];
-      return newObj;
-    });
+    visibleVeiculos.length === 0 &&
+      setVisibleVeiculos(() => {
+        const newObj = [...veiculos];
+        return newObj;
+      });
   }, [veiculos]);
 
   return (
