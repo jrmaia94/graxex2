@@ -349,7 +349,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
               {visibleVeiculos.map((item) => (
                 <div
                   key={item.veiculo.id}
-                  className="h-6 flex w-full items-center"
+                  className="h-9 flex w-full items-center"
                 >
                   <input
                     checked={item.isChecked}

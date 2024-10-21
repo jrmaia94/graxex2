@@ -267,7 +267,7 @@ const AgendamentoPage = () => {
               {visibleVeiculos.map((item) => (
                 <div
                   key={item.veiculo.id}
-                  className="h-fit flex items-center w-full"
+                  className="h-10 flex items-center w-full"
                 >
                   <input
                     checked={item.isChecked}
