@@ -59,6 +59,7 @@ const AgendamentoPage = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [selectedCliente, setSelectedCliente] = useState<number>(-1);
   const [veiculos, setVeiculos] = useState<SchemaVeiculo[]>([]);
+  const [visibleVeiculos, setVisibleVeiculos] = useState<SchemaVeiculo[]>([]);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
 
@@ -93,6 +94,11 @@ const AgendamentoPage = () => {
       }
     });
     setPrice(sum);
+
+    setVisibleVeiculos(() => {
+      const newObj = [...veiculos];
+      return newObj;
+    });
   }, [veiculos]);
 
   useEffect(() => {
@@ -219,6 +225,28 @@ const AgendamentoPage = () => {
           <label htmlFor="veiculos" className="text-lg">
             Veículos
           </label>
+          <Input
+            className="bg-primary text-primary-foreground h-7 w-64"
+            placeholder="buscar veículos..."
+            onChange={(e) =>
+              setVisibleVeiculos(() => {
+                const newObj = [...veiculos].filter((item) => {
+                  return (
+                    item.veiculo.modelo
+                      .toUpperCase()
+                      .includes(e.target.value.toUpperCase()) ||
+                    item.veiculo.fabricante
+                      ?.toUpperCase()
+                      .includes(e.target.value.toUpperCase()) ||
+                    item.veiculo.placa
+                      ?.toUpperCase()
+                      .includes(e.target.value.toUpperCase())
+                  );
+                });
+                return newObj;
+              })
+            }
+          />
           <div className="ps-3">
             <input
               type="checkbox"
@@ -235,7 +263,7 @@ const AgendamentoPage = () => {
           </div>
           <ScrollArea className="h-[150px] w-full max-w-[500px] rounded-md border border-primary p-2 mb-2">
             <div className="flex flex-col gap-1">
-              {veiculos.map((item) => (
+              {visibleVeiculos.map((item) => (
                 <div
                   key={item.veiculo.id}
                   className="h-fit flex items-center w-full"

@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useTransition } from "react";
+import { useContext, useTransition } from "react";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import Loader from "@/components/loader";
 import { DataContext } from "@/providers/store";
@@ -14,10 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import CardCliente from "@/components/card-cliente";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { getAgendamentosFinalizados } from "./actions/get-agendamentos";
-import { generate_PDF_recibo } from "./actions/generate-PDF-recibo";
-import Image from "next/image";
-import { generate_PDF } from "./actions/generate-PDF";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];

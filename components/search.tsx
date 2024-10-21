@@ -92,6 +92,7 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
             <FormItem className="w-full">
               <FormControl>
                 <Input
+                  disabled={origin === "agendamentos"}
                   placeholder="Search"
                   className="bg-primary text-primary-foreground"
                   {...field}
