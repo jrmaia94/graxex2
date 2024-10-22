@@ -56,7 +56,7 @@ const Relatorios = () => {
         </Button>
       </div>
       <div className="flex flex-col">
-        {atendimentos.length > 0 && <DataTable atendimentos={atendimentos} />}
+        {atendimentos.length > 0 && <DataTable agendamentos={atendimentos} />}
       </div>
     </div>
   );

@@ -35,7 +35,7 @@ const ItemMenu = ({
       <CardContent className="p-0 flex items-center justify-start w-full">
         <Link
           onClick={() => action(false)}
-          href={itemMenu.href === "/relatorios" ? "/" : itemMenu.href}
+          href={itemMenu.href === "/relatorio" ? "/" : itemMenu.href}
           className="flex gap-2 items-center"
         >
           {itemIcon(itemMenu.title)}
