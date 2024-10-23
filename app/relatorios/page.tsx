@@ -26,7 +26,10 @@ const Relatorios = () => {
           data.agendamentos.filter(
             (agendamento) =>
               agendamento.serviceCompleted &&
-              agendamento.serviceCompleted > new Date(initialDate)
+              agendamento.serviceCompleted.setHours(20) >=
+                new Date(initialDate).setHours(5) &&
+              agendamento.serviceCompleted.setHours(5) <=
+                new Date(finalDate).setHours(20)
           )
         );
     }, 500);

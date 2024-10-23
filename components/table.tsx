@@ -22,14 +22,15 @@ export function DataTable({ agendamentos }: { agendamentos: any[] }) {
 
   useEffect(() => {
     let dados: Atendimento[] = [];
-    agendamentos.forEach((e) =>
-      dados.push({
+    agendamentos.forEach((e) => {
+      console.log(e.serviceCompleted);
+      return dados.push({
         id: e.id,
         cliente: e.cliente.name,
         data: e.serviceCompleted,
         price: e.price,
-      })
-    );
+      });
+    });
     setAtendimentos(dados);
   }, [agendamentos]);
 
@@ -53,7 +54,7 @@ export function DataTable({ agendamentos }: { agendamentos: any[] }) {
             <TableCell className="font-medium">{atendimento.id}</TableCell>
             <TableCell>{atendimento.cliente}</TableCell>
             <TableCell>
-              {moment(atendimento.data).format("DD-MM-YYYY")}
+              {moment(atendimento.data.setUTCHours(8)).format("DD-MM-YYYY")}
             </TableCell>
             <TableCell className="text-right">
               {Intl.NumberFormat("pt-BR", {

@@ -7,6 +7,8 @@ import { UserFull } from "./get-users";
 const dataSchema = z.object({
   clienteId: z.number(),
   price: z.number(),
+  paid: z.boolean(),
+  paymentMethod: z.string(),
   pricePerVeiculo: z.array(
     z.object({ veiculoId: z.number(), price: z.number() })
   ),
@@ -27,29 +29,31 @@ const dataSchema = z.object({
 });
 
 export const createAgendamento = async (agendamento: any, user: UserFull) => {
-  console.log(agendamento);
   if (user.perfil && user.accessLevel.create) {
     if (dataSchema.safeParse(agendamento).success) {
       try {
-        const createdAgendamento = await prisma.agendamento.create({
-          data: {
-            date: agendamento.date,
-            clienteId: agendamento.clienteId,
-            serviceCompleted: agendamento.serviceCompleted,
-            price: agendamento.price,
-            pricePerVeiculo: agendamento.pricePerVeiculo,
-            veiculos: {
-              create: agendamento.veiculos.map((veiculo: any) => {
-                return {
-                  veiculo: {
-                    connect: {
-                      id: veiculo.id,
-                    },
+        const data = {
+          date: agendamento.date,
+          clienteId: agendamento.clienteId,
+          serviceCompleted: agendamento.serviceCompleted,
+          price: agendamento.price,
+          paid: agendamento.paid,
+          paymentMethod: agendamento.paymentMethod,
+          pricePerVeiculo: agendamento.pricePerVeiculo,
+          veiculos: {
+            create: agendamento.veiculos.map((veiculo: any) => {
+              return {
+                veiculo: {
+                  connect: {
+                    id: veiculo.id,
                   },
-                };
-              }),
-            },
+                },
+              };
+            }),
           },
+        };
+        const createdAgendamento = await prisma.agendamento.create({
+          data: data,
         });
         return createdAgendamento;
       } catch (error) {

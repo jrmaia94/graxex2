@@ -60,6 +60,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
   const dateIsDoneRef = useRef<any>(null);
   const isDoneRef = useRef<any>(null);
   const priceRef = useRef<any>(null);
+  const paymentMethod = useRef<any>(null);
 
   const [agendamento, setAgendamento] = useState<AgendamentoFull | null>();
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -67,6 +68,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
   const [veiculos, setVeiculos] = useState<SchemaVeiculo[]>([]);
   const [visibleVeiculos, setVisibleVeiculos] = useState<SchemaVeiculo[]>([]);
   const [isDone, setIsDone] = useState<boolean>(false);
+  const [isPaid, setIsPaid] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
 
   const [isPending, startTransition] = useTransition();
@@ -79,6 +81,8 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
     | "id"
     | "pricePerVeiculo"
     | "price"
+    | "paid"
+    | "paymentMethod"
   >;
 
   const formSubmit = (e: any) => {
@@ -108,6 +112,8 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
           serviceCompleted: isDone
             ? new Date(new Date(dateIsDoneRef.current.value).setUTCHours(12))
             : null,
+          paid: isPaid,
+          paymentMethod: paymentMethod.current.value,
           pricePerVeiculo: prices,
           price: parseFloat(
             priceRef.current.value
@@ -174,6 +180,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
 
   useEffect(() => {
     setPrice(agendamento?.price || 0);
+    setIsPaid(agendamento?.paid || false);
     idRef.current.value = agendamento?.id;
     let dateFormat = `${Intl.DateTimeFormat("eng", { year: "numeric" }).format(
       agendamento?.date
@@ -187,6 +194,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
       style: "currency",
       currency: "BRL",
     }).format(agendamento?.price || 0);
+    paymentMethod.current.value = agendamento?.paymentMethod;
     if (agendamento?.serviceCompleted) {
       let dateIsDoneFormat = `${Intl.DateTimeFormat("eng", {
         year: "numeric",
@@ -466,6 +474,30 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             type="text"
             className="h-7 max-w-[150px] rounded-sm text-primary-foreground me-2 text-end px-1"
           />
+          <div className="flex mb-2">
+            <label className="me-2 text-lg" htmlFor="valor">
+              Pago?
+            </label>
+            <input
+              checked={isPaid}
+              onChange={() => setIsPaid(!isPaid)}
+              type="checkbox"
+            />
+          </div>
+          <label className="me-2 text-lg" htmlFor="valor">
+            Forma de pagamento
+          </label>
+          <select
+            disabled={!isPaid}
+            ref={paymentMethod}
+            className="h-7 mb-2 max-w-[350px] rounded-sm text-primary-foreground me-2 text-start px-1"
+          >
+            <option value="0">Selecione uma forma de pagamento</option>
+            <option value="pix">Pix</option>
+            <option value="cartao">Cartão</option>
+            <option value="dinheiro">Dinheiro</option>
+            <option value="boleto">Boleto</option>
+          </select>
           <label className="me-2 text-lg" htmlFor="date">
             Data
           </label>

@@ -17,7 +17,6 @@ export const updateAgendamento = async (
   user: UserFull
 ) => {
   if (user.perfil && user.accessLevel.update) {
-    console.log(agendamento);
     if (dataSchema.safeParse(agendamento).success) {
       try {
         await prisma.agendamentosPorVeiculos.deleteMany({
@@ -41,6 +40,8 @@ export const updateAgendamento = async (
             serviceCompleted: agendamento.serviceCompleted,
             clienteId: agendamento.clienteId,
             price: agendamento.price,
+            paid: agendamento.paid,
+            paymentMethod: agendamento.paymentMethod,
             pricePerVeiculo: agendamento.pricePerVeiculo || [],
           },
         });

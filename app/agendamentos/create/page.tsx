@@ -54,6 +54,7 @@ const AgendamentoPage = () => {
   const dateRef = useRef<any>(null);
   const dateIsDoneRef = useRef<any>(null);
   const isDoneRef = useRef<any>(null);
+  const paymentMethod = useRef<any>(null);
 
   const router = useRouter();
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -61,13 +62,20 @@ const AgendamentoPage = () => {
   const [veiculos, setVeiculos] = useState<SchemaVeiculo[]>([]);
   const [visibleVeiculos, setVisibleVeiculos] = useState<SchemaVeiculo[]>([]);
   const [isDone, setIsDone] = useState<boolean>(false);
+  const [isPaid, setIsPaid] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
 
   const [isPending, startTransition] = useTransition();
 
   type CreateAgendamento = Pick<
     Agendamento,
-    "clienteId" | "date" | "serviceCompleted" | "price" | "pricePerVeiculo"
+    | "clienteId"
+    | "date"
+    | "serviceCompleted"
+    | "price"
+    | "pricePerVeiculo"
+    | "paid"
+    | "paymentMethod"
   >;
 
   useEffect(() => {
@@ -120,13 +128,6 @@ const AgendamentoPage = () => {
           });
           setVeiculos(arrayVeiculos || []);
         }
-        /* getClienteById(selectedCliente, data.user)
-          .then((res) => {
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error("Erro ao buscar cliente!");
-          }); */
       }
     });
   }, [selectedCliente, data, dados]);
@@ -154,6 +155,8 @@ const AgendamentoPage = () => {
         date:
           new Date(new Date(dateRef?.current?.value).setUTCHours(12)) || null,
         price: price,
+        paid: isPaid,
+        paymentMethod: isPaid ? paymentMethod.current.value : "",
         pricePerVeiculo: prices,
         serviceCompleted: isDoneRef?.current?.value
           ? new Date(new Date(dateIsDoneRef?.current?.value).setUTCHours(12)) ||
@@ -382,8 +385,32 @@ const AgendamentoPage = () => {
               e.target.select();
             }}
             type="text"
-            className="h-7 max-w-[150px] rounded-sm text-primary-foreground me-2 text-end px-1"
+            className="h-7 max-w-[150px] mb-2 rounded-sm text-primary-foreground me-2 text-end px-1"
           />
+          <div className="flex mb-2">
+            <label className="me-2 text-lg" htmlFor="valor">
+              Pago?
+            </label>
+            <input
+              checked={isPaid}
+              onChange={() => setIsPaid(!isPaid)}
+              type="checkbox"
+            />
+          </div>
+          <label className="me-2 text-lg" htmlFor="valor">
+            Forma de pagamento
+          </label>
+          <select
+            disabled={!isPaid}
+            ref={paymentMethod}
+            className="h-7 mb-2 max-w-[350px] rounded-sm text-primary-foreground me-2 text-start px-1"
+          >
+            <option value="0">Selecione uma forma de pagamento</option>
+            <option value="pix">Pix</option>
+            <option value="cartao">Cartão</option>
+            <option value="dinheiro">Dinheiro</option>
+            <option value="boleto">Boleto</option>
+          </select>
           <label className="me-2 text-lg" htmlFor="date">
             Data
           </label>

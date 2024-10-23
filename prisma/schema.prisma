@@ -99,6 +99,8 @@ model Agendamento {
   price            Float                     @default(0)
   createdAt        DateTime                  @default(now())
   updatedAt        DateTime                  @updatedAt
+  paid             Boolean                   @default(false)
+  paymentMethod    String?
   clienteId        Int
   cliente          Cliente                   @relation(fields: [clienteId], references: [id])
   veiculos         AgendamentosPorVeiculos[]
