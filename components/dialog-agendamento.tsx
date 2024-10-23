@@ -50,9 +50,10 @@ export const DialogAgendamento = ({
   });
   const [date, setDate] = useState<Date>(new Date(Date.now()));
   const [dateIsDone, setDateIsDone] = useState<Date>(new Date(Date.now()));
-
+  const paymentMethod = useRef<any>(null);
   const [veiculos, setVeiculos] = useState<SchemaVeiculo[]>([]);
   const [isDone, setIsDone] = useState<boolean>(true);
+  const [isPaid, setIsPaid] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(0);
   const [isLoading, startTransition] = useTransition();
 
@@ -70,11 +71,19 @@ export const DialogAgendamento = ({
       });
       const agendamento: Pick<
         Agendamento,
-        "date" | "price" | "pricePerVeiculo" | "serviceCompleted" | "clienteId"
+        | "date"
+        | "price"
+        | "pricePerVeiculo"
+        | "serviceCompleted"
+        | "clienteId"
+        | "paid"
+        | "paymentMethod"
       > = {
         clienteId: cliente.id,
         date: date,
         price: price,
+        paid: isPaid,
+        paymentMethod: paymentMethod.current?.value || "",
         serviceCompleted: dateIsDone,
         pricePerVeiculo: prices,
       };
@@ -279,6 +288,29 @@ export const DialogAgendamento = ({
           type="text"
           className="h-7 px-1 max-w-[150px] rounded-sm text-primary-foreground text-end"
         />
+        <div className="flex mb-2 items-center">
+          <label className="me-2 text-lg" htmlFor="valor">
+            Pago?
+          </label>
+          <input
+            checked={isPaid}
+            onChange={() => setIsPaid(!isPaid)}
+            type="checkbox"
+          />
+        </div>
+        <label className="me-2 text-lg" htmlFor="valor">
+          Forma de pagamento
+        </label>
+        <select
+          ref={paymentMethod}
+          className="h-7 mb-2 max-w-[350px] rounded-sm text-primary-foreground me-2 text-start px-1"
+        >
+          <option value="0">Selecione uma forma de pagamento</option>
+          <option value="pix">Pix</option>
+          <option value="cartao">Cartão</option>
+          <option value="dinheiro">Dinheiro</option>
+          <option value="boleto">Boleto</option>
+        </select>
         <label className="text-lg" htmlFor="date">
           Data
         </label>
