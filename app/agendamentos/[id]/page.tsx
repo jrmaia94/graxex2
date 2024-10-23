@@ -488,7 +488,6 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             Forma de pagamento
           </label>
           <select
-            disabled={!isPaid}
             ref={paymentMethod}
             className="h-7 mb-2 max-w-[350px] rounded-sm text-primary-foreground me-2 text-start px-1"
           >

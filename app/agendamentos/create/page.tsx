@@ -156,7 +156,7 @@ const AgendamentoPage = () => {
           new Date(new Date(dateRef?.current?.value).setUTCHours(12)) || null,
         price: price,
         paid: isPaid,
-        paymentMethod: isPaid ? paymentMethod.current.value : "",
+        paymentMethod: paymentMethod.current.value,
         pricePerVeiculo: prices,
         serviceCompleted: isDoneRef?.current?.value
           ? new Date(new Date(dateIsDoneRef?.current?.value).setUTCHours(12)) ||
@@ -401,7 +401,6 @@ const AgendamentoPage = () => {
             Forma de pagamento
           </label>
           <select
-            disabled={!isPaid}
             ref={paymentMethod}
             className="h-7 mb-2 max-w-[350px] rounded-sm text-primary-foreground me-2 text-start px-1"
           >

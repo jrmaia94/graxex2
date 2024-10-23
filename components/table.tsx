@@ -7,6 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  CheckCheckIcon,
+  CheckCircle,
+  CheckCircle2,
+  CheckIcon,
+} from "lucide-react";
 import moment from "moment";
 import { useEffect, useState } from "react";
 
@@ -15,6 +21,8 @@ interface Atendimento {
   cliente: string;
   data: Date;
   price: number;
+  paid: boolean;
+  paymentMethod: string;
 }
 
 export function DataTable({ agendamentos }: { agendamentos: any[] }) {
@@ -29,6 +37,8 @@ export function DataTable({ agendamentos }: { agendamentos: any[] }) {
         cliente: e.cliente.name,
         data: e.serviceCompleted,
         price: e.price,
+        paid: e.paid,
+        paymentMethod: e.paymentMethod,
       });
     });
     setAtendimentos(dados);
@@ -43,6 +53,10 @@ export function DataTable({ agendamentos }: { agendamentos: any[] }) {
           </TableHead>
           <TableHead className="text-primary-foreground">Cliente</TableHead>
           <TableHead className="text-primary-foreground">Data</TableHead>
+          <TableHead className="text-primary-foreground">
+            Forma de pagamento
+          </TableHead>
+          <TableHead className="text-primary-foreground">Pago?</TableHead>
           <TableHead className="text-right text-primary-foreground">
             Valor
           </TableHead>
@@ -56,6 +70,10 @@ export function DataTable({ agendamentos }: { agendamentos: any[] }) {
             <TableCell>
               {moment(atendimento.data.setUTCHours(8)).format("DD-MM-YYYY")}
             </TableCell>
+            <TableCell className="uppercase">
+              {atendimento.paymentMethod}
+            </TableCell>
+            <TableCell>{atendimento.paid ? <CheckIcon /> : <></>}</TableCell>
             <TableCell className="text-right">
               {Intl.NumberFormat("pt-BR", {
                 style: "currency",
