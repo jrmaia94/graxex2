@@ -7,8 +7,8 @@ import { UserFull } from "./get-users";
 const dataSchema = z.object({
   clienteId: z.number(),
   price: z.number(),
-  paid: z.boolean(),
-  paymentMethod: z.string(),
+  paid: z.boolean().optional(),
+  paymentMethod: z.string().optional(),
   pricePerVeiculo: z.array(
     z.object({ veiculoId: z.number(), price: z.number() })
   ),
