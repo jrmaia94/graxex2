@@ -345,7 +345,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
               <input
                 ref={inputCorRef}
                 type="text"
-                className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
+                className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[60px]"
               />
             </div>
             <div className="flex flex-col">

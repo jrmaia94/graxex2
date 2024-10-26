@@ -69,9 +69,9 @@ const PageVeiculos = () => {
         <div className="flex flex-col gap-1 mt-[120px]">
           {veiculos?.map((veiculo) => (
             <Card key={veiculo.id}>
-              <CardContent className="p-2 h-20 flex justify-between">
+              <CardContent className="p-2 h-20 flex justify-between relative">
                 <CardVeiculo veiculo={veiculo} />
-                <div className="relative flex flex-col justify-center gap-2 px-4">
+                <div className="absolute top-0 right-0 flex flex-col justify-center gap-2 px-4">
                   <Button
                     onClick={() => {
                       data?.user &&
@@ -106,7 +106,7 @@ const PageVeiculos = () => {
                           });
                     }}
                     variant="ghost"
-                    className="p-0 m-0 h-5 absolute right-1 bottom-1"
+                    className="p-0 m-0 h-5 absolute right-1 bottom-4"
                   >
                     <Trash2Icon size={20} />
                   </Button>
@@ -115,7 +115,7 @@ const PageVeiculos = () => {
                       <Button
                         size="xs"
                         variant="ghost"
-                        className="p-0 m-0 h-5 absolute right-1 top-1"
+                        className="p-0 m-0 h-5 absolute right-1 top-2"
                       >
                         <EyeIcon size={20} />
                       </Button>
