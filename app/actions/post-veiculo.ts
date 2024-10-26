@@ -25,6 +25,8 @@ const dataSchema = z.object({
   frota: z.string().nullable(),
   observacao: z.string().nullable(),
   numEixos: z.number(),
+  nomeMotorista: z.string().optional(),
+  phoneMotorista: z.string().optional(),
 });
 
 export const createVeiculo = async (veiculo: CreateVeiculo, user: UserFull) => {

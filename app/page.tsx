@@ -14,6 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import CardCliente from "@/components/card-cliente";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import Link from "next/link";
+import { PhoneCallIcon } from "lucide-react";
+import Image from "next/image";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -112,6 +115,36 @@ const Home = () => {
                               <span>{veiculo.placa}</span>
                               <span>{veiculo.fabricante}</span>
                               <span>{veiculo.modelo}</span>
+                              {veiculo.phoneMotorista && (
+                                <span>
+                                  <Link
+                                    onClick={() =>
+                                      navigator.clipboard.writeText(
+                                        veiculo.phoneMotorista || ""
+                                      )
+                                    }
+                                    href={`https://wa.me//${veiculo.phoneMotorista
+                                      ?.toString()
+                                      .replace(
+                                        /\D/g,
+                                        ""
+                                      )}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
+                                    target="_blank"
+                                    className="flex gap-1"
+                                  >
+                                    <Image
+                                      className="rounded-full"
+                                      alt="Ícone Whatsapp"
+                                      src="/wpp-icon.svg"
+                                      width={15}
+                                      height={15}
+                                    />
+                                    <p className="text-ring text-sm">
+                                      {veiculo.nomeMotorista}
+                                    </p>
+                                  </Link>
+                                </span>
+                              )}
                             </div>
                             {ultAtendimento ? (
                               <div className="gap-2 flex italic text-red-300">

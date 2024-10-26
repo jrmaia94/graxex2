@@ -57,6 +57,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const inputDocumentRef = useRef<any>(null);
   const inputFrotaRef = useRef<any>(null);
   const inputObsRef = useRef<any>(null);
+  const inputNomeMotoRef = useRef<any>(null);
+  const inputPhoneMotoRef = useRef<any>(null);
 
   // Lida com o envio do formulário
   const handleSubmit = (e: any) => {
@@ -72,7 +74,19 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
 
     // Efetuando cadastro
     startTransition(() => {
-      const cadVeiculo = {
+      const cadVeiculo: Pick<
+        Veiculo,
+        | "clienteId"
+        | "cor"
+        | "fabricante"
+        | "frota"
+        | "modelo"
+        | "nomeMotorista"
+        | "numEixos"
+        | "observacao"
+        | "phoneMotorista"
+        | "placa"
+      > = {
         clienteId: selectedCliente,
         modelo: clearFields(inputModeloRef.current?.value) || "",
         fabricante: clearFields(inputFabricanteRef.current?.value),
@@ -80,6 +94,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         cor: clearFields(inputCorRef.current.value),
         frota: clearFields(inputFrotaRef.current.value),
         observacao: clearFields(inputObsRef.current.value),
+        nomeMotorista: inputNomeMotoRef.current.value,
+        phoneMotorista: inputPhoneMotoRef.current.value,
         numEixos: parseInt(selectEixosRef.current?.value),
       };
 
@@ -192,6 +208,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
       selectEixosRef.current.value = veiculo.numEixos;
       inputFrotaRef.current.value = veiculo.frota;
       inputObsRef.current.value = veiculo.observacao;
+      inputNomeMotoRef.current.value = veiculo.nomeMotorista;
+      inputPhoneMotoRef.current.value = veiculo.phoneMotorista || "";
     }
   }, [veiculo]);
 
@@ -310,58 +328,80 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
               })}
             </datalist>
           </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Placa</label>
-            <InputMask
-              ref={inputPlacaRef}
-              mask="aaa-9*99"
-              className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-[200px]"
-              onBlur={(e) =>
-                (e.target.value = e.target.value.toString().toUpperCase())
-              }
-            />
+          <div className="flex justify-between gap-2">
+            <div className="flex flex-col">
+              <label className="text-primary-foreground">Placa</label>
+              <InputMask
+                ref={inputPlacaRef}
+                mask="aaa-9*99"
+                className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-full max-w-[150px]"
+                onBlur={(e) =>
+                  (e.target.value = e.target.value.toString().toUpperCase())
+                }
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-primary-foreground">Cor</label>
+              <input
+                ref={inputCorRef}
+                type="text"
+                className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-primary-foreground">Frota</label>
+              <input
+                ref={inputFrotaRef}
+                type="text"
+                className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[70px]"
+              />
+            </div>
+          </div>
+          <div className="flex justify-between gap-2">
+            <div className="flex flex-col">
+              <label className="text-primary-foreground">Obs</label>
+              <input
+                ref={inputObsRef}
+                type="text"
+                className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-full"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-primary-foreground">Eixos</label>
+              <select
+                className="text-primary-foreground h-8 p-1 rounded-sm w-[100px]"
+                name="eixos"
+                id="eixos"
+                ref={selectEixosRef}
+              >
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+                <option value={6}>6</option>
+                <option value={7}>7</option>
+                <option value={8}>8</option>
+                <option value={9}>9</option>
+              </select>
+            </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-primary-foreground">Cor</label>
+            <label className="text-primary-foreground">Nome do motorista</label>
             <input
-              ref={inputCorRef}
-              type="text"
-              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Frota</label>
-            <input
-              ref={inputFrotaRef}
-              type="text"
-              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Obs</label>
-            <input
-              ref={inputObsRef}
+              ref={inputNomeMotoRef}
               type="text"
               className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-full"
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-primary-foreground">Eixos</label>
-            <select
-              className="text-primary-foreground h-8 p-1 rounded-sm w-[100px]"
-              name="eixos"
-              id="eixos"
-              ref={selectEixosRef}
-            >
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-              <option value={6}>6</option>
-              <option value={7}>7</option>
-              <option value={8}>8</option>
-              <option value={9}>9</option>
-            </select>
+            <label className="text-primary-foreground">
+              Telefone do motorista
+            </label>
+            <InputMask
+              ref={inputPhoneMotoRef}
+              mask="+55(99)99999-9999"
+              className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-full"
+            />
           </div>
           <div className="flex gap-10 items-center">
             <Button

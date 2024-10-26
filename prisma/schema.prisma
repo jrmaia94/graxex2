@@ -77,18 +77,20 @@ model Cliente {
 }
 
 model Veiculo {
-  id           Int                       @id @default(autoincrement())
-  modelo       String
-  fabricante   String?
-  imageUrl     String?
-  placa        String                    @unique
-  cor          String?
-  frota        String?
-  observacao   String?
-  numEixos     Int
-  clienteId    Int
-  cliente      Cliente                   @relation(fields: [clienteId], references: [id])
-  agendamentos AgendamentosPorVeiculos[]
+  id             Int                       @id @default(autoincrement())
+  modelo         String
+  fabricante     String?
+  imageUrl       String?
+  placa          String                    @unique
+  cor            String?
+  frota          String?
+  observacao     String?
+  nomeMotorista  String?
+  phoneMotorista String?
+  numEixos       Int
+  clienteId      Int
+  cliente        Cliente                   @relation(fields: [clienteId], references: [id])
+  agendamentos   AgendamentosPorVeiculos[]
 }
 
 model Agendamento {

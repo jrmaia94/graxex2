@@ -1,0 +1,152 @@
+[
+  {
+    "id": 140,
+    "clienteId": 33,
+    "nomeMotorista": "Ruskleber",
+    "phoneMotorista": "+55(64)99213-7148"
+  },
+  {
+    "id": 150,
+    "clienteId": 33,
+    "nomeMotorista": "Vailson",
+    "phoneMotorista": "+55(64)99218-0943"
+  },
+  {
+    "id": 74,
+    "clienteId": 33,
+    "nomeMotorista": "Edilson",
+    "phoneMotorista": "+55(64)99625-2558"
+  },
+  {
+    "id": 164,
+    "clienteId": 33,
+    "nomeMotorista": "Edson",
+    "phoneMotorista": "+55(64)99229-3929"
+  },
+  {
+    "id": 198,
+    "clienteId": 33,
+    "nomeMotorista": "cero",
+    "phoneMotorista": "+55(64)99646-3456"
+  },
+  {
+    "id": 153,
+    "clienteId": 33,
+    "nomeMotorista": "Marcio",
+    "phoneMotorista": "+55(64)99342-6553"
+  },
+  {
+    "id": 152,
+    "clienteId": 33,
+    "nomeMotorista": "Elete",
+    "phoneMotorista": "+55(64)99214-6461"
+  },
+  {
+    "id": 201,
+    "clienteId": 33,
+    "nomeMotorista": "Reine",
+    "phoneMotorista": "+55(64)99229-8085"
+  },
+  {
+    "id": 353,
+    "clienteId": 63,
+    "nomeMotorista": "Adriel",
+    "phoneMotorista": "+55(64)98425-5994"
+  },
+  {
+    "id": 354,
+    "clienteId": 33,
+    "nomeMotorista": "Jailson",
+    "phoneMotorista": "+55(64)99967-7157"
+  },
+  {
+    "id": 230,
+    "clienteId": 33,
+    "nomeMotorista": "Uelvis",
+    "phoneMotorista": "+55(64)99204-6329"
+  },
+  {
+    "id": 347,
+    "clienteId": 33,
+    "nomeMotorista": "Gildevan",
+    "phoneMotorista": "+55(64)99201-5140"
+  },
+  {
+    "id": 349,
+    "clienteId": 33,
+    "nomeMotorista": "Marcio",
+    "phoneMotorista": "+55(64)99985-8099"
+  },
+  {
+    "id": 355,
+    "clienteId": 33,
+    "nomeMotorista": "Antonio",
+    "phoneMotorista": "+55(64)99331-5225"
+  },
+  {
+    "id": 359,
+    "clienteId": 33,
+    "nomeMotorista": "Celismar",
+    "phoneMotorista": "+55(64)98416-9012"
+  },
+  {
+    "id": 360,
+    "clienteId": 33,
+    "nomeMotorista": "Adriano",
+    "phoneMotorista": "+55(64)99216-4917"
+  },
+  {
+    "id": 361,
+    "clienteId": 33,
+    "nomeMotorista": "Warle",
+    "phoneMotorista": "+55(64)99229-8772"
+  },
+  {
+    "id": 362,
+    "clienteId": 33,
+    "nomeMotorista": "Ronaldo",
+    "phoneMotorista": "+55(64)99289-9900"
+  },
+  {
+    "id": 363,
+    "clienteId": 73,
+    "nomeMotorista": "Luziel",
+    "phoneMotorista": "+55(64)99217-7333"
+  },
+  {
+    "id": 377,
+    "clienteId": 74,
+    "nomeMotorista": "Juliermes",
+    "phoneMotorista": "+55(64)99948-3304"
+  },
+  {
+    "id": 380,
+    "clienteId": 33,
+    "nomeMotorista": "Daniel",
+    "phoneMotorista": "+55(64)99328-5829"
+  },
+  {
+    "id": 389,
+    "clienteId": 33,
+    "nomeMotorista": "Antonio",
+    "phoneMotorista": "+55(64)9XXX-XXXX"
+  },
+  {
+    "id": 398,
+    "clienteId": 33,
+    "nomeMotorista": "Marcos",
+    "phoneMotorista": "+55(64)99231-5261"
+  },
+  {
+    "id": 400,
+    "clienteId": 33,
+    "nomeMotorista": "Miqueias",
+    "phoneMotorista": "+55(64)99311-0215"
+  },
+  {
+    "id": 384,
+    "clienteId": 55,
+    "nomeMotorista": "Rennerson",
+    "phoneMotorista": "+55(64)99975-5395"
+  }
+]

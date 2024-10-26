@@ -18,11 +18,14 @@ const dataSchema = z.object({
   frota: z.string().nullable(),
   observacao: z.string().nullable(),
   numEixos: z.number(),
+  nomeMotorista: z.string().optional(),
+  phoneMotorista: z.string().optional(),
 });
 
 export const updateVeiculo = async (veiculo: UpdateVeiculo, user: UserFull) => {
   if (user.perfil && user.accessLevel.update) {
     const { id, ...data } = veiculo;
+    console.log(veiculo);
     if (dataSchema.safeParse(veiculo).success) {
       try {
         const updatedVeiculo = await prisma.veiculo.update({

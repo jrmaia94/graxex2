@@ -2,7 +2,7 @@
 
 import { getClienteById } from "@/app/actions/get-clientes";
 import { Cliente, Veiculo } from "@prisma/client";
-import { TruckIcon } from "lucide-react";
+import { PhoneCallIcon, TruckIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,7 +42,38 @@ const CardVeiculo = ({ veiculo }: CardVeiculoProps) => {
                 <span className="text-sm">{veiculo.modelo}</span>
               </h3>
             </Link>
-            <p className="text-sm">{veiculo.cliente.name}</p>
+            <div className="flex gap-3 items-center">
+              <p className="text-sm">{veiculo.cliente.name}</p>
+              {veiculo.phoneMotorista && (
+                <>
+                  <span>-</span>
+                  <div className="flex items-center gap-1">
+                    <span>
+                      <Link
+                        href={`https://wa.me//${veiculo.phoneMotorista
+                          ?.toString()
+                          .replace(
+                            /\D/g,
+                            ""
+                          )}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
+                        target="_blank"
+                      >
+                        <Image
+                          className="rounded-full"
+                          alt="Ícone Whatsapp"
+                          src="/wpp-icon.svg"
+                          width={15}
+                          height={15}
+                        />
+                      </Link>
+                    </span>
+                    {veiculo.nomeMotorista && (
+                      <p className="text-sm">{veiculo.nomeMotorista}</p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
             <div className="flex gap-3">
               <div className="flex flex-row">
                 <h3 className="text-sm pe-1 text-gray-400">Placa:</h3>
