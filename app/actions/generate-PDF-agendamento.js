@@ -186,7 +186,12 @@ export const generate_PDF_Agendamento = (data) => {
           style: "currency",
           currency: "BRL",
         })
-          .format(data.agendamento.price)
+          .format(
+            data.agendamento.pricePerVeiculo.reduce(
+              (sum, current) => sum + current.price,
+              0
+            )
+          )
           .replace("R$", "")
           .trim()}`,
       ],
