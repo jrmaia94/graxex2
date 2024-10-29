@@ -13,7 +13,9 @@ import Loader from "@/components/loader";
 import Link from "next/link";
 import SendImage from "@/components/send-image";
 import { ComboboxClientes } from "@/components/combox-cliente";
-import { DataContext } from "@/providers/store";
+import { getAllClientes } from "@/app/actions/get-clientes";
+import { VeiculoFull } from "@/app/page";
+import { getAllVeiculos } from "@/app/actions/get-veiculos";
 
 interface VeiculoPageProps {
   params: {
@@ -35,10 +37,10 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados, setData } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const [veiculo, setVeiculo] = useState<Veiculo>();
+  const [veiculo, setVeiculo] = useState<VeiculoFull>();
+  const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
   const [fabricantes, setFabricantes] = useState<string[]>([]);
   const [modelos, setModelos] = useState<string[]>([]);
   const [veiculoFoto, setVeiculoFoto] = useState<VeiculoFoto | null>(null);
@@ -103,19 +105,6 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         ? data?.user &&
           createVeiculo(cadVeiculo, data.user)
             .then((res) => {
-              let preventRepeat = 0;
-              setData((prevData) => {
-                preventRepeat += 1;
-                const newData = { ...prevData };
-                if (preventRepeat <= 1) {
-                  let newVeiculo = { ...res, agendamentos: [] };
-                  newData.veiculos.push(newVeiculo);
-                  newData.clientes
-                    .find((item) => item.id === res.clienteId)
-                    ?.veiculos.push(newVeiculo);
-                }
-                return newData;
-              });
               toast.success("Veículo cadastrado com sucesso!");
               router.push(`/veiculos/${res.id}`);
             })
@@ -129,21 +118,6 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
             data.user
           )
             .then((res) => {
-              let preventRepeat = 0;
-              setData((prevData) => {
-                preventRepeat += 1;
-                const newData = { ...prevData };
-                if (preventRepeat <= 1) {
-                  let index = newData.veiculos.findIndex(
-                    (item) => item.id === res.id
-                  );
-                  newData.veiculos.splice(index, 1, {
-                    ...res,
-                    agendamentos: [...prevData.veiculos[index].agendamentos],
-                  });
-                }
-                return newData;
-              });
               toast.success("Veículo atualizado!");
             })
             .catch((err) => {
@@ -156,11 +130,32 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   // Lida com o carregamento da página com parâmetros
   useEffect(() => {
     startTransition(() => {
-      if (dados && dados.agendamentos && dados.clientes && dados.veiculos) {
-        setClientes(dados.clientes);
+      if (data?.user) {
+        getAllClientes(data.user)
+          .then((res) => {
+            setClientes(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+        getAllVeiculos(data.user)
+          .then((res) => {
+            setVeiculos(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    });
+  }, [data]);
+
+  useEffect(() => {
+    veiculos.length > 0 &&
+      startTransition(() => {
         let fabs = [];
         let models = [];
-        for (let item of dados.veiculos) {
+        for (let item of veiculos) {
           item.fabricante && fabs.push(item.fabricante.toUpperCase());
           item.modelo && models.push(item.modelo.toUpperCase());
         }
@@ -170,80 +165,41 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         setModelos(models);
         if (params.id !== "create") {
           setIsCreate(false);
-          if (data?.user) {
-            let localVeiculo = dados.veiculos.find(
-              (item) => item.id === parseInt(params.id.toString())
-            );
-            localVeiculo
-              ? setVeiculo(localVeiculo)
-              : toast.error(
-                  `Não foi possível encontrar o veiculo com id ${params.id}!`
-                );
-            /* getVeiculoById(parseInt(params.id.toString()), data.user)
-              .then((res) => {
-                if (!res) toast.info("Cliente não encontrado!");
-                if (res) setVeiculo(res);
-              })
-              .catch((err) => {
-                console.log(err);
-                toast.error("Ocorreu um erro na buscar do cliente!");
-              }); */
-          }
+
+          let localVeiculo = veiculos.find(
+            (item) => item.id === parseInt(params.id.toString())
+          );
+          localVeiculo
+            ? setVeiculo(localVeiculo)
+            : toast.error(
+                `Não foi possível encontrar o veiculo com id ${params.id}!`
+              );
         } else {
           setIsCreate(true);
         }
-      }
-    });
-  }, [params, data, dados]);
+      });
+  }, [params, veiculos]);
 
   // Atualiza inputs com os dados do cliente encontrado
   useEffect(() => {
     if (veiculo) {
-      inputIDRef.current.value = veiculo.id;
-      setSelectedCliente(veiculo.clienteId);
-      inputModeloRef.current.value = veiculo.modelo;
-      inputFabricanteRef.current.value = veiculo.fabricante;
-      inputPlacaRef.current.value = veiculo.placa;
-      inputCorRef.current.value = veiculo.cor;
-      selectEixosRef.current.value = veiculo.numEixos;
-      inputFrotaRef.current.value = veiculo.frota;
-      inputObsRef.current.value = veiculo.observacao;
-      inputNomeMotoRef.current.value = veiculo.nomeMotorista;
-      inputPhoneMotoRef.current.value = veiculo.phoneMotorista || "";
+      startTransition(() => {
+        inputIDRef.current.value = veiculo.id;
+        setSelectedCliente(veiculo.clienteId);
+        inputModeloRef.current.value = veiculo.modelo;
+        inputFabricanteRef.current.value = veiculo.fabricante;
+        inputPlacaRef.current.value = veiculo.placa;
+        inputCorRef.current.value = veiculo.cor;
+        selectEixosRef.current.value = veiculo.numEixos;
+        inputFrotaRef.current.value = veiculo.frota;
+        inputObsRef.current.value = veiculo.observacao;
+        inputNomeMotoRef.current.value = veiculo.nomeMotorista;
+        inputPhoneMotoRef.current.value = veiculo.phoneMotorista || "";
+      });
     }
   }, [veiculo]);
 
   // Lida com a mascara do input CPF/CNPJ
-  /*   useEffect(() => {
-    if (data?.user) {
-      getAllClientes(data.user)
-        .then((res) => {
-          setClientes(res);
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Não foi possível carregar os clientes");
-        });
-
-      getAllVeiculos(data.user)
-        .then((res) => {
-          let fabs = [];
-          let models = [];
-          for (let item of res) {
-            item.fabricante && fabs.push(item.fabricante.toUpperCase());
-            item.modelo && models.push(item.modelo.toUpperCase());
-          }
-          fabs = [...new Set(fabs)];
-          models = [...new Set(models)];
-          setFabricantes(fabs);
-          setModelos(models);
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Não foi possível carregar os veículos");
-        });
-    }
-  }, [data]); */
 
   useEffect(() => {
     veiculoFoto &&

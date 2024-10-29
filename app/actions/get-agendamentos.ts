@@ -120,11 +120,21 @@ export const getAgendamentoById = async (id: number, user: User) => {
         id: id,
       },
       include: {
-        cliente: true,
         veiculos: {
           include: {
             veiculo: {
-              include: { cliente: true },
+              include: {
+                cliente: true,
+              },
+            },
+          },
+        },
+        cliente: {
+          include: {
+            veiculos: {
+              include: {
+                cliente: true,
+              },
             },
           },
         },

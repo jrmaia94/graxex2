@@ -1,14 +1,10 @@
 "use client";
 import Loader from "@/components/loader";
-import { DataContext } from "@/providers/store";
+
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { getAllUsers, UserFull } from "../actions/get-users";
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
-import { CheckCheck, Trash2, User2 } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -17,7 +13,6 @@ const PageConfig = () => {
     required: true,
   });
   const router = useRouter();
-  const { data: dados } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [users, setUsers] = useState<UserFull[]>([]);
 

@@ -1,16 +1,12 @@
 "use client";
-import { UserFull } from "@/app/actions/get-users";
+import { getAllUsers, UserFull } from "@/app/actions/get-users";
 import { updateUser } from "@/app/actions/update-user";
 import CardUser from "@/components/card-user";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { typesAccess } from "@/constants/perfil-access";
-import { DataContext } from "@/providers/store";
-import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface PageEditUserParams {
@@ -24,7 +20,6 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
     required: true,
   });
 
-  const { data: dados } = useContext(DataContext);
   const [user, setUser] = useState<UserFull | null>(null);
 
   const callUpdateUser = () => {
@@ -55,28 +50,26 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
 
   useEffect(() => {
     if (params) {
-      if (data) {
-        if (dados) {
-          if (dados.users) {
-            let localUser = dados.users.find((item) => item.id === params.id);
-            if (localUser) {
-              console.log(localUser);
-              let obj = {
-                read: false,
-                create: false,
-                update: false,
-                delete: false,
-                admin: false,
-              };
-              !localUser.accessLevel
-                ? setUser({ ...localUser, accessLevel: obj })
-                : setUser({ ...localUser });
-            }
+      if (data?.user) {
+        getAllUsers(data.user).then((res) => {
+          let localUser = res.find((item) => item.id === params.id);
+          if (localUser) {
+            console.log(localUser);
+            let obj = {
+              read: false,
+              create: false,
+              update: false,
+              delete: false,
+              admin: false,
+            };
+            !localUser.accessLevel
+              ? setUser({ ...localUser, accessLevel: obj })
+              : setUser({ ...localUser });
           }
-        }
+        });
       }
     }
-  }, [params, data, dados]);
+  }, [params, data]);
   return (
     <div className="mt-[90px] w-full">
       {user && (

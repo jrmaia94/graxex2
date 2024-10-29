@@ -21,17 +21,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DataContext } from "@/providers/store";
-
-interface ClienteFull extends Cliente {
-  veiculos: Veiculo[];
-}
+import { ClienteFull } from "../page";
 
 const Clientes = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados, setData } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [clientes, setClientes] = useState<ClienteFull[]>([]);
 
@@ -39,14 +34,6 @@ const Clientes = () => {
     deleteClienteById(id, data.user)
       .then((res) => {
         toast.success(`Cliente ${res.name} deletado com sucesso`);
-        setData((prevData) => {
-          const newData = { ...prevData };
-          let index = newData.clientes.findIndex((item) => item.id === res.id);
-          if (index > 0) {
-            newData.clientes.splice(index, 1);
-          }
-          return newData;
-        });
       })
       .catch((err) => {
         console.log(err);
@@ -56,9 +43,16 @@ const Clientes = () => {
 
   useEffect(() => {
     startTransition(() => {
-      dados && dados.clientes && setClientes(dados.clientes);
+      data?.user &&
+        getAllClientes(data.user)
+          .then((res) => {
+            setClientes(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
     });
-  }, [dados]);
+  }, [data]);
 
   /*   useEffect(() => {
     data?.user &&

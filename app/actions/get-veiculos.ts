@@ -73,6 +73,26 @@ export const getAllVeiculos = async (user: User) => {
   }
 };
 
+export const getVeiculosByCLiente = async (clienteId: number, user: User) => {
+  if (user.perfil) {
+    const veiculos = await prisma.veiculo.findMany({
+      where: {
+        clienteId: clienteId,
+      },
+      include: {
+        cliente: true,
+        agendamentos: {
+          include: { agendamento: true },
+        },
+      },
+    });
+
+    return veiculos;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
+};
+
 export const getVeiculoById = async (id: number, user: User) => {
   if (user.perfil) {
     const veiculo = await prisma.veiculo.findUnique({

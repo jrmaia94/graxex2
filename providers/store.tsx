@@ -1,4 +1,4 @@
-"use client";
+/* "use client";
 
 import { getAllAgendamentos } from "@/app/actions/get-agendamentos";
 import { getAllClientes } from "@/app/actions/get-clientes";
@@ -119,3 +119,4 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     </DataContext.Provider>
   );
 };
+ */

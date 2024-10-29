@@ -17,22 +17,10 @@ import { Description } from "@radix-ui/react-dialog";
 import { useSession } from "next-auth/react";
 import { deleteAgendamentoById } from "@/app/actions/delete-agendamento";
 import { toast } from "sonner";
+import { AgendamentoFull } from "@/app/page";
 //import CardAgendamentoFull from "./card-agendamento-full";
 
-interface ClienteFull extends Cliente {
-  veiculos: Veiculo[];
-}
-
-interface AgendamentoProps extends Agendamento {
-  cliente: ClienteFull;
-  veiculos: Veiculo[];
-}
-
-const CardAgendamento = ({
-  agendamento,
-}: {
-  agendamento: AgendamentoProps;
-}) => {
+const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
@@ -133,7 +121,7 @@ const CardAgendamento = ({
               <CardAgendamentoFull
                 agendamento={agendamento}
                 cliente={agendamento.cliente}
-                veiculos={agendamento.veiculos}
+                veiculos={agendamento.veiculos.map((e) => e.veiculo)}
               />
             </div>
           </DialogContent>

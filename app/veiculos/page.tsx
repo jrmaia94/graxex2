@@ -1,13 +1,12 @@
 "use client";
 
 import Search from "@/components/search";
-import { useContext, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EyeIcon, Trash2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Cliente, Veiculo } from "@prisma/client";
 import CardVeiculo from "@/components/card-veiculo";
 import { getAllVeiculos } from "../actions/get-veiculos";
 import { deleteVeiculoById } from "../actions/delete-veiculos";
@@ -20,27 +19,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CardVeiculoFull from "@/components/card-veiculo-full";
-import { DataContext } from "@/providers/store";
-
-interface VeiculoFull extends Veiculo {
-  cliente: Cliente;
-}
+import { VeiculoFull } from "../page";
 
 const PageVeiculos = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados, setData } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
 
   useEffect(() => {
-    startTransition(() => {
-      dados && dados.veiculos && setVeiculos(dados.veiculos);
-    });
-  }, [dados]);
-
-  /*   useEffect(() => {
     startTransition(() => {
       data?.user &&
         getAllVeiculos(data.user)
@@ -52,12 +40,12 @@ const PageVeiculos = () => {
             toast.error("Erro ano buscar veiculos!");
           });
     });
-  }, [data]); */
+  }, [data]);
 
   return (
     <div className="flex justify-center mt-[90px]">
+      {isPending && <Loader />}
       <div className="px-4 w-full max-w-[600px]">
-        {isPending && <Loader />}
         <div className="w-full left-0 top-[90px] px-4 z-10 bg-gray-800/[.97] fixed flex flex-col">
           <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
             Veiculos
@@ -76,26 +64,7 @@ const PageVeiculos = () => {
                     onClick={() => {
                       data?.user &&
                         deleteVeiculoById(veiculo.id, data.user)
-                          .then((res) => {
-                            setData((prevData) => {
-                              const newData = { ...prevData };
-                              let index = newData.veiculos.findIndex(
-                                (item) => item.id === res.id
-                              );
-                              if (index > 0) {
-                                newData.veiculos.splice(index, 1);
-                                let indexInCliente = newData.clientes
-                                  .find((item) => item.id === res.clienteId)
-                                  ?.veiculos.findIndex(
-                                    (item) => item.id === res.id
-                                  );
-                                indexInCliente &&
-                                  newData.clientes
-                                    .find((item) => item.id === res.clienteId)
-                                    ?.veiculos.splice(indexInCliente, 1);
-                              }
-                              return newData;
-                            });
+                          .then(() => {
                             toast.success(
                               `Veículo com o id ${veiculo.id} foi excluído!`
                             );

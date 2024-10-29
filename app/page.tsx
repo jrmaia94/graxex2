@@ -1,9 +1,8 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useContext, useTransition } from "react";
+import { useContext, useEffect, useState, useTransition } from "react";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import Loader from "@/components/loader";
-import { DataContext } from "@/providers/store";
 import {
   Dialog,
   DialogHeader,
@@ -15,16 +14,39 @@ import { Button } from "@/components/ui/button";
 import CardCliente from "@/components/card-cliente";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Link from "next/link";
-import { PhoneCallIcon } from "lucide-react";
 import Image from "next/image";
+import { getAllClientes } from "./actions/get-clientes";
+import { getAllAgendamentos } from "./actions/get-agendamentos";
 
-interface ClienteFull extends Cliente {
+export interface ClienteFull extends Cliente {
+  veiculos: Veiculo[];
+  agendamentos: Agendamento[];
+}
+
+export interface ClienteWVeiculo extends Cliente {
   veiculos: Veiculo[];
 }
 
-interface AgendamentoProps extends Agendamento {
-  cliente: ClienteFull;
-  veiculos: Veiculo[];
+export interface VeiculoFull extends Veiculo {
+  cliente: Cliente;
+  agendamentos: {
+    veiculoId: number;
+    agendamentoId: number;
+    agendamento: Agendamento;
+  }[];
+}
+
+export interface VeiculoWCliente extends Veiculo {
+  cliente: Cliente;
+}
+
+export interface AgendamentoFull extends Agendamento {
+  cliente: ClienteWVeiculo;
+  veiculos: {
+    veiculoId: number;
+    agendamentoId: number;
+    veiculo: VeiculoWCliente;
+  }[];
 }
 
 const Home = () => {
@@ -33,10 +55,30 @@ const Home = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados } = useContext(DataContext);
 
-  const clientes = dados?.clientes;
-  const agendamentos = dados?.agendamentos;
+  const [clientes, setClientes] = useState<ClienteFull[]>();
+  const [agendamentos, setAgendamentos] = useState<AgendamentoFull[]>();
+
+  useEffect(() => {
+    data?.user &&
+      startTransition(() => {
+        getAllClientes(data.user)
+          .then((res) => {
+            setClientes(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+        getAllAgendamentos(data.user)
+          .then((res) => {
+            setAgendamentos(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+  }, [data]);
 
   const handleSortOfLastService = (cliente: ClienteFull) => {
     interface LastService {
@@ -85,8 +127,8 @@ const Home = () => {
 
   return (
     <div className="flex justify-center mt-[90px]">
+      {isPending && <Loader />}
       <div className="w-full px-10 max-w-[920px] mx-auto flex flex-wrap justify-center relative gap-2">
-        {isPending && <Loader />}
         {clientes?.map((cliente) => {
           if (handleSortOfLastService(cliente).length > 0) {
             return (

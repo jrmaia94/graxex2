@@ -1,12 +1,14 @@
 "use client";
 
+import { getAgendamentoById } from "@/app/actions/get-agendamentos";
+import { getAllClientes } from "@/app/actions/get-clientes";
 import { updateAgendamento } from "@/app/actions/update-agendamento";
+import { AgendamentoFull, ClienteFull, ClienteWVeiculo } from "@/app/page";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { AgendamentoFull, DataContext } from "@/providers/store";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
 import { CircleAlert } from "lucide-react";
@@ -53,7 +55,6 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados } = useContext(DataContext);
   const idRef = useRef<any>(null);
   const clienteRef = useRef<any>(null);
   const dateRef = useRef<any>(null);
@@ -64,7 +65,8 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
 
   const [agendamento, setAgendamento] = useState<AgendamentoFull | null>();
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+  const [selectedCliente, setSelectedCliente] =
+    useState<ClienteWVeiculo | null>(null);
   const [veiculos, setVeiculos] = useState<SchemaVeiculo[]>([]);
   const [visibleVeiculos, setVisibleVeiculos] = useState<SchemaVeiculo[]>([]);
   const [isDone, setIsDone] = useState<boolean>(false);
@@ -142,26 +144,27 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
 
   useEffect(() => {
     startTransition(() => {
-      if (data?.user && dados?.clientes && dados?.agendamentos && params.id) {
-        setClientes(dados.clientes);
-        let localAgendamento = dados.agendamentos.find(
-          (item) => item.id === parseInt(params.id.toString())
-        );
-
-        setAgendamento(localAgendamento);
-        setSelectedCliente(localAgendamento?.cliente || null);
-        /*         getAllClientes(data.user)
+      if (data?.user && params.id) {
+        getAllClientes(data.user)
           .then((res) => {
             setClientes(res);
           })
           .catch((err) => {
             console.log(err);
-            }); */
+          });
+        getAgendamentoById(parseInt(params.id.toString()), data.user).then(
+          (res) => {
+            if (res) {
+              setAgendamento(res);
+              setSelectedCliente(res.cliente);
+            }
+          }
+        );
       } else {
         toast.error("Não possível encontrar dados cadastrados!");
       }
     });
-  }, [data, dados, params]);
+  }, [data, params]);
 
   /*   useEffect(() => {
     if (params.id) {
@@ -209,11 +212,9 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
     }
 
     if (selectedCliente) {
-      if (data?.user && dados?.clientes) {
+      if (data?.user) {
         startTransition(() => {
-          let localCliente = dados.clientes.find(
-            (item) => item.id === selectedCliente.id
-          );
+          let localCliente = selectedCliente;
           let arrayVeiculos: SchemaVeiculo[] = [];
           if (localCliente) {
             localCliente.veiculos.map((veiculo) => {
@@ -260,7 +261,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
         toast.error("Não possível encontrar dados cadastrados!");
       }
     }
-  }, [selectedCliente, agendamento, dados, data]);
+  }, [selectedCliente, agendamento, data]);
 
   useEffect(() => {
     let sum = 0;
@@ -300,9 +301,7 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
             required
             ref={clienteRef}
             value={selectedCliente?.id}
-            onChange={() =>
-              setSelectedCliente(clientes.find((cliente) => cliente.id) || null)
-            }
+            disabled
             name="cliente"
             className="px-1 h-7 text-primary-foreground rounded-sm mb-2"
           >

@@ -56,6 +56,7 @@ export const getClienteById = async (id: number, user: User) => {
       },
       include: {
         veiculos: true,
+        agendamentos: true,
       },
     });
     return cliente;

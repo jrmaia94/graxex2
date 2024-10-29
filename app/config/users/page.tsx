@@ -1,26 +1,16 @@
 "use client";
 import Loader from "@/components/loader";
-import { DataContext } from "@/providers/store";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { getAllUsers, UserFull } from "../../actions/get-users";
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
-import { CheckCheck, Trash2, User2 } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import CardUser from "@/components/card-user";
-import { read } from "fs";
-import { create } from "domain";
 
 const PageConfig = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
   const router = useRouter();
-  const { data: dados, setData } = useContext(DataContext);
   const [isPending, startTransition] = useTransition();
   const [users, setUsers] = useState<UserFull[]>([]);
 
@@ -30,11 +20,6 @@ const PageConfig = () => {
       startTransition(() => {
         getAllUsers(data.user)
           .then((res: any) => {
-            setData((prevObjs) => {
-              const newObjs = { ...prevObjs };
-              newObjs.users = [...res];
-              return newObjs;
-            });
             let localUsers: UserFull[] = [];
             res.forEach((user: UserFull) => {
               if (!user.accessLevel) {
@@ -59,7 +44,7 @@ const PageConfig = () => {
           });
       });
     }
-  }, [data, router, setData]);
+  }, [data, router]);
 
   return (
     <div className="flex justify-center mt-[90px]">

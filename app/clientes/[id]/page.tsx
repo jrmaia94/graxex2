@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import InputMask from "react-input-mask";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,7 @@ import { createCliente } from "@/app/actions/post-cliente";
 import { updateCliente, UpdateCliente } from "@/app/actions/update-cliente";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/loader";
-import { DataContext } from "@/providers/store";
+import { ClienteFull } from "@/app/page";
 
 interface ClientePageProps {
   params: {
@@ -25,7 +25,6 @@ const ClientePage = ({ params }: ClientePageProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados, setData } = useContext(DataContext);
 
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -72,17 +71,6 @@ const ClientePage = ({ params }: ClientePageProps) => {
       if (params.id === "create" && data.user) {
         createCliente(cadCliente, data.user)
           .then((res) => {
-            setData((prevData) => {
-              const newData = { ...prevData };
-              if (!newData.clientes.find((item) => item.id === res.id)) {
-                newData.clientes.push({
-                  ...res,
-                  veiculos: [],
-                  agendamentos: [],
-                });
-              }
-              return newData;
-            });
             toast.success("Cliente cadastrado com sucesso!");
             setTimeout(() => {
               router.push(`/clientes/${res.id}`);
@@ -98,23 +86,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
           data.user
         )
           .then((res) => {
-            let preventRepeat = 0;
-            setData((prevData) => {
-              preventRepeat += 1;
-              const newData = { ...prevData };
-              if (!(preventRepeat > 1)) {
-                let index = newData.clientes.findIndex(
-                  (item) => item.id === res.id
-                );
-                newData.clientes.splice(index, 1, {
-                  ...res,
-                  veiculos: [...prevData.clientes[index].veiculos],
-                  agendamentos: [...prevData.clientes[index].agendamentos],
-                });
-              }
-              return newData;
-            });
-            toast.success("Cliente atualizado!");
+            toast.success(`Cliente ${res.name} atualizado!`);
           })
           .catch((err) => {
             console.log(err);
@@ -127,18 +99,19 @@ const ClientePage = ({ params }: ClientePageProps) => {
   // Lida com o carregamento da página com parâmetros
   useEffect(() => {
     startTransition(() => {
-      if (dados && dados.clientes) {
-        if (params.id !== "create" && data?.user) {
-          let localCliente = dados.clientes.find(
-            (item) => item.id === parseInt(params.id.toString())
-          );
-          localCliente
-            ? setCliente(localCliente)
-            : toast.error(
-                `Não foi possível encontrar o cliente com id ${params.id}!`
-              );
+      if (params.id !== "create" && data?.user) {
+        let localCliente: ClienteFull | null = null;
+        getClienteById(parseInt(params.id.toString()), data.user)
+          .then((res) => {
+            if (res) setCliente(res);
+          })
+          .catch((err) => {
+            toast.error(
+              `Não foi possível encontrar o cliente com id ${params.id}!`
+            );
+          });
 
-          /* getClienteById(parseInt(params.id.toString()), data.user)
+        /* getClienteById(parseInt(params.id.toString()), data.user)
             .then((res) => {
               if (!res) toast.info("Cliente não encontrado!");
               if (res) setCliente(res);
@@ -147,23 +120,24 @@ const ClientePage = ({ params }: ClientePageProps) => {
             .catch((err) => {
               console.log(err);
             }); */
-        }
       }
     });
-  }, [params, data, dados]);
+  }, [params, data]);
 
   // Atualiza inputs com os dados do cliente encontrado
   useEffect(() => {
-    if (cliente) {
-      cliente.CPFCNPJ && cliente.CPFCNPJ.length > 14
-        ? setTypeOfDoc("cnpj")
-        : setTypeOfDoc("cpf");
-      inputIDRef.current.value = cliente.id;
-      inputNameRef.current.value = cliente.name;
-      inputDocumentRef.current.value = cliente.CPFCNPJ || "";
-      inputAddressRef.current.value = cliente.address || "";
-      inputPhoneRef.current.value = cliente.phone || "";
-    }
+    startTransition(() => {
+      if (cliente) {
+        cliente.CPFCNPJ && cliente.CPFCNPJ.length > 14
+          ? setTypeOfDoc("cnpj")
+          : setTypeOfDoc("cpf");
+        inputIDRef.current.value = cliente.id;
+        inputNameRef.current.value = cliente.name;
+        inputDocumentRef.current.value = cliente.CPFCNPJ || "";
+        inputAddressRef.current.value = cliente.address || "";
+        inputPhoneRef.current.value = cliente.phone || "";
+      }
+    });
   }, [cliente]);
 
   // Lida com a mascara do input CPF/CNPJ

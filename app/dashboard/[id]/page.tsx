@@ -1,6 +1,5 @@
 "use client";
 
-import { Agendamento, AgendamentosPorVeiculos, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useContext, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -10,12 +9,14 @@ import CardVeiculo from "@/components/card-veiculo";
 import CardCliente from "@/components/card-cliente";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { CircleCheckBig, FileText } from "lucide-react";
+import { CircleCheckBig } from "lucide-react";
 import Image from "next/image";
 import { DialogAgendamento } from "@/components/dialog-agendamento";
 import { generate_PDF } from "@/app/actions/generate-PDF.js";
-import { ClienteFull, DataContext, VeiculoFull } from "@/providers/store";
 import { Input } from "@/components/ui/input";
+import { ClienteFull, VeiculoFull } from "@/app/page";
+import { getClienteById } from "@/app/actions/get-clientes";
+import { getVeiculosByCLiente } from "@/app/actions/get-veiculos";
 
 interface DashboardClienteProps {
   params: {
@@ -27,7 +28,6 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
-  const { data: dados } = useContext(DataContext);
 
   const [isPending, startTransition] = useTransition();
 
@@ -124,28 +124,16 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
   };
 
   useEffect(() => {
-    if (dados && dados.clientes && data) {
+    if (data) {
       if (data?.user && params.id) {
         startTransition(() => {
-          let localCliente = dados.clientes.find(
-            (item) => item.id === parseInt(params.id.toString())
+          getClienteById(parseInt(params.id.toString()), data.user).then(
+            (res) => {
+              if (res) {
+                setCliente(res);
+              }
+            }
           );
-          localCliente
-            ? setCliente(localCliente)
-            : toast.error(
-                `Não foi possível buscar o cliente com id ${params.id}!`
-              );
-
-          let localVeiculos = sortArrayVeiculos(
-            dados.veiculos.filter(
-              (item) => item.clienteId === parseInt(params.id.toString())
-            )
-          );
-          localVeiculos
-            ? setVeiculos(localVeiculos)
-            : toast.error(
-                `Não foi possível encontrar os veiculos do cliente com id ${params.id}!`
-              );
           /* getFullClienteById(parseInt(params.id), data.user)
             .then((res) => {
               setCliente(res);
@@ -156,12 +144,26 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
         });
       }
     }
-  }, [params, data, dados]);
+  }, [params, data]);
+
+  useEffect(() => {
+    if (cliente && data?.user) {
+      startTransition(() => {
+        getVeiculosByCLiente(cliente.id, data.user)
+          .then((res) => {
+            setVeiculos(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+    }
+  }, [cliente, data]);
 
   return (
     <div className="flex flex-col p-4 mt-[90px]">
       {isPending && <Loader />}
-      {dados && cliente && (
+      {cliente && (
         <div className="w-full flex flex-col md:items-center">
           <div className="md:max-w-[864px] md:w-full">
             <CardCliente cliente={cliente} />
@@ -200,12 +202,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                     className="bg-primary border-none h-8 w-[50%] text-primary-foreground"
                     placeholder="Buscar veículo"
                     onChange={(e) => {
-                      let localVeiculos =
-                        dados &&
-                        dados.veiculos.filter(
-                          (item) =>
-                            item.clienteId === parseInt(params.id.toString())
-                        );
+                      let localVeiculos = [...veiculos];
 
                       if (localVeiculos) {
                         localVeiculos = localVeiculos.filter((item) => {
@@ -259,21 +256,17 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                         </p>
                         <p className="text-xs py-2 w-[23%]">{veiculo.placa}</p>
                         {ultAgendamento(
-                          dados?.veiculos.find((item) => item.id === veiculo.id)
+                          veiculos.find((item) => item.id === veiculo.id)
                         ) === "Nunca foi atendido" ? (
                           <p className="text-xs py-2 text-red-400 font-bold w-[27%]">
                             {ultAgendamento(
-                              dados?.veiculos.find(
-                                (item) => item.id === veiculo.id
-                              )
+                              veiculos.find((item) => item.id === veiculo.id)
                             )}
                           </p>
                         ) : (
                           numDias(
                             ultAgendamento(
-                              dados?.veiculos.find(
-                                (item) => item.id === veiculo.id
-                              )
+                              veiculos.find((item) => item.id === veiculo.id)
                             )
                           )
                         )}
@@ -337,39 +330,45 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                         })
                       }
                     >
-                      <CardVeiculo
-                        veiculo={dados?.veiculos.find(
-                          (item) => item.id === veiculo.id
+                      <div className="flex gap-2 w-full items-center">
+                        <p className="text-xs py-2 w-[12%]">{veiculo.frota}</p>
+                        <p className="text-xs py-2 w-[38%]">
+                          {veiculo.modelo?.toUpperCase()}
+                        </p>
+                        <p className="text-xs py-2 w-[23%]">{veiculo.placa}</p>
+                        {ultAgendamento(
+                          veiculos.find((item) => item.id === veiculo.id)
+                        ) === "Nunca foi atendido" ? (
+                          <p className="text-xs py-2 text-red-400 font-bold w-[27%]">
+                            {ultAgendamento(
+                              veiculos.find((item) => item.id === veiculo.id)
+                            )}
+                          </p>
+                        ) : (
+                          numDias(
+                            ultAgendamento(
+                              veiculos.find((item) => item.id === veiculo.id)
+                            )
+                          )
                         )}
-                      />
+                      </div>
                       <div className="w-full">
                         {" "}
                         {ultAgendamento(
-                          dados?.veiculos.find((item) => item.id === veiculo.id)
+                          veiculos.find((item) => item.id === veiculo.id)
                         ) === "Nunca foi atendido" ? (
                           <p className="text-xs py-2 text-red-400 font-bold">
                             {ultAgendamento(
-                              dados?.veiculos.find(
-                                (item) => item.id === veiculo.id
-                              )
+                              veiculos.find((item) => item.id === veiculo.id)
                             )}
                           </p>
                         ) : (
                           <div className="flex gap-3">
                             <p className="text-xs py-2 font-bold">
                               {ultAgendamento(
-                                dados?.veiculos.find(
-                                  (item) => item.id === veiculo.id
-                                )
+                                veiculos.find((item) => item.id === veiculo.id)
                               )}
                             </p>
-                            {numDias(
-                              ultAgendamento(
-                                dados?.veiculos.find(
-                                  (item) => item.id === veiculo.id
-                                )
-                              )
-                            )}
                           </div>
                         )}
                       </div>

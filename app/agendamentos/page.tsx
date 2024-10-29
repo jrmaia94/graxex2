@@ -1,31 +1,19 @@
 "use client";
 
 import Search from "@/components/search";
-import { useContext, useEffect, useState, useTransition } from "react";
-import { toast } from "sonner";
+import { useEffect, useState, useTransition } from "react";
 import CardAgendamento from "@/components/card-agendamento";
 import Loader from "@/components/loader";
 import { useSession } from "next-auth/react";
-import { Agendamento, Cliente, Veiculo } from "@prisma/client";
-import { DataContext } from "@/providers/store";
-
-interface ClienteFull extends Cliente {
-  veiculos: Veiculo[];
-}
-
-interface AgendamentoProps extends Agendamento {
-  cliente: ClienteFull;
-  veiculos: Veiculo[];
-}
+import { AgendamentoFull } from "../page";
+import { getAllAgendamentos } from "../actions/get-agendamentos";
 
 const Agendamentos = () => {
   const { data }: { data: any } = useSession({
     required: true,
   });
 
-  const { data: dados } = useContext(DataContext);
-
-  const [agendamentos, setAgendamentos] = useState<AgendamentoProps[]>([]);
+  const [agendamentos, setAgendamentos] = useState<AgendamentoFull[]>([]);
   const [isPending, startTransition] = useTransition();
 
   /*   useEffect(() => {
@@ -67,20 +55,18 @@ const Agendamentos = () => {
   }, [loadAllAgendamentos, data]); */
 
   useEffect(() => {
-    if (dados) {
-      if (dados.agendamentos) {
-        startTransition(() => {
-          const newObj = dados.agendamentos.map((e) => {
-            return {
-              ...e,
-              veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
-            };
+    if (data?.user) {
+      startTransition(() => {
+        getAllAgendamentos(data.user)
+          .then((res) => {
+            setAgendamentos(res);
+          })
+          .catch((err) => {
+            console.log(err);
           });
-          setAgendamentos(newObj);
-        });
-      }
+      });
     }
-  }, [dados]);
+  }, [data]);
   return (
     <div className="flex justify-center mt-[90px]">
       <div className="px-4 w-full max-w-[600px]">

@@ -2,15 +2,19 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DataContext } from "@/providers/store";
-import { useContext, useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import moment from "moment";
 import { DataTable } from "@/components/table";
+import { getAllAgendamentos } from "../actions/get-agendamentos";
+import { useSession } from "next-auth/react";
+import { AgendamentoFull } from "../page";
 
 const Relatorios = () => {
-  const { data } = useContext(DataContext);
-
-  const [atendimentos, setAtendimentos] = useState<any[]>([]);
+  const { data }: { data: any } = useSession();
+  const [atendimentos, setAtendimentos] = useState<AgendamentoFull[]>([]);
+  const [filteredAtendimentos, setFilteredAtendimentos] = useState<
+    AgendamentoFull[]
+  >([]);
   const [initialDate, setInitialDate] = useState<any>(
     moment(Date.now()).format("YYYY-MM-DD")
   );
@@ -18,20 +22,32 @@ const Relatorios = () => {
     moment(Date.now()).format("YYYY-MM-DD")
   );
 
+  useEffect(() => {
+    data?.user &&
+      startTransition(() => {
+        getAllAgendamentos(data.user)
+          .then((res) => {
+            setAtendimentos(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+  }, [data]);
+
   const filterAtendimentos = () => {
-    setAtendimentos([]);
     setTimeout(() => {
-      data &&
-        setAtendimentos(
-          data.agendamentos.filter(
-            (agendamento) =>
-              agendamento.serviceCompleted &&
-              agendamento.serviceCompleted.setHours(20) >=
-                new Date(initialDate).setHours(5) &&
-              agendamento.serviceCompleted.setHours(5) <=
-                new Date(finalDate).setHours(20)
-          )
+      setFilteredAtendimentos(() => {
+        const newObj = atendimentos.filter(
+          (agendamento) =>
+            agendamento.serviceCompleted &&
+            agendamento.serviceCompleted.setHours(20) >=
+              new Date(initialDate).setHours(5) &&
+            agendamento.serviceCompleted.setHours(5) <=
+              new Date(finalDate).setHours(20)
         );
+        return newObj;
+      });
     }, 500);
   };
 
@@ -59,7 +75,9 @@ const Relatorios = () => {
         </Button>
       </div>
       <div className="flex flex-col">
-        {atendimentos.length > 0 && <DataTable agendamentos={atendimentos} />}
+        {filteredAtendimentos.length > 0 && (
+          <DataTable agendamentos={filteredAtendimentos} />
+        )}
       </div>
     </div>
   );
