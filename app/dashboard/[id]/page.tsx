@@ -33,6 +33,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
 
   const [cliente, setCliente] = useState<ClienteFull | null>(null);
   const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
+  const [filteredVeiculos, setFilteredVeiculos] = useState<VeiculoFull[]>([]);
   const [selectedVeiculos, setSelectedVeiculos] = useState<VeiculoFull[]>([]);
 
   const [isDialogAgendamentoOpen, setIsDialogAgendamentoOpen] =
@@ -151,7 +152,8 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
       startTransition(() => {
         getVeiculosByCLiente(cliente.id, data.user)
           .then((res) => {
-            setVeiculos(res);
+            const sortVeiculos = [...sortArrayVeiculos(res)];
+            setVeiculos(sortVeiculos);
           })
           .catch((err) => {
             console.log(err);
@@ -159,6 +161,10 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
       });
     }
   }, [cliente, data]);
+
+  useEffect(() => {
+    setFilteredVeiculos(veiculos);
+  }, [veiculos]);
 
   return (
     <div className="flex flex-col p-4 mt-[90px]">
@@ -223,13 +229,13 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                             return item;
                           }
                         });
-                        setVeiculos(localVeiculos);
+                        setFilteredVeiculos(localVeiculos);
                       }
                     }}
                   />
                 </div>
                 <ScrollArea className="h-72">
-                  {veiculos?.map((veiculo) => (
+                  {filteredVeiculos?.map((veiculo) => (
                     <div
                       className={
                         selectedVeiculos?.find((item) => item.id === veiculo.id)
