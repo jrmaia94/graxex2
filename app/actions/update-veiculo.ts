@@ -20,7 +20,7 @@ const dataSchema = z.object({
   numEixos: z.number(),
   nomeMotorista: z.string().optional(),
   phoneMotorista: z.string().optional(),
-  ciclo: z.number().min(1).nullable().optional(),
+  ciclo: z.number(),
 });
 
 export const updateVeiculo = async (veiculo: UpdateVeiculo, user: UserFull) => {
