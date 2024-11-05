@@ -70,6 +70,7 @@ model Cliente {
   imageUrl     String?
   image        Bytes?
   CPFCNPJ      String?
+  ciclo        Int           @default(0)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   veiculos     Veiculo[]
@@ -87,6 +88,7 @@ model Veiculo {
   observacao     String?
   nomeMotorista  String?
   phoneMotorista String?
+  ciclo          Int                       @default(0)
   numEixos       Int
   clienteId      Int
   cliente        Cliente                   @relation(fields: [clienteId], references: [id])

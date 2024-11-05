@@ -23,6 +23,7 @@ const dataSchema = z.object({
     .string()
     .regex(/\+55\(\d{2}\)\d{5}\-\d{4}/gm)
     .nullable(),
+  ciclo: z.number(),
 });
 
 export const updateCliente = async (cliente: UpdateCliente, user: UserFull) => {

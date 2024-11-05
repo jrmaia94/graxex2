@@ -61,6 +61,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
   const inputObsRef = useRef<any>(null);
   const inputNomeMotoRef = useRef<any>(null);
   const inputPhoneMotoRef = useRef<any>(null);
+  const inputFreqServicosRef = useRef<any>(null);
 
   // Lida com o envio do formulário
   const handleSubmit = (e: any) => {
@@ -88,6 +89,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         | "observacao"
         | "phoneMotorista"
         | "placa"
+        | "ciclo"
       > = {
         clienteId: selectedCliente,
         modelo: clearFields(inputModeloRef.current?.value) || "",
@@ -99,6 +101,10 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         nomeMotorista: inputNomeMotoRef.current.value,
         phoneMotorista: inputPhoneMotoRef.current.value,
         numEixos: parseInt(selectEixosRef.current?.value),
+        ciclo:
+          parseInt(inputFreqServicosRef.current?.value) > 0
+            ? parseInt(inputFreqServicosRef.current?.value)
+            : 0,
       };
 
       params.id === "create"
@@ -195,6 +201,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         inputObsRef.current.value = veiculo.observacao;
         inputNomeMotoRef.current.value = veiculo.nomeMotorista;
         inputPhoneMotoRef.current.value = veiculo.phoneMotorista || "";
+        inputFreqServicosRef.current.value = veiculo.ciclo || 0;
       });
     }
   }, [veiculo]);
@@ -341,22 +348,34 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
               </select>
             </div>
           </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Nome do motorista</label>
-            <input
-              ref={inputNomeMotoRef}
-              type="text"
-              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-full"
-            />
+          <div className="flex justify-between gap-2">
+            <div className="flex flex-col">
+              <label className="text-primary-foreground">
+                Nome do motorista
+              </label>
+              <input
+                ref={inputNomeMotoRef}
+                type="text"
+                className="h-8 bg-primary text-primary-foreground p-1 rounded-sm max-w-[250px] w-full"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-primary-foreground">
+                Telefone do motorista
+              </label>
+              <InputMask
+                ref={inputPhoneMotoRef}
+                mask="+55(99)99999-9999"
+                className="h-8 text-primary-foreground bg-primary p-1 rounded-sm max-w-[200px] w-full"
+              />
+            </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-primary-foreground">
-              Telefone do motorista
-            </label>
-            <InputMask
-              ref={inputPhoneMotoRef}
-              mask="+55(99)99999-9999"
-              className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-full"
+            <label className="text-primary-foreground">Ciclo(dias)</label>
+            <input
+              ref={inputFreqServicosRef}
+              type="number"
+              className="h-8 bg-primary text-primary-foreground p-1 rounded-sm max-w-[80px] w-full"
             />
           </div>
           <div className="flex gap-10 items-center">

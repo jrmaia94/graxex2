@@ -8,11 +8,10 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { createCliente } from "@/app/actions/post-cliente";
+import { CreateCliente, createCliente } from "@/app/actions/post-cliente";
 import { updateCliente, UpdateCliente } from "@/app/actions/update-cliente";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/loader";
-import { ClienteFull } from "@/app/page";
 
 interface ClientePageProps {
   params: {
@@ -36,6 +35,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
   const inputDocumentRef = useRef<any>(null);
   const inputAddressRef = useRef<any>(null);
   const inputPhoneRef = useRef<any>(null);
+  const inputFreqServiceRef = useRef<any>(null);
   const inputFileRef = useRef<any>(null);
   const [typeOfDoc, setTypeOfDoc] = useState("cnpj");
   const [maskDoc, setMaskDoc] = useState("999.999.999-99");
@@ -60,11 +60,15 @@ const ClientePage = ({ params }: ClientePageProps) => {
 
     // Efetuando cadastro
     startTransition(() => {
-      const cadCliente = {
+      const cadCliente: CreateCliente = {
         name: clearFields(inputNameRef.current?.value) || "",
         address: clearFields(inputAddressRef.current?.value),
         CPFCNPJ: clearFields(inputDocumentRef.current?.value),
         phone: clearFields(inputPhoneRef.current?.value),
+        ciclo:
+          inputFreqServiceRef.current?.value > 0
+            ? inputFreqServiceRef.current?.value
+            : 0,
         //image: inputFileRef.current?.value,
       };
 
@@ -100,7 +104,6 @@ const ClientePage = ({ params }: ClientePageProps) => {
   useEffect(() => {
     startTransition(() => {
       if (params.id !== "create" && data?.user) {
-        let localCliente: ClienteFull | null = null;
         getClienteById(parseInt(params.id.toString()), data.user)
           .then((res) => {
             if (res) setCliente(res);
@@ -136,6 +139,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
         inputDocumentRef.current.value = cliente.CPFCNPJ || "";
         inputAddressRef.current.value = cliente.address || "";
         inputPhoneRef.current.value = cliente.phone || "";
+        inputFreqServiceRef.current.value = cliente.ciclo || 0;
       }
     });
   }, [cliente]);
@@ -218,6 +222,14 @@ const ClientePage = ({ params }: ClientePageProps) => {
               ref={inputPhoneRef}
               mask="+55(99)99999-9999"
               className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-[200px]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-primary-foreground">Ciclo(dias)</label>
+            <input
+              ref={inputFreqServiceRef}
+              type="number"
+              className="h-8 text-primary-foreground bg-primary p-1 rounded-sm w-full max-w-[80px]"
             />
           </div>
           <div className="flex flex-col">

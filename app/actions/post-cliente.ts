@@ -6,7 +6,7 @@ import { UserFull } from "./get-users";
 
 export type CreateCliente = Pick<
   Cliente,
-  "name" | "address" | "CPFCNPJ" | "phone"
+  "name" | "address" | "CPFCNPJ" | "phone" | "ciclo"
 >;
 
 const dataSchema = z.object({
@@ -22,6 +22,7 @@ const dataSchema = z.object({
     .string()
     .regex(/\+55\(\d{2}\)\d{5}\-\d{4}/gm)
     .nullable(),
+  ciclo: z.number(),
 });
 
 export const createCliente = async (cliente: CreateCliente, user: UserFull) => {

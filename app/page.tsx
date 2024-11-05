@@ -99,10 +99,12 @@ const Home = () => {
           (a: any, b: any) => b.serviceCompleted - a.serviceCompleted
         )[0]?.serviceCompleted;
 
+      const ciclo = veiculo.ciclo || cliente.ciclo || 25;
+
       if (
         lastService &&
         Math.round((Date.now() - lastService.getTime()) / 1000 / 60 / 60 / 24) >
-          25
+          ciclo
       ) {
         veiculosWithLastServices.push({
           veiculo: veiculo,

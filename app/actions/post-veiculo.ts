@@ -14,6 +14,9 @@ export type CreateVeiculo = Pick<
   | "clienteId"
   | "frota"
   | "observacao"
+  | "ciclo"
+  | "nomeMotorista"
+  | "phoneMotorista"
 >;
 
 const dataSchema = z.object({
@@ -27,9 +30,11 @@ const dataSchema = z.object({
   numEixos: z.number(),
   nomeMotorista: z.string().optional(),
   phoneMotorista: z.string().optional(),
+  ciclo: z.number().min(1).nullable().optional(),
 });
 
 export const createVeiculo = async (veiculo: CreateVeiculo, user: UserFull) => {
+  console.log(veiculo);
   if (user.perfil && user.accessLevel.create) {
     if (dataSchema.safeParse(veiculo).success) {
       try {
