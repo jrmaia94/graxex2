@@ -28,6 +28,7 @@ const dataSchema = z.object({
 
 export const updateCliente = async (cliente: UpdateCliente, user: UserFull) => {
   if (user.perfil && user.accessLevel.update) {
+    console.log(cliente);
     const { id, ...data } = cliente;
     if (dataSchema.safeParse(cliente).success) {
       try {

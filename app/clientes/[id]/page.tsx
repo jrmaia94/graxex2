@@ -65,10 +65,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
         address: clearFields(inputAddressRef.current?.value),
         CPFCNPJ: clearFields(inputDocumentRef.current?.value),
         phone: clearFields(inputPhoneRef.current?.value),
-        ciclo:
-          inputFreqServiceRef.current?.value > 0
-            ? inputFreqServiceRef.current?.value
-            : 0,
+        ciclo: parseInt(inputFreqServiceRef.current?.value) || 0,
         //image: inputFileRef.current?.value,
       };
 
