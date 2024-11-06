@@ -24,7 +24,7 @@ const dataSchema = z.object({
   modelo: z.string().min(2),
   fabricante: z.string().min(2).nullable(),
   placa: z.string().regex(/\D{3}\-\d\w\d{2}/gm),
-  cor: z.string(),
+  cor: z.string().nullable(),
   frota: z.string().nullable(),
   observacao: z.string().nullable(),
   numEixos: z.number(),
@@ -34,7 +34,6 @@ const dataSchema = z.object({
 });
 
 export const createVeiculo = async (veiculo: CreateVeiculo, user: UserFull) => {
-  console.log(veiculo);
   if (user.perfil && user.accessLevel.create) {
     if (dataSchema.safeParse(veiculo).success) {
       try {

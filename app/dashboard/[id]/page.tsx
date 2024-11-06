@@ -339,11 +339,13 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                     >
                       <div className="flex gap-2 w-full items-center">
                         <p className="text-xs py-2 w-[12%]">{veiculo.frota}</p>
-                        <Link href={`/veiculos/${veiculo.id}`}>
-                          <p className="text-xs py-2 w-[38%]">
-                            {veiculo.modelo?.toUpperCase()}
-                          </p>
-                        </Link>
+                        <div className="flex w-[60%]">
+                          <Link href={`/veiculos/${veiculo.id}`}>
+                            <p className="text-xs py-2 w-full">
+                              {veiculo.modelo?.toUpperCase()}
+                            </p>
+                          </Link>
+                        </div>
                         <p className="text-xs py-2 w-[23%]">{veiculo.placa}</p>
                         {ultAgendamento(
                           veiculos.find((item) => item.id === veiculo.id)

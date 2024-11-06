@@ -101,10 +101,7 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
         nomeMotorista: inputNomeMotoRef.current.value,
         phoneMotorista: inputPhoneMotoRef.current.value,
         numEixos: parseInt(selectEixosRef.current?.value),
-        ciclo:
-          parseInt(inputFreqServicosRef.current?.value) > 0
-            ? parseInt(inputFreqServicosRef.current?.value)
-            : 0,
+        ciclo: parseInt(inputFreqServicosRef.current?.value) || 0,
       };
 
       params.id === "create"
