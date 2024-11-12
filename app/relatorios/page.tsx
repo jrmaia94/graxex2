@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { startTransition, useEffect, useState } from "react";
 import moment from "moment";
-import { DataTable } from "@/components/table";
+import { GeneralTable } from "@/components/table";
 import { getAllAgendamentos } from "../actions/get-agendamentos";
 import { useSession } from "next-auth/react";
 import { AgendamentoFull } from "../page";
+import { DataTable } from "@/components/ui/data-table";
+import { columnsAtendimentos } from "./_columns";
 
 const Relatorios = () => {
   const { data }: { data: any } = useSession();
@@ -76,7 +78,11 @@ const Relatorios = () => {
       </div>
       <div className="flex flex-col">
         {filteredAtendimentos.length > 0 && (
-          <DataTable agendamentos={filteredAtendimentos} />
+          <GeneralTable agendamentos={filteredAtendimentos} />
+          //<DataTable
+          //  data={filteredAtendimentos}
+          //  columns={columnsAtendimentos}
+          ///>
         )}
       </div>
     </div>

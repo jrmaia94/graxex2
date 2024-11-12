@@ -7,13 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  CheckCheckIcon,
-  CheckCircle,
-  CheckCircle2,
-  CheckIcon,
-} from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import moment from "moment";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface Atendimento {
@@ -25,13 +21,12 @@ interface Atendimento {
   paymentMethod: string;
 }
 
-export function DataTable({ agendamentos }: { agendamentos: any[] }) {
+export function GeneralTable({ agendamentos }: { agendamentos: any[] }) {
   const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
 
   useEffect(() => {
     let dados: Atendimento[] = [];
     agendamentos.forEach((e) => {
-      console.log(e.serviceCompleted);
       return dados.push({
         id: e.id,
         cliente: e.cliente.name,
@@ -65,7 +60,11 @@ export function DataTable({ agendamentos }: { agendamentos: any[] }) {
       <TableBody>
         {atendimentos.map((atendimento) => (
           <TableRow key={atendimento.id} className="bg-gray-700">
-            <TableCell className="font-medium">{atendimento.id}</TableCell>
+            <TableCell className="font-medium">
+              <Link href={`./agendamentos/${atendimento.id}`}>
+                {atendimento.id}
+              </Link>
+            </TableCell>
             <TableCell>{atendimento.cliente}</TableCell>
             <TableCell>
               {moment(atendimento.data.setUTCHours(8)).format("DD-MM-YYYY")}
