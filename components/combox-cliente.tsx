@@ -30,7 +30,7 @@ export function ComboboxClientes({
   setSelectedCliente: Dispatch<SetStateAction<number>>;
 }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(selectedCliente.toString());
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,9 +56,9 @@ export function ComboboxClientes({
               {clientes.map((cliente) => (
                 <CommandItem
                   key={cliente.id}
-                  value={cliente.id.toString()}
+                  value={cliente.name.toString()}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    setValue(cliente.id.toString());
                     setSelectedCliente(cliente.id);
                     setOpen(false);
                   }}
