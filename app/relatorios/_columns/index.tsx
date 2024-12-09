@@ -41,6 +41,7 @@ export const columnsAtendimentos: ColumnDef<
     cell: ({ row: { original: atendimento } }) => (
       <div className="flex w-full justify-center">{atendimento.id}</div>
     ),
+    enableGrouping: true,
   },
   {
     accessorKey: "cliente",

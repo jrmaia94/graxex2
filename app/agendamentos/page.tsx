@@ -14,6 +14,9 @@ const Agendamentos = () => {
   });
 
   const [agendamentos, setAgendamentos] = useState<AgendamentoFull[]>([]);
+  const [filteredAgendamentos, setFilteredAgendamentos] = useState<
+    AgendamentoFull[]
+  >([]);
   const [isPending, startTransition] = useTransition();
 
   /*   useEffect(() => {
@@ -55,6 +58,10 @@ const Agendamentos = () => {
   }, [loadAllAgendamentos, data]); */
 
   useEffect(() => {
+    setFilteredAgendamentos(agendamentos);
+  }, [agendamentos]);
+
+  useEffect(() => {
     if (data?.user) {
       startTransition(() => {
         getAllAgendamentos(data.user)
@@ -69,17 +76,25 @@ const Agendamentos = () => {
   }, [data]);
   return (
     <div className="flex justify-center mt-[90px]">
+      {isPending && <Loader />}
       <div className="px-4 w-full max-w-[600px]">
-        {isPending && <Loader />}
-        <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
-          Agendamentos
-        </h2>
-        <div className="mb-3">
-          <Search origin="agendamentos" action={setAgendamentos} />
+        <div className="w-full left-0 top-[90px] px-4 z-10 bg-gray-800/[.97] fixed flex flex-col">
+          <h2 className="mb-3 mt-4 text-lg font-bold uppercase text-gray-400">
+            Agendamentos
+          </h2>
+          <div className="mb-3 flex w-full gap-2">
+            <Search
+              origin="agendamentos"
+              state={agendamentos}
+              action={setFilteredAgendamentos}
+            />
+          </div>
         </div>
-        {agendamentos.map((agendamento) => (
-          <CardAgendamento key={agendamento.id} agendamento={agendamento} />
-        ))}
+        <div className="flex flex-col gap-1 mt-[120px]">
+          {filteredAgendamentos.map((agendamento) => (
+            <CardAgendamento key={agendamento.id} agendamento={agendamento} />
+          ))}
+        </div>
       </div>
     </div>
   );

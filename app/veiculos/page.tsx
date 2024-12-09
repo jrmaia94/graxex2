@@ -27,6 +27,7 @@ const PageVeiculos = () => {
   });
   const [isPending, startTransition] = useTransition();
   const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
+  const [filteredVeiculos, setFilteredVeiculos] = useState<VeiculoFull[]>([]);
 
   useEffect(() => {
     startTransition(() => {
@@ -42,6 +43,10 @@ const PageVeiculos = () => {
     });
   }, [data]);
 
+  useEffect(() => {
+    setFilteredVeiculos(veiculos);
+  }, [veiculos]);
+
   return (
     <div className="flex justify-center mt-[90px]">
       {isPending && <Loader />}
@@ -51,11 +56,15 @@ const PageVeiculos = () => {
             Veiculos
           </h2>
           <div className="mb-3 flex w-full gap-2">
-            <Search origin="veiculos" action={setVeiculos} />
+            <Search
+              origin="veiculos"
+              state={veiculos}
+              action={setFilteredVeiculos}
+            />
           </div>
         </div>
         <div className="flex flex-col gap-1 mt-[120px]">
-          {veiculos?.map((veiculo) => (
+          {filteredVeiculos?.map((veiculo) => (
             <Card key={veiculo.id}>
               <CardContent className="p-2 h-20 flex justify-between relative">
                 <CardVeiculo veiculo={veiculo} />

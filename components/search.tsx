@@ -3,24 +3,31 @@ import { PlusIcon, SearchIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
-import { getSomeClientes } from "@/app/actions/get-clientes";
-import { toast } from "sonner";
 import Link from "next/link";
-import { Agendamento, Veiculo } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { getSomeVeiculos } from "@/app/actions/get-veiculos";
-import { useTransition } from "react";
+import { Dispatch, SetStateAction, useTransition } from "react";
 import Loader from "./loader";
+import { AgendamentoFull, ClienteFull, VeiculoFull } from "@/app/page";
 
 const formSchema = z.object({
   param: z.string().trim(),
 });
 
-const Search = ({ action, origin }: { action: Function; origin: string }) => {
+const Search = ({
+  state,
+  action,
+  origin,
+}: {
+  state: AgendamentoFull[] | ClienteFull[] | VeiculoFull[];
+  action:
+    | Dispatch<SetStateAction<AgendamentoFull[]>>
+    | Dispatch<SetStateAction<ClienteFull[]>>
+    | Dispatch<SetStateAction<VeiculoFull[]>>;
+  origin: string;
+}) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
@@ -33,44 +40,34 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
   });
 
   const handleSubmit = (formData: z.infer<typeof formSchema>) => {
+    const value = formData.param;
     if (data?.user) {
       startTransition(() => {
         switch (origin) {
           case "clientes":
-            getSomeClientes(formData.param, data.user)
-              .then((res) => {
-                return action(res);
-              })
-              .catch((err) => {
-                console.log(err);
-                toast.error("Não foi possível buscar os clientes");
-              });
+            action(() => {
+              return state.filter((e) =>
+                e.name.toLowerCase().includes(value.toLowerCase())
+              );
+            });
             break;
           case "veiculos":
-            getSomeVeiculos(formData.param, data.user)
-              .then((res) => {
-                return action(res);
-              })
-              .catch((err) => {
-                console.log(err);
-                toast.error("Não foi possível buscar os veículos");
-              });
+            action(() => {
+              return state.filter(
+                (e) =>
+                  e.cliente.name.toLowerCase().includes(value.toLowerCase()) ||
+                  e.modelo.toLowerCase().includes(value.toLowerCase()) ||
+                  e.placa.toLowerCase().includes(value.toLowerCase()) ||
+                  e.fabricante.toLowerCase().includes(value.toLowerCase())
+              );
+            });
             break;
           case "agendamentos":
-            getSomeClientes(formData.param, data.user)
-              .then((res) => {
-                let agendamentos: Agendamento[] = [];
-                res.map((cliente) => {
-                  cliente.agendamentos.map((agendamento) =>
-                    agendamentos.push(agendamento)
-                  );
-                });
-                return action(agendamentos);
-              })
-              .catch((err) => {
-                console.log(err);
-                toast.error("Não foi possível buscar os clientes");
-              });
+            action(() => {
+              return state.filter((e) =>
+                e.cliente.name.toLowerCase().includes(value.toLowerCase())
+              );
+            });
             break;
           default:
             break;
@@ -92,7 +89,6 @@ const Search = ({ action, origin }: { action: Function; origin: string }) => {
             <FormItem className="w-full">
               <FormControl>
                 <Input
-                  disabled={origin === "agendamentos"}
                   placeholder="Search"
                   className="bg-primary text-primary-foreground"
                   {...field}
