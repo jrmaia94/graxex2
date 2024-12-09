@@ -74,23 +74,25 @@ const CardAgendamentoFull = ({
                   }}
                   className="gap-4 flex flex-col"
                 >
-                  {veiculos.map((veiculo) => (
-                    <div key={veiculo.id} className="flex">
-                      <input
-                        id={veiculo.id.toString()}
-                        type="checkbox"
-                        defaultChecked
-                      />
-                      <label className="flex gap-5">
-                        <span>{veiculo.frota}</span>
-                        <span>{veiculo.placa}</span>
-                        <span>{veiculo.fabricante}</span>
-                        <span>{veiculo.modelo}</span>
-                        <span>{veiculo.cor}</span>
-                      </label>
-                    </div>
-                  ))}
                   <Button type="submit">Emitir PDF</Button>
+                  <ScrollArea>
+                    {veiculos.map((veiculo) => (
+                      <div key={veiculo.id} className="flex py-1 items-center">
+                        <input
+                          id={veiculo.id.toString()}
+                          type="checkbox"
+                          defaultChecked
+                        />
+                        <label className="flex gap-5">
+                          <span>{veiculo.frota}</span>
+                          <span>{veiculo.placa}</span>
+                          <span>{veiculo.fabricante}</span>
+                          <span>{veiculo.modelo}</span>
+                          <span>{veiculo.cor}</span>
+                        </label>
+                      </div>
+                    ))}
+                  </ScrollArea>
                 </form>
               </PopoverContent>
             </Popover>
