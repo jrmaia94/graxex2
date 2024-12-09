@@ -21,11 +21,8 @@ const Search = ({
   action,
   origin,
 }: {
-  state: AgendamentoFull[] | ClienteFull[] | VeiculoFull[];
-  action:
-    | Dispatch<SetStateAction<AgendamentoFull[]>>
-    | Dispatch<SetStateAction<ClienteFull[]>>
-    | Dispatch<SetStateAction<VeiculoFull[]>>;
+  state: any[];
+  action: Dispatch<SetStateAction<any[]>>;
   origin: string;
 }) => {
   const { data }: { data: any } = useSession({
