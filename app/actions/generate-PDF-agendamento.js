@@ -260,7 +260,7 @@ export const generate_PDF_Agendamento = (data) => {
         }
       )
         .format(new Date(Date.now()).setUTCHours(12))
-        .replace(/\//g, "_")}`
+        .replace(/\//g, "_")}.pdf`
     );
   }, 400);
 };

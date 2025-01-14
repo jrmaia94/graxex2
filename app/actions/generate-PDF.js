@@ -311,7 +311,7 @@ export const generate_PDF = (data) => {
         year: "numeric",
       })
         .format(new Date(Date.now()).setUTCHours(12))
-        .replace(/\//g, "_")}`
+        .replace(/\//g, "_")}.pdf`
     );
   }, 400);
 };
