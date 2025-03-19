@@ -1,27 +1,29 @@
 "use client";
 
 import { Prisma } from "@prisma/client";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { getAllClientes, getClienteById } from "../actions/get-clientes";
+import { getAllClientes, getClienteById } from "../../actions/get-clientes";
 import { useSession } from "next-auth/react";
 
-import { SearchCliente } from "./components/searchCliente";
+import { SearchCliente } from "../components/searchCliente";
 import Loader from "@/components/loader";
+import ListAgendamentos from "../components/listAgendamentos";
 
-const UnifyReportPage = () => {
-  const id = useSearchParams().get("cliente");
+export type ClienteWithVeiculosAndAtendimentos = Prisma.ClienteGetPayload<{
+  include: { veiculos: true; agendamentos: true };
+}>;
+
+const UnifyReportPage = ({ params }: { params: { id: string } }) => {
+  const { id } = params;
   const { data }: { data: any } = useSession({
     required: true,
   });
   const [isPending, startTransition] = useTransition();
   const [clientes, setClientes] = useState<
-    Prisma.ClienteGetPayload<{ include: { veiculos: true } }>[]
+    ClienteWithVeiculosAndAtendimentos[]
   >([]);
   const [selectedCliente, setSelectedCliente] =
-    useState<Prisma.ClienteGetPayload<{ include: { veiculos: true } }> | null>(
-      null
-    );
+    useState<ClienteWithVeiculosAndAtendimentos | null>(null);
 
   useEffect(() => {
     startTransition(() => {
@@ -48,11 +50,10 @@ const UnifyReportPage = () => {
       {isPending && <Loader />}
       {/* ESQUERDA */}
       <div className="w-[50%] p-2">
-        <SearchCliente
-          clientes={clientes}
-          selectedCliente={selectedCliente}
-          setSelectedCliente={setSelectedCliente}
-        />
+        <SearchCliente clientes={clientes} selectedCliente={selectedCliente} />
+        {selectedCliente && (
+          <ListAgendamentos agendamentos={selectedCliente.agendamentos} />
+        )}
       </div>
       {/* DIREITA */}
       <div className="w-[50%] bg-primary m-2 rounded-lg"></div>

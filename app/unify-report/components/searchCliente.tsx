@@ -17,34 +17,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Cliente, Prisma } from "@prisma/client";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
+import { useState } from "react";
+import { ClienteWithVeiculosAndAtendimentos } from "../[id]/page";
+import { useRouter } from "next/navigation";
 
 export function SearchCliente({
   clientes,
   selectedCliente,
-  setSelectedCliente,
 }: {
-  clientes: Prisma.ClienteGetPayload<{
-    include: { veiculos: true };
-  }>[];
-  selectedCliente: Prisma.ClienteGetPayload<{
-    include: { veiculos: true };
-  }> | null;
-  setSelectedCliente: Dispatch<
-    SetStateAction<Prisma.ClienteGetPayload<{
-      include: { veiculos: true };
-    }> | null>
-  >;
+  clientes: ClienteWithVeiculosAndAtendimentos[];
+  selectedCliente: ClienteWithVeiculosAndAtendimentos | null;
 }) {
   const [open, setOpen] = useState(false);
-  const [id, setId] = useState<number>();
 
-  useEffect(() => {
-    if (selectedCliente) {
-      setId(selectedCliente?.id);
-    }
-  }, [selectedCliente]);
+  const router = useRouter();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -55,8 +42,9 @@ export function SearchCliente({
           aria-expanded={open}
           className="w-[400px] justify-between bg-primary text-primary-foreground"
         >
-          {id
-            ? clientes.find((cliente) => cliente.id === id)?.name
+          {selectedCliente && selectedCliente.id
+            ? clientes.find((cliente) => cliente.id === selectedCliente.id)
+                ?.name
             : "Selecione um cliente..."}
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -72,18 +60,10 @@ export function SearchCliente({
                   key={cliente.id}
                   value={cliente.name}
                   onSelect={(currentValue) => {
-                    setId(
-                      currentValue === id?.toString()
-                        ? 0
-                        : parseInt(currentValue)
-                    );
-                    const cliente = clientes.find(
-                      (cliente) => cliente.id === id
-                    );
-                    if (cliente) {
-                      setSelectedCliente(cliente);
-                      setOpen(false);
-                    }
+                    const clientId = clientes.find(
+                      (c) => c.name === currentValue
+                    )?.id;
+                    router.push(`/unify-report/${clientId}`);
                   }}
                   className="text-primary-foreground"
                 >
@@ -91,7 +71,9 @@ export function SearchCliente({
                   <Check
                     className={cn(
                       "ml-auto",
-                      id === cliente.id ? "opacity-100" : "opacity-0"
+                      selectedCliente?.id === cliente.id
+                        ? "opacity-100"
+                        : "opacity-0"
                     )}
                   />
                 </CommandItem>

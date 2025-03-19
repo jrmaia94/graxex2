@@ -2,6 +2,7 @@ import { ItemsMenuOptions } from "@/constants/nav-menu";
 import { Card, CardContent } from "./ui/card";
 import {
   CalendarArrowUp,
+  FileTextIcon,
   ListCollapseIcon,
   SettingsIcon,
   TruckIcon,
@@ -28,6 +29,8 @@ const ItemMenu = ({
         return <SettingsIcon size={30} />;
       case "Relatórios":
         return <ListCollapseIcon size={30} />;
+      case "PDF - Vários atendimentos":
+        return <FileTextIcon size={30} />;
     }
   };
   return (

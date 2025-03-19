@@ -23,4 +23,8 @@ export const itemsMenu: ItemsMenuOptions[] = [
     title: "Relatórios",
     href: "/relatorios",
   },
+  {
+    title: "PDF - Vários atendimentos",
+    href: "/unify-report/0",
+  },
 ];
