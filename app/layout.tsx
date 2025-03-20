@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import AuthProvider from "../providers/session";
 import Header from "@/components/header";
+import ViewAds from "@/components/viewAds";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <Header />
+          <ViewAds />
           {children}
         </AuthProvider>
         <Toaster />

@@ -50,6 +50,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           });
           token.perfil = user?.perfil;
           token.accessLevel = user?.accessLevel;
+          console.log(user?.viewAds);
+          token.ads = user?.viewAds;
         } else if (id) {
           const user = await prisma.user.findUnique({
             where: {
@@ -58,6 +60,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           });
           token.perfil = user?.perfil;
           token.accessLevel = user?.accessLevel;
+          token.ads = user?.viewAds;
         }
       }
       return token;
@@ -66,6 +69,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       session.user.id = token.sub || "";
       session.user.perfil = token.perfil;
       session.user.accessLevel = token.accessLevel;
+      session.user.ads = token.ads;
 
       return session;
     },

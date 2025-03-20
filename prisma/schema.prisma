@@ -46,6 +46,7 @@ model User {
   emailVerified DateTime? @map("email_verified")
   perfil        Boolean   @default(false)
   accessLevel   Json?
+  viewAds       Boolean   @default(true)
   image         String?
   accounts      Account[]
   sessions      Session[]

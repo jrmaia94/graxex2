@@ -50,7 +50,6 @@ export interface AgendamentoFull extends Agendamento {
 }
 
 const Home = () => {
-  const {} = useTransition();
   const [isPending, startTransition] = useTransition();
   const { data }: { data: any } = useSession({
     required: true,
