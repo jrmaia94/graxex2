@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { Agendamento, Prisma } from "@prisma/client";
-import { Dispatch, SetStateAction } from "react";
+import { Prisma } from "@prisma/client";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 const ListAgendamentos = ({
   agendamentos,
@@ -17,6 +17,16 @@ const ListAgendamentos = ({
     >
   >;
 }) => {
+  const [selection, setSelection] = useState<
+    Prisma.AgendamentoGetPayload<{
+      include: { veiculos: { include: { veiculo: true } } };
+    }>[]
+  >([]);
+
+  useEffect(() => {
+    setSelectedAgendamentos(() => selection);
+  }, [selection, setSelectedAgendamentos]);
+
   function sortAgendamentos(
     array: Prisma.AgendamentoGetPayload<{
       include: { veiculos: { include: { veiculo: true } } };
@@ -33,45 +43,70 @@ const ListAgendamentos = ({
   }
 
   return (
-    <div className="pt-2 w-full grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 justify-start gap-2">
-      {sortAgendamentos(agendamentos).map((agendamento) => {
-        if (agendamento.serviceCompleted) {
-          return (
-            <div
-              key={agendamento.id}
-              className="flex items-center justify-between w-[220px] h-[50px] bg-primary text-primary-foreground mb-2 rounded-md p-4"
-            >
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  onCheckedChange={(isCheck) => {
-                    if (isCheck) {
-                      setSelectedAgendamentos((prev) => {
-                        const newObj = [...prev, agendamento];
-                        return newObj;
-                      });
-                    } else {
-                      setSelectedAgendamentos((prev) => {
-                        const newObj = prev.filter(
-                          (item) => item.id !== agendamento.id
-                        );
-                        return newObj;
-                      });
-                    }
-                  }}
-                  id="terms"
-                  className="border border-primary-foreground"
-                />
+    <div className="p-2 w-full gap-1 flex flex-col">
+      <h3 className="text-primary-foreground font-bold">Agendamentos</h3>
+      <div className="text-primary-foreground flex gap-1 items-center pb-1">
+        <Checkbox
+          onCheckedChange={(isChecked) => {
+            if (isChecked) {
+              setSelection(agendamentos);
+            } else {
+              setSelection([]);
+            }
+          }}
+          className="bg-primary text-primary-foreground border-gray-600"
+        />
+        <span>marcar todos</span>
+        <span className="ml-4">
+          {selection?.length} de {agendamentos.length} agendamentos selecionados
+        </span>
+      </div>
+      <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 justify-items-center gap-2">
+        {sortAgendamentos(agendamentos).map((agendamento) => {
+          if (agendamento.serviceCompleted) {
+            return (
+              <div
+                key={agendamento.id}
+                className="flex items-center gap-2 w-[185px] h-[50px] bg-primary text-primary-foreground mb-2 rounded-md p-2 text-xs"
+              >
+                <div className="flex items-center">
+                  <Checkbox
+                    checked={selection
+                      .map((item) => item.id)
+                      .includes(agendamento.id)}
+                    onCheckedChange={(isCheck) => {
+                      if (isCheck) {
+                        setSelection((prev) => {
+                          const newObj = [...prev, agendamento];
+                          return newObj;
+                        });
+                      } else {
+                        setSelection((prev) => {
+                          const newObj = prev.filter(
+                            (item) => item.id !== agendamento.id
+                          );
+                          return newObj;
+                        });
+                      }
+                    }}
+                    id="terms"
+                    className="border border-primary-foreground"
+                  />
+                </div>
+                <div className="flex justify-between gap-1">
+                  <p>
+                    {Intl.DateTimeFormat("pt-BR", {
+                      dateStyle: "short",
+                    }).format(agendamento.serviceCompleted)}
+                  </p>
+                  <p> - </p>
+                  <p>{agendamento.pricePerVeiculo.length} veículos</p>
+                </div>
               </div>
-              <p>
-                {Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(
-                  agendamento.serviceCompleted
-                )}
-              </p>
-              <p>{agendamento.pricePerVeiculo.length} veículos</p>
-            </div>
-          );
-        }
-      })}
+            );
+          }
+        })}
+      </div>
     </div>
   );
 };

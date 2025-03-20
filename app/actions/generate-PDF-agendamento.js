@@ -125,14 +125,25 @@ export const generate_PDF_Agendamento = (data) => {
   size(12);
   weight("normal");
 
-  doc.text(
-    Intl.DateTimeFormat("pt-br", { dateStyle: "full" }).format(
-      new Date(Date.now())
-    ),
-    doc.internal.pageSize.getWidth() - 20,
-    inicioCabecalhoCliente + 30,
-    { align: "right" }
-  );
+  if (data.dataForRel) {
+    doc.text(
+      Intl.DateTimeFormat("pt-br", { dateStyle: "full" }).format(
+        new Date(data.dataForRel)
+      ),
+      doc.internal.pageSize.getWidth() - 20,
+      inicioCabecalhoCliente + 30,
+      { align: "right" }
+    );
+  } else {
+    doc.text(
+      Intl.DateTimeFormat("pt-br", { dateStyle: "full" }).format(
+        new Date(Date.now())
+      ),
+      doc.internal.pageSize.getWidth() - 20,
+      inicioCabecalhoCliente + 30,
+      { align: "right" }
+    );
+  }
 
   // Tabela
   const dados = data.agendamento.veiculos.map((item) => {

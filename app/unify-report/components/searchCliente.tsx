@@ -40,7 +40,7 @@ export function SearchCliente({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[400px] justify-between bg-primary text-primary-foreground"
+          className="w-[400px] justify-between bg-primary hover:bg-gray-200 text-primary-foreground hover:text-primary-foreground"
         >
           {selectedCliente && selectedCliente.id
             ? clientes.find((cliente) => cliente.id === selectedCliente.id)
@@ -50,7 +50,13 @@ export function SearchCliente({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0">
-        <Command className="bg-primary text-primary-foreground">
+        <Command
+          className="bg-primary text-primary-foreground"
+          filter={(value, search) => {
+            if (value.toUpperCase().includes(search.toUpperCase())) return 1;
+            return 0;
+          }}
+        >
           <CommandInput placeholder="Procurar cliente..." className="h-9" />
           <CommandList>
             <CommandEmpty>Nenhum cliente encontrado.</CommandEmpty>
@@ -65,17 +71,9 @@ export function SearchCliente({
                     )?.id;
                     router.push(`/unify-report/${clientId}`);
                   }}
-                  className="text-primary-foreground"
+                  className="text-primary-foreground hover:bg-primary"
                 >
                   {cliente.name}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      selectedCliente?.id === cliente.id
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
                 </CommandItem>
               ))}
             </CommandGroup>
