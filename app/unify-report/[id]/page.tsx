@@ -2,15 +2,20 @@
 
 import { Prisma } from "@prisma/client";
 import { useEffect, useState, useTransition } from "react";
-import { getAllClientes, getClienteById } from "../../actions/get-clientes";
+import { getAllClientesForUnifyReport } from "../../actions/get-clientes";
 import { useSession } from "next-auth/react";
 
 import { SearchCliente } from "../components/searchCliente";
 import Loader from "@/components/loader";
 import ListAgendamentos from "../components/listAgendamentos";
+import ListVeiculos from "../components/listVeiculos";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export type ClienteWithVeiculosAndAtendimentos = Prisma.ClienteGetPayload<{
-  include: { veiculos: true; agendamentos: true };
+  include: {
+    veiculos: true;
+    agendamentos: { include: { veiculos: { include: { veiculo: true } } } };
+  };
 }>;
 
 const UnifyReportPage = ({ params }: { params: { id: string } }) => {
@@ -25,10 +30,16 @@ const UnifyReportPage = ({ params }: { params: { id: string } }) => {
   const [selectedCliente, setSelectedCliente] =
     useState<ClienteWithVeiculosAndAtendimentos | null>(null);
 
+  const [selectedAgendamentos, setSelectedAgendamentos] = useState<
+    Prisma.AgendamentoGetPayload<{
+      include: { veiculos: { include: { veiculo: true } } };
+    }>[]
+  >([]);
+
   useEffect(() => {
     startTransition(() => {
       if (data) {
-        getAllClientes(data.user).then((res) => {
+        getAllClientesForUnifyReport(data.user).then((res) => {
           if (res) {
             setClientes(res);
           }
@@ -49,10 +60,18 @@ const UnifyReportPage = ({ params }: { params: { id: string } }) => {
     <div className="w-full h-screen flex pt-[90px]">
       {isPending && <Loader />}
       {/* ESQUERDA */}
-      <div className="w-[50%] p-2">
+      <div className="w-[50%] p-2 gap-2 flex flex-col">
         <SearchCliente clientes={clientes} selectedCliente={selectedCliente} />
-        {selectedCliente && (
-          <ListAgendamentos agendamentos={selectedCliente.agendamentos} />
+        <ScrollArea className="h-72 bg-muted-foreground rounded-md p-2 py-0">
+          {selectedCliente && (
+            <ListAgendamentos
+              setSelectedAgendamentos={setSelectedAgendamentos}
+              agendamentos={selectedCliente.agendamentos}
+            />
+          )}
+        </ScrollArea>
+        {selectedAgendamentos.length > 0 && (
+          <ListVeiculos selectedAgendamentos={selectedAgendamentos} />
         )}
       </div>
       {/* DIREITA */}
