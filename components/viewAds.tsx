@@ -51,10 +51,10 @@ const ViewAds = () => {
     <>
       {isPending && <Loader />}
       {visible && (
-        <div className="absolute z-50 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[70%] h-[95%] flex justify-center items-center bg-black p-10 rounded-lg gap-2">
+        <div className="absolute z-50 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[70%] h-[80%] md:h-[95%] flex md:flex-row flex-col justify-center items-center bg-black p-10 rounded-lg gap-2">
           <Image src="/meme.jpeg" alt="meme" width={500} height={500} />
-          <div className="flex flex-col h-full justify-between">
-            <p className="flex justify-center items-center text-2xl bg-black p-2 rounded-lg">
+          <div className="flex flex-col h-full justify-around">
+            <p className="flex justify-center items-center md:text-2xl text-lg bg-black p-2 rounded-lg">
               Eaeee seu viadinho, atualização lançada. Fica ligado aí que mais
               tarde te dou a call da nova funcionalidade
             </p>
