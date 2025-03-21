@@ -32,7 +32,7 @@ export const itemsMenu: ItemsMenuOptions[] = [
       },
       {
         title: "Parcial",
-        href: "/agendamento-parcial",
+        href: "/agendamento-parcial/0",
       },
     ],
   },

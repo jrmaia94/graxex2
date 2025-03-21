@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { createPartialAgendamento } from "@/app/actions/post-agendamento";
@@ -41,6 +41,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAgendamentoById } from "@/app/actions/get-agendamentos";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
   id: z.number().default(0),
@@ -57,16 +60,22 @@ const FormSchema = z.object({
 
 interface FormAgendamentoProps {
   clientes: Cliente[];
+  params: {
+    id: string;
+  };
 }
 
-export function FormAgendamento({ clientes }: FormAgendamentoProps) {
+export function FormAgendamento({ clientes, params }: FormAgendamentoProps) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
+  const { data }: { data: any } = useSession({ required: true });
+  const router = useRouter();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const [isSavedAgendamento, setIsSaveAgendamento] = useState<boolean>(true);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
+  const [agendamento, setAgendamento] = useState<Agendamento | null>(null);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     createPartialAgendamento({
@@ -74,12 +83,25 @@ export function FormAgendamento({ clientes }: FormAgendamentoProps) {
       date: data.date,
     })
       .then((res) => {
+        router.push(`/agendamento-parcial/${res.id}`);
         console.log(res);
       })
       .catch((err) => {
         console.log(err);
       });
   }
+
+  useEffect(() => {
+    if (parseInt(params.id) !== 0 && data?.user) {
+      getAgendamentoById(parseInt(params.id), data.user)
+        .then((res) => {
+          setAgendamento(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [params, data]);
 
   return (
     <div className="flex flex-col w-full gap-2">
