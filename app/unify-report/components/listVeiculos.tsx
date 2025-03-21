@@ -7,12 +7,14 @@ const ListVeiculos = ({
   selectedAgendamentos,
   setSelectedVeiculos,
 }: {
-  setSelectedVeiculos: Dispatch<SetStateAction<Veiculo[]>>;
+  setSelectedVeiculos: Dispatch<SetStateAction<(Veiculo & { date: Date })[]>>;
   selectedAgendamentos: Prisma.AgendamentoGetPayload<{
     include: { veiculos: { include: { veiculo: true } } };
   }>[];
 }) => {
-  const [selection, setSelection] = useState<Veiculo[] | null>(null);
+  const [selection, setSelection] = useState<
+    (Veiculo & { date: Date })[] | null
+  >(null);
 
   const sortVeiculos = (
     array: Prisma.AgendamentoGetPayload<{
@@ -55,9 +57,11 @@ const ListVeiculos = ({
           onCheckedChange={(isChecked) => {
             if (isChecked) {
               setSelection(() => {
-                const items: Veiculo[] = [];
+                const items: (Veiculo & { date: Date })[] = [];
                 selectedAgendamentos.forEach((item) =>
-                  item.veiculos.forEach((e) => items.push(e.veiculo))
+                  item.veiculos.forEach((e) =>
+                    items.push({ ...e.veiculo, date: item.date })
+                  )
                 );
                 return items;
               });
@@ -89,10 +93,13 @@ const ListVeiculos = ({
                   if (isChecked) {
                     setSelection((prev) => {
                       if (prev) {
-                        const newObj = [...prev, item.veiculo];
+                        const newObj = [
+                          ...prev,
+                          { ...item.veiculo, date: item.date },
+                        ];
                         return newObj;
                       } else {
-                        return [item.veiculo];
+                        return [{ ...item.veiculo, date: item.date }];
                       }
                     });
                   } else {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Agendamento, Prisma, Veiculo } from "@prisma/client";
+import { Prisma, Veiculo } from "@prisma/client";
 import { useEffect, useState, useTransition } from "react";
 import { getAllClientesForUnifyReport } from "../../actions/get-clientes";
 import { useSession } from "next-auth/react";
@@ -24,7 +24,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { generate_PDF_Agendamento } from "@/app/actions/generate-PDF-agendamento";
+import { generate_PDF_agendamento_unificado } from "@/app/actions/generate-PDF-agendamento-unificado";
 
 export type ClienteWithVeiculosAndAtendimentos = Prisma.ClienteGetPayload<{
   include: {
@@ -42,6 +42,7 @@ type PropsForReport = {
   dataForRel: Date;
   agendamento: {
     veiculos: {
+      date: Date;
       placa: string;
       frota: string;
       fabricante: string;
@@ -53,6 +54,7 @@ type PropsForReport = {
       price: number;
       observacao: string;
     }[];
+    quantity: number;
   };
 };
 
@@ -75,7 +77,9 @@ const UnifyReportPage = ({ params }: { params: { id: string } }) => {
     }>[]
   >([]);
 
-  const [selectedVeiculos, setSelectedVeiculos] = useState<Veiculo[]>([]);
+  const [selectedVeiculos, setSelectedVeiculos] = useState<
+    (Veiculo & { date: Date })[]
+  >([]);
   const [dateReport, setDateReport] = useState<Date | null>(null);
 
   function handleClick() {
@@ -102,8 +106,10 @@ const UnifyReportPage = ({ params }: { params: { id: string } }) => {
             fabricante: veiculo.fabricante ?? "",
             modelo: veiculo.modelo,
             id: veiculo.id,
+            date: veiculo.date,
           })),
           pricePerVeiculo: [...pricePerVeiculo.flat()],
+          quantity: selectedAgendamentos.length,
         },
         cliente: {
           name: selectedCliente?.name ?? "",
@@ -112,8 +118,7 @@ const UnifyReportPage = ({ params }: { params: { id: string } }) => {
         },
         dataForRel: dateReport || new Date(),
       };
-      console.log(data);
-      generate_PDF_Agendamento(data);
+      generate_PDF_agendamento_unificado(data);
     });
   }
 
@@ -192,12 +197,12 @@ const UnifyReportPage = ({ params }: { params: { id: string } }) => {
           <DialogHeader>
             <DialogTitle>Gerar relatório unificado</DialogTitle>
             <DialogDescription>
-              Preencha as informções para gerar o relatório
+              Selecione uma das data ou coloque manualmente.
+              <br />
+              Essa será a data de emissão do relatório.
             </DialogDescription>
           </DialogHeader>
-          <h1 className="text-2xl">{selectedCliente?.name ?? ""}</h1>
-          <fieldset className="border border-gray-400 p-2 rounded-md gap-2 grid grid-cols-auto-fit">
-            <legend className="ml-2">Selecione uma data</legend>
+          <fieldset className="rounded-md gap-2 grid grid-cols-auto-fit">
             {selectedAgendamentos.map((item) => (
               <div
                 key={item.id}
