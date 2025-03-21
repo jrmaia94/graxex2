@@ -1,15 +1,13 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useState, useTransition } from "react";
-import { toast } from "sonner";
+import { useEffect, useState, useTransition } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Loader from "@/components/loader";
-import CardVeiculo from "@/components/card-veiculo";
 import CardCliente from "@/components/card-cliente";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { CircleCheckBig } from "lucide-react";
+import { CircleCheckBig, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { DialogAgendamento } from "@/components/dialog-agendamento";
 import { generate_PDF } from "@/app/actions/generate-PDF.js";
@@ -18,6 +16,7 @@ import { ClienteFull, VeiculoFull } from "@/app/page";
 import { getClienteById } from "@/app/actions/get-clientes";
 import { getVeiculosByCLiente } from "@/app/actions/get-veiculos";
 import Link from "next/link";
+import HandleVeiculo from "@/components/veiculos/handleVeiculo";
 
 interface DashboardClienteProps {
   params: {
@@ -205,35 +204,46 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                       Dias desde o ult. atendimento
                     </span>
                   </div>
-                  <Input
-                    className="bg-primary border-none h-8 w-[50%] text-primary-foreground"
-                    placeholder="Buscar veículo"
-                    onChange={(e) => {
-                      let localVeiculos = [...veiculos];
+                  <div className="flex items-center justify-between">
+                    <Input
+                      className="bg-primary border-none h-8 w-[50%] text-primary-foreground"
+                      placeholder="Buscar veículo"
+                      onChange={(e) => {
+                        let localVeiculos = [...veiculos];
 
-                      if (localVeiculos) {
-                        localVeiculos = localVeiculos.filter((item) => {
-                          if (
-                            item.placa
-                              .toLowerCase()
-                              .includes(e.target.value.toLowerCase()) ||
-                            item.fabricante
-                              ?.toLowerCase()
-                              .includes(e.target.value.toLowerCase()) ||
-                            item.modelo
-                              .toLowerCase()
-                              .includes(e.target.value.toLowerCase()) ||
-                            item.frota
-                              ?.toLowerCase()
-                              .includes(e.target.value.toLowerCase())
-                          ) {
-                            return item;
-                          }
-                        });
-                        setFilteredVeiculos(localVeiculos);
-                      }
-                    }}
-                  />
+                        if (localVeiculos) {
+                          localVeiculos = localVeiculos.filter((item) => {
+                            if (
+                              item.placa
+                                .toLowerCase()
+                                .includes(e.target.value.toLowerCase()) ||
+                              item.fabricante
+                                ?.toLowerCase()
+                                .includes(e.target.value.toLowerCase()) ||
+                              item.modelo
+                                .toLowerCase()
+                                .includes(e.target.value.toLowerCase()) ||
+                              item.frota
+                                ?.toLowerCase()
+                                .includes(e.target.value.toLowerCase())
+                            ) {
+                              return item;
+                            }
+                          });
+                          setFilteredVeiculos(localVeiculos);
+                        }
+                      }}
+                    />
+                    <HandleVeiculo>
+                      <Button
+                        className={
+                          "select-none rounded-full w-8 transition-all bg-sky-500 h-8 text-primary hover:cursor-pointer my-1 px-1"
+                        }
+                      >
+                        <PlusIcon />
+                      </Button>
+                    </HandleVeiculo>
+                  </div>
                 </div>
                 <ScrollArea className="h-72">
                   {filteredVeiculos?.map((veiculo) => (
@@ -244,7 +254,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                           : "select-none transition-all hover:cursor-pointer my-1 rounded-md px-1 bg-slate-700"
                       }
                       key={veiculo.id}
-                      onDoubleClick={() =>
+                      onClick={() =>
                         setSelectedVeiculos((array) => {
                           const newArray = [...array];
                           if (
@@ -328,7 +338,7 @@ const DashboardCliente = ({ params }: DashboardClienteProps) => {
                     <div
                       className="select-none hover:cursor-pointer bg-card-selected rounded-md mb-1 px-2"
                       key={veiculo.id}
-                      onDoubleClick={() =>
+                      onClick={() =>
                         setSelectedVeiculos((array) => {
                           const newArray = [...array];
                           return newArray.filter(

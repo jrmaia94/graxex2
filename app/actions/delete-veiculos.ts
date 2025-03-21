@@ -5,6 +5,7 @@ import { UserFull } from "./get-users";
 
 export const deleteVeiculoById = (id: number, user: UserFull) => {
   if (user.perfil && user.accessLevel.delete) {
+    console.log(id);
     try {
       const veiculoDeleted = prisma.veiculo.delete({
         where: {

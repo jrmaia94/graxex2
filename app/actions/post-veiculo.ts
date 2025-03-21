@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { User, Veiculo } from "@prisma/client";
 import { z } from "zod";
 import { UserFull } from "./get-users";
+import { revalidatePath } from "next/cache";
 
 export type CreateVeiculo = Pick<
   Veiculo,
@@ -43,6 +44,9 @@ export const createVeiculo = async (veiculo: CreateVeiculo, user: UserFull) => {
             cliente: true,
           },
         });
+        revalidatePath("/veiculos");
+        revalidatePath("/dashboard");
+        revalidatePath("/dashboard/id");
         return createdVeiculo;
       } catch (error) {
         throw error;

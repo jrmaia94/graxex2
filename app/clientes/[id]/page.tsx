@@ -12,6 +12,7 @@ import { CreateCliente, createCliente } from "@/app/actions/post-cliente";
 import { updateCliente, UpdateCliente } from "@/app/actions/update-cliente";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/loader";
+import HandleVeiculo from "@/components/veiculos/handleVeiculo";
 
 interface ClientePageProps {
   params: {
@@ -238,7 +239,7 @@ const ClientePage = ({ params }: ClientePageProps) => {
               className="h-8 text-primary-foreground bg-primary border-none p-1"
             />
           </div>
-          <div>
+          <div className="flex justify-between">
             <Button
               disabled={isPending}
               onClick={handleSubmit}
@@ -247,6 +248,11 @@ const ClientePage = ({ params }: ClientePageProps) => {
             >
               Salvar
             </Button>
+            <HandleVeiculo>
+              <Button variant={"ghost"} className="text-primary bg-gray-800">
+                Cadastrar veículo
+              </Button>
+            </HandleVeiculo>
           </div>
         </form>
       </div>
