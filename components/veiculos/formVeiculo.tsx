@@ -169,11 +169,13 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
         {isPending && <Loader />}
         <form
           onSubmit={handleSubmit}
-          className="gap-3 flex flex-col bg-ring rounded-xl py-4 px-2"
+          className="gap-3 flex flex-col bg-ring rounded-xl py-2 px-2"
         >
           <SendImage setVeiculoFoto={setVeiculoFoto} />
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">id</label>
+          <div className="flex flex-row">
+            <label className="text-right min-w-[80px] text-primary-foreground">
+              id
+            </label>
             <input
               readOnly
               disabled
@@ -182,8 +184,10 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
               className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[100px]"
             />
           </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Cliente</label>
+          <div className="flex flex-row">
+            <label className="text-right min-w-[80px] text-primary-foreground">
+              Cliente
+            </label>
             <input
               type="text"
               value={clientes.find((c) => c.id === selectedCliente)?.name ?? ""}
@@ -191,8 +195,10 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
               readOnly
             />
           </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Fabricante</label>
+          <div className="flex flex-row">
+            <label className="text-right min-w-[80px] text-primary-foreground">
+              Fabricante
+            </label>
             <input
               ref={inputFabricanteRef}
               type="text"
@@ -205,8 +211,10 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
               })}
             </datalist>
           </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Modelo</label>
+          <div className="flex flex-row">
+            <label className="text-right min-w-[80px] text-primary-foreground">
+              Modelo
+            </label>
             <input
               list="list-modelos"
               required
@@ -221,8 +229,10 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
             </datalist>
           </div>
           <div className="flex justify-between gap-2">
-            <div className="flex flex-col">
-              <label className="text-primary-foreground">Placa</label>
+            <div className="flex flex-row">
+              <label className="text-right min-w-[80px] text-primary-foreground">
+                Placa
+              </label>
               <InputMask
                 ref={inputPlacaRef}
                 mask="aaa-9*99"
@@ -232,16 +242,20 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
                 }
               />
             </div>
-            <div className="flex flex-col">
-              <label className="text-primary-foreground">Cor</label>
+            <div className="flex flex-row">
+              <label className="text-right min-w-[80px] text-primary-foreground">
+                Cor
+              </label>
               <input
                 ref={inputCorRef}
                 type="text"
                 className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-[60px]"
               />
             </div>
-            <div className="flex flex-col">
-              <label className="text-primary-foreground">Frota</label>
+            <div className="flex flex-row">
+              <label className="text-right min-w-[80px] text-primary-foreground">
+                Frota
+              </label>
               <input
                 ref={inputFrotaRef}
                 type="text"
@@ -250,16 +264,20 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
             </div>
           </div>
           <div className="flex justify-between gap-2">
-            <div className="flex flex-col">
-              <label className="text-primary-foreground">Obs</label>
+            <div className="flex flex-row">
+              <label className="text-right min-w-[80px] text-primary-foreground">
+                Obs
+              </label>
               <input
                 ref={inputObsRef}
                 type="text"
                 className="h-8 bg-primary text-primary-foreground p-1 rounded-sm w-full"
               />
             </div>
-            <div className="flex flex-col">
-              <label className="text-primary-foreground">Eixos</label>
+            <div className="flex flex-row">
+              <label className="text-right min-w-[80px] text-primary-foreground">
+                Eixos
+              </label>
               <select
                 className="text-primary-foreground h-8 p-1 rounded-sm w-[100px]"
                 name="eixos"
@@ -278,8 +296,8 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
             </div>
           </div>
           <div className="flex justify-between gap-2">
-            <div className="flex flex-col">
-              <label className="text-primary-foreground">
+            <div className="flex flex-row">
+              <label className="text-right min-w-[80px] text-primary-foreground">
                 Nome do motorista
               </label>
               <input
@@ -288,8 +306,8 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
                 className="h-8 bg-primary text-primary-foreground p-1 rounded-sm max-w-[250px] w-full"
               />
             </div>
-            <div className="flex flex-col">
-              <label className="text-primary-foreground">
+            <div className="flex flex-row">
+              <label className="text-right min-w-[80px] text-primary-foreground">
                 Telefone do motorista
               </label>
               <InputMask
@@ -299,8 +317,10 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
               />
             </div>
           </div>
-          <div className="flex flex-col">
-            <label className="text-primary-foreground">Ciclo(dias)</label>
+          <div className="flex flex-row">
+            <label className="text-right min-w-[80px] text-primary-foreground">
+              Ciclo(dias)
+            </label>
             <input
               ref={inputFreqServicosRef}
               type="number"
