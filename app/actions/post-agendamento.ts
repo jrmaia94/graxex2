@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { UserFull } from "./get-users";
+import { Agendamento } from "@prisma/client";
 
 const dataSchema = z.object({
   clienteId: z.number(),
@@ -65,4 +66,25 @@ export const createAgendamento = async (agendamento: any, user: UserFull) => {
   } else {
     throw Error("Usuário não autorizado!");
   }
+};
+
+export const createPartialAgendamento = async (
+  agendamento: Pick<Agendamento, "clienteId" | "date">
+) => {
+  return await prisma.agendamento.create({
+    data: {
+      clienteId: agendamento.clienteId,
+      date: agendamento.date,
+      paid: false,
+      serviceCompleted: agendamento.date,
+    },
+    include: {
+      veiculos: {
+        include: {
+          agendamento: true,
+        },
+      },
+      cliente: true,
+    },
+  });
 };

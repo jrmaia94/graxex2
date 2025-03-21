@@ -48,29 +48,25 @@ export const getAllClientes = async (user: User) => {
   }
 };
 
-export const getAllClientesForUnifyReport = async (user: User) => {
-  if (user.perfil) {
-    const clientes = await prisma.cliente.findMany({
-      include: {
-        veiculos: true,
-        agendamentos: {
-          include: {
-            veiculos: {
-              include: {
-                veiculo: true,
-              },
+export const getAllClientesForUnifyReport = async (user?: User) => {
+  const clientes = await prisma.cliente.findMany({
+    include: {
+      veiculos: true,
+      agendamentos: {
+        include: {
+          veiculos: {
+            include: {
+              veiculo: true,
             },
           },
         },
       },
-      orderBy: {
-        name: "asc",
-      },
-    });
-    return clientes;
-  } else {
-    throw Error("Usuário não autorizado!");
-  }
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+  return clientes;
 };
 
 export const getClienteById = async (id: number, user: User) => {

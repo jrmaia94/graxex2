@@ -17,6 +17,7 @@ import { useState } from "react";
 import { itemsMenu } from "@/constants/nav-menu";
 import ItemMenu from "./item-menu";
 import { UserFull } from "@/app/actions/get-users";
+import { Separator } from "./ui/separator";
 
 const Header = () => {
   const { data }: { data: any } = useSession({ required: true });
@@ -89,23 +90,45 @@ const Header = () => {
                   </div>
                 )}
                 {itemsMenu.map((item, index) => {
-                  if (item.href === "/config") {
-                    if (data?.user?.accessLevel?.admin) {
+                  if (item.type === "item") {
+                    if (item.href === "/config") {
+                      if (data?.user?.accessLevel?.admin) {
+                        return (
+                          <ItemMenu
+                            action={setIsSheetOpen}
+                            key={index + item.title}
+                            itemMenu={item}
+                          />
+                        );
+                      }
+                    } else {
                       return (
                         <ItemMenu
                           action={setIsSheetOpen}
-                          key={index}
+                          key={index + item.title}
                           itemMenu={item}
                         />
                       );
                     }
-                  } else {
+                  } else if (item.type === "group") {
                     return (
-                      <ItemMenu
-                        action={setIsSheetOpen}
-                        key={index}
-                        itemMenu={item}
-                      />
+                      <div key={index + item.title}>
+                        <Separator className="bg-primary mt-3 w-[85%]" />
+                        <span className="text-left w-full p-1 ps-6">
+                          Agendamentos
+                        </span>
+                        {item.group.map((item, indexx) => {
+                          return (
+                            <ItemMenu
+                              classname="scale-90 mt-0"
+                              action={setIsSheetOpen}
+                              key={index + item.title}
+                              itemMenu={item}
+                            />
+                          );
+                        })}
+                        <Separator className="bg-primary w-[85%]" />
+                      </div>
                     );
                   }
                 })}
