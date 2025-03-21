@@ -50,7 +50,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           });
           token.perfil = user?.perfil;
           token.accessLevel = user?.accessLevel;
-          console.log(user?.viewAds);
           token.ads = user?.viewAds;
         } else if (id) {
           const user = await prisma.user.findUnique({

@@ -270,7 +270,8 @@ export const generate_PDF_agendamento_unificado = (data) => {
       fillColor: [225, 225, 225],
     },
     willDrawCell: ({ row }) => {
-      if (row.cells[0].raw === "") doc.setTextColor(238, 78, 5);
+      if (row.cells[0].raw === "" && row.section === "body")
+        doc.setTextColor(238, 78, 5);
     },
     didDrawCell: ({ row }) => {
       doc.setTextColor(40, 40, 40);
