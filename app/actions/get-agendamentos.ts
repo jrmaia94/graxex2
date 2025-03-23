@@ -134,6 +134,7 @@ export const getAgendamentoById = async (id: number, user: User) => {
             veiculos: {
               include: {
                 cliente: true,
+                agendamentos: { include: { agendamento: true } },
               },
             },
           },

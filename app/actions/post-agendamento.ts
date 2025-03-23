@@ -69,7 +69,7 @@ export const createAgendamento = async (agendamento: any, user: UserFull) => {
 };
 
 export const createPartialAgendamento = async (
-  agendamento: Pick<Agendamento, "clienteId" | "date">
+  agendamento: Pick<Agendamento, "clienteId" | "date" | "paymentMethod">
 ) => {
   return await prisma.agendamento.create({
     data: {
@@ -77,6 +77,7 @@ export const createPartialAgendamento = async (
       date: agendamento.date,
       paid: false,
       serviceCompleted: agendamento.date,
+      paymentMethod: agendamento.paymentMethod,
     },
     include: {
       veiculos: {
