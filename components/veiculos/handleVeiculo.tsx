@@ -10,6 +10,7 @@ import {
 import { useSession } from "next-auth/react";
 import { FormVeiculo } from "./formVeiculo";
 import { ScrollArea } from "../ui/scroll-area";
+import { Veiculo } from "@prisma/client";
 
 interface HandleVeiculoProps {
   children: ReactNode;

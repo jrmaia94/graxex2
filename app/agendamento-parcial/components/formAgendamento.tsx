@@ -82,6 +82,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import FormObs from "./formObs";
+import HandleVeiculo from "@/components/veiculos/handleVeiculo";
 
 const FormSchema = z.object({
   id: z.number(),
@@ -250,7 +251,7 @@ export function FormAgendamento({ clientes, params }: FormAgendamentoProps) {
   }, [cliente]);
 
   return (
-    <div className="flex flex-col w-full max-w-[600px] h-screen gap-2">
+    <div className="flex flex-col w-full max-w-[700px] h-full gap-2 relative">
       {isPending && <Loader />}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -424,8 +425,13 @@ export function FormAgendamento({ clientes, params }: FormAgendamentoProps) {
             .map((veiculo) => (
               <Dialog key={veiculo.id}>
                 <DialogTrigger asChild>
-                  <div className="cursor-pointer p-2 bg-slate-200 gap-2 w-[150px] flex items-center justify-center rounded-md text-sm relative">
-                    <p className="text-nowrap">{veiculo.placa}</p>
+                  <div className="cursor-pointer p-2 bg-slate-200 gap-2 min-w-[150px] w-fit flex items-center justify-center rounded-md text-sm relative">
+                    <p className="text-nowrap rounded-sm p-1">
+                      {veiculo.frota}
+                    </p>
+                    <p className="text-nowrap border rounded-sm p-1">
+                      {veiculo.placa}
+                    </p>
                     {veiculo.obs && (
                       <CircleAlertIcon className="text-orange-500 w-3 h-3 absolute right-1 top-1" />
                     )}
@@ -475,6 +481,7 @@ export function FormAgendamento({ clientes, params }: FormAgendamentoProps) {
                 Selecione os veiculos para adicionar ao agendamento.
               </SheetDescription>
               <Input
+                autoFocus={false}
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 className="bg-primary text-primary-foreground my-1"
@@ -512,7 +519,7 @@ export function FormAgendamento({ clientes, params }: FormAgendamentoProps) {
                           key={veiculo.id}
                           className="flex items-center p-1 mb-2 bg-slate-200 rounded-md h-fit"
                         >
-                          <div className="w-[70%]">
+                          <div className="w-[70%] text-sm">
                             <div className="flex items-center gap-1 truncate text-ellipsis">
                               <span className="text-[0.6rem] text-muted-foreground w-[40px] text-right">
                                 Modelo:{" "}
@@ -530,6 +537,12 @@ export function FormAgendamento({ clientes, params }: FormAgendamentoProps) {
                                 Placa:{" "}
                               </span>
                               <p className="text-sm">{veiculo.placa}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[0.6rem] text-muted-foreground w-[40px] text-right">
+                                Frota:{" "}
+                              </span>
+                              <p className="text-sm">{veiculo.frota}</p>
                             </div>
                           </div>
                           <Separator
@@ -583,7 +596,7 @@ export function FormAgendamento({ clientes, params }: FormAgendamentoProps) {
           </SheetContent>
         </Sheet>
       </ScrollArea>
-      <div className="absolute bottom-2 right-2 flex gap-1 items-center bg-primary text-primary-foreground p-2 rounded-md">
+      <div className="fixed bottom-4 right-4 md:absolute md:bottom-0 md:right-0 flex gap-1 items-center bg-primary text-primary-foreground p-2 rounded-md">
         <p>Valor total:</p>
         <span className="text-lg font-bold">
           {Intl.NumberFormat("pt-BR", {
