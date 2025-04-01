@@ -112,18 +112,15 @@ const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
               <EyeIcon size={20} />
             </Button>
           </DialogTrigger>
-          <DialogContent className="left-1/2 top-1/2 max-h-[600px] w-[90%] p-5">
+          <DialogContent className="flex flex-col items-start w-[90%] p-5">
             <DialogHeader>
-              <Description></Description>
               <DialogTitle>Detalhes sobre o agendamento</DialogTitle>
             </DialogHeader>
-            <div className="w-[100%]">
-              <CardAgendamentoFull
-                agendamento={agendamento}
-                cliente={agendamento.cliente}
-                veiculos={agendamento.veiculos.map((e) => e.veiculo)}
-              />
-            </div>
+            <CardAgendamentoFull
+              agendamento={agendamento}
+              cliente={agendamento.cliente}
+              veiculos={agendamento.veiculos.map((e) => e.veiculo)}
+            />
           </DialogContent>
         </Dialog>
       </CardContent>

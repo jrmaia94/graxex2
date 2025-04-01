@@ -25,17 +25,17 @@ const CardAgendamentoFull = ({
   cliente: ClienteFull;
 }) => {
   return (
-    <Card>
-      <CardContent className="flex max-h-[70vh] flex-col gap-0 overflow-hidden p-2">
-        <div className="flex w-full justify-end py-1 pe-2 relative">
-          <div className="absolute top-0 left-1 flex gap-3">
+    <Card className="w-full">
+      <CardContent className="flex w-full flex-col gap-0 overflow-hidden p-2 relative">
+        <div className="flex w-full justify-between py-1 pe-2">
+          <div className="flex gap-3">
             <Link
               className="flex items-center"
               href={`/agendamentos/${agendamento.id}`}
             >
               <Edit />
             </Link>
-            <Popover>
+            <Popover modal>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="xs" className="bg-transparent">
                   <Image
@@ -46,7 +46,7 @@ const CardAgendamentoFull = ({
                   />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="flex flex-col gap-2 w-fit">
+              <PopoverContent className="flex flex-col gap-2 w-fit max-w-[100vw]">
                 <form
                   onSubmit={(e: any) => {
                     const idVeiculos: string[] = [];
@@ -96,7 +96,7 @@ const CardAgendamentoFull = ({
                 </form>
               </PopoverContent>
             </Popover>
-            <Button
+            {/*             <Button
               disabled
               variant="outline"
               size="xs"
@@ -104,7 +104,7 @@ const CardAgendamentoFull = ({
               onClick={() => generate_PDF_recibo(agendamento)}
             >
               RECIBO
-            </Button>
+            </Button> */}
           </div>
           <p className="hidden sm:block text-lg italic">
             {Intl.DateTimeFormat("pt-BR", {
