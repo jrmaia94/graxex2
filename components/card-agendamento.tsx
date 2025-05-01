@@ -2,7 +2,14 @@
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { EyeIcon, Trash2, UserIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  EyeIcon,
+  FileWarningIcon,
+  MailWarningIcon,
+  Trash2,
+  UserIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -11,6 +18,8 @@ import {
   DialogContent,
   DialogTrigger,
   DialogTitle,
+  DialogDescription,
+  DialogClose,
 } from "./ui/dialog";
 import CardAgendamentoFull from "./card-agendamento-full";
 import { Description } from "@radix-ui/react-dialog";
@@ -93,14 +102,40 @@ const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
               agendamento.date
             )}
           </p>
-          <Button
-            size="xs"
-            variant="ghost"
-            className="absolute bottom-2 right-1"
-            onClick={() => deleteAgendamento(agendamento.id)}
-          >
-            <Trash2 size={20} />
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                size="xs"
+                variant="ghost"
+                className="absolute bottom-2 right-1"
+              >
+                <Trash2 size={20} />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <AlertTriangleIcon />
+                  Alerta
+                </DialogTitle>
+                <DialogDescription>
+                  Deseja mesmo excluir o atendimento?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex w-full justify-end gap-4">
+                <Button
+                  className="w-36"
+                  variant={"destructive"}
+                  onClick={() => deleteAgendamento(agendamento.id)}
+                >
+                  Excluir
+                </Button>
+                <DialogClose asChild>
+                  <Button className="w-36">Cancelar</Button>
+                </DialogClose>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         <Dialog>
           <DialogTrigger asChild>
