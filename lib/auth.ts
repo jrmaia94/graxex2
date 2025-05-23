@@ -4,6 +4,7 @@ import { prisma } from "./prisma";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -43,23 +44,41 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const email = token.email;
         const id = user.id;
         if (email) {
-          const user = await prisma.user.findUnique({
+          const dbUser = await prisma.user.findUnique({
             where: {
               email: email,
             },
+            include: {
+              clientes: {
+                include: {
+                  cliente: true,
+                },
+              },
+            },
           });
-          token.perfil = user?.perfil;
-          token.accessLevel = user?.accessLevel;
-          token.ads = user?.viewAds;
+          token.perfil = dbUser?.perfil;
+          token.accessLevel = dbUser?.accessLevel;
+          token.ads = dbUser?.viewAds;
+          token.typeUser = dbUser?.typeUser;
+          token.clientes = dbUser?.clientes;
         } else if (id) {
-          const user = await prisma.user.findUnique({
+          const dbUser = await prisma.user.findUnique({
             where: {
               id: id,
             },
+            include: {
+              clientes: {
+                include: {
+                  cliente: true,
+                },
+              },
+            },
           });
-          token.perfil = user?.perfil;
-          token.accessLevel = user?.accessLevel;
-          token.ads = user?.viewAds;
+          token.perfil = dbUser?.perfil;
+          token.accessLevel = dbUser?.accessLevel;
+          token.ads = dbUser?.viewAds;
+          token.typeUser = dbUser?.typeUser;
+          token.clientes = dbUser?.clientes;
         }
       }
       return token;
@@ -69,6 +88,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       session.user.perfil = token.perfil;
       session.user.accessLevel = token.accessLevel;
       session.user.ads = token.ads;
+      session.user.typeUser = token.typeUser;
+      session.user.clientes = token.clientes;
 
       return session;
     },

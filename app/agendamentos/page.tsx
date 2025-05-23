@@ -75,7 +75,7 @@ const Agendamentos = () => {
     }
   }, [data]);
   return (
-    <div className="flex justify-center mt-[120px]">
+    <div className="flex justify-center mt-[130px]">
       {isPending && <Loader />}
       <div className="px-4 w-full max-w-[600px]">
         <div className="w-full left-0 top-[90px] px-4 z-10 bg-gray-800/[.97] fixed flex flex-col">

@@ -56,3 +56,24 @@ export const itemsMenu: ItemsMenuOptions[] = [
     group: [],
   },
 ];
+
+export const itemsMenuForClient: ItemsMenuOptions[] = [
+  {
+    type: "item",
+    title: "Veículos",
+    href: "/cliente/veiculos",
+    group: [],
+  },
+  {
+    type: "item",
+    title: "Serviços",
+    href: "/cliente/servicos",
+    group: [],
+  },
+  /*   {
+    type: "item",
+    title: "Relatórios",
+    href: "/relatorios",
+    group: [],
+  }, */
+];

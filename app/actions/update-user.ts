@@ -21,6 +21,39 @@ export const updateUser = async (data: UserFull, user: UserFull) => {
   }
 };
 
+export const addClienteInUser = async (
+  clienteId: number,
+  userId: string,
+  user: UserFull
+) => {
+  if (user) {
+    if (user.accessLevel?.admin) {
+      const updatedUser = prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          clientes: {
+            create: {
+              cliente: {
+                connect: {
+                  id: clienteId,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return updatedUser;
+    } else {
+      throw Error("Usuário não autorizado");
+    }
+  } else {
+    throw Error("Problema na verificação do usuário");
+  }
+};
+
 export const disableAdsForUser = async (user: UserFull) => {
   if (user) {
     const updatedUser = await prisma.user.update({

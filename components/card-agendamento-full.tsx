@@ -10,6 +10,9 @@ import Image from "next/image";
 import { generate_PDF_recibo } from "@/app/actions/generate-PDF-recibo";
 import { generate_PDF_Agendamento } from "@/app/actions/generate-PDF-agendamento";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { ChangeEvent } from "react";
+import { updatePaymentStatus } from "@/app/actions/update-agendamento";
+import { toast } from "sonner";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -24,6 +27,24 @@ const CardAgendamentoFull = ({
   veiculos: Veiculo[];
   cliente: ClienteFull;
 }) => {
+  const isServicePaid = (e: ChangeEvent<HTMLInputElement>) => {
+    updatePaymentStatus(agendamento.id, e.target.checked)
+      .then((res) => {
+        toast.success(
+          `Status do pagamento com id ${agendamento.id} atualizado para ${
+            e.target.checked ? "sim" : "não"
+          } com sucesso!`
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Erro ao atualizar o status do pagamento!");
+      });
+  };
+
   return (
     <Card className="w-full">
       <CardContent className="flex w-full flex-col gap-0 overflow-hidden p-2 relative">
@@ -124,6 +145,15 @@ const CardAgendamentoFull = ({
         <div className="border-b border-solid pb-2">
           <h3 className="font-bold uppercase text-gray-400">Cliente</h3>
           <CardCliente cliente={cliente} />
+        </div>
+        <div className="border-b border-solid pb-2 flex items-center h-10 gap-2">
+          <label>Serviço pago?</label>
+          <input
+            type="checkbox"
+            defaultChecked={agendamento.paid}
+            className="w-4 h-4"
+            onChange={isServicePaid}
+          />
         </div>
         <div className="pt-1">
           <h3 className="mb-2 font-bold uppercase text-gray-400">Veículos</h3>

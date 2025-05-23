@@ -1,6 +1,6 @@
 "use client";
 
-import { Cliente, Veiculo } from "@prisma/client";
+import { Cliente } from "@prisma/client";
 import CardVeiculo from "./card-veiculo";
 import { useEffect, useState, useTransition } from "react";
 import Loader from "./loader";
@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "./ui/button";
 import { DialogAgendamento } from "./dialog-agendamento";
 import { toast } from "sonner";
-import { ClienteFull, VeiculoFull } from "@/app/page";
+import { VeiculoFull } from "@/app/page";
 
 const CardVeiculoFull = ({
   veiculo: importedVeiculo,

@@ -24,10 +24,12 @@ export function ComboboxClientes({
   clientes,
   selectedCliente,
   setSelectedCliente,
+  disabled,
 }: {
   clientes: Cliente[];
   selectedCliente: number;
   setSelectedCliente: Dispatch<SetStateAction<number>>;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(selectedCliente.toString());
@@ -36,6 +38,7 @@ export function ComboboxClientes({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={disabled || false}
           variant="default"
           role="combobox"
           aria-expanded={open}

@@ -27,6 +27,7 @@ import { useSession } from "next-auth/react";
 import { deleteAgendamentoById } from "@/app/actions/delete-agendamento";
 import { toast } from "sonner";
 import { AgendamentoFull } from "@/app/page";
+import { cn } from "@/lib/utils";
 //import CardAgendamentoFull from "./card-agendamento-full";
 
 const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
@@ -49,8 +50,8 @@ const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
         });
   };
   return (
-    <Card>
-      <CardContent className="relative m-0 flex max-w-[90vw] flex-row items-center justify-between p-0">
+    <Card className={cn(!agendamento.paid && "bg-red-950")}>
+      <CardContent className="relative bg m-0 flex max-w-[90vw] flex-row items-center justify-between p-0">
         <div className="flex w-[70%] flex-row items-center gap-2 border-r border-solid py-3 ps-2">
           {agendamento.cliente.imageUrl ? (
             <Image

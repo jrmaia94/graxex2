@@ -1,10 +1,8 @@
 "use client";
-
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { XIcon } from "lucide-react";
-import { prisma } from "@/lib/prisma";
 import { useEffect, useState, useTransition } from "react";
 import { disableAdsForUser, getAdsSituation } from "@/app/actions/update-user";
 import Loader from "./loader";

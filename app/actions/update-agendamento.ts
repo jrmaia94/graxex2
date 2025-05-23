@@ -214,3 +214,20 @@ function calculatePrice(eixos: number) {
       return 50;
   }
 }
+
+export const updatePaymentStatus = async (id: number, isPaid: boolean) => {
+  try {
+    const updatedAgendamento = await prisma.agendamento.update({
+      where: {
+        id: id,
+      },
+      data: {
+        paid: isPaid,
+      },
+    });
+
+    return updatedAgendamento;
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -40,6 +40,8 @@ const ItemMenu = ({
         return <ListCollapseIcon size={30} />;
       case "PDF - Vários atendimentos":
         return <FileTextIcon size={30} />;
+      case "Serviços":
+        return <CalendarArrowUp size={30} />;
     }
   };
   return (

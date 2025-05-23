@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import AuthProvider from "../providers/session";
 import Header from "@/components/header";
 import ViewAds from "@/components/viewAds";
+import Redirector from "@/components/redirector";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,9 +29,11 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AuthProvider>
-          <Header />
-          <ViewAds />
-          {children}
+          <Redirector>
+            <Header />
+            {/* <ViewAds /> */}
+            {children}
+          </Redirector>
         </AuthProvider>
         <Toaster />
       </body>

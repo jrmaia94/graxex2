@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Agendamento, Cliente, Veiculo } from "@prisma/client";
 import Loader from "@/components/loader";
 import {

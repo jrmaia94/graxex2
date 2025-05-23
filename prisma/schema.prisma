@@ -38,20 +38,28 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String               @id @default(cuid())
   name          String?
-  username      String?   @unique
-  email         String?   @unique
+  username      String?              @unique
+  email         String?              @unique
   password      String?
-  emailVerified DateTime? @map("email_verified")
-  perfil        Boolean   @default(false)
+  emailVerified DateTime?            @map("email_verified")
+  perfil        Boolean              @default(false)
   accessLevel   Json?
-  viewAds       Boolean   @default(true)
+  viewAds       Boolean              @default(true)
   image         String?
+  typeUser      TypeUser             @default(CLIENTE)
+  clientes      UsuariosPorCliente[]
   accounts      Account[]
   sessions      Session[]
 
   @@map("users")
+}
+
+enum TypeUser {
+  CLIENTE
+  COLABORADOR
+  ADMIN
 }
 
 model VerificationToken {
@@ -64,16 +72,18 @@ model VerificationToken {
 }
 
 model Cliente {
-  id           Int           @id @default(autoincrement())
-  name         String        @unique
-  address      String?
-  phone        String?
-  imageUrl     String?
-  image        Bytes?
-  CPFCNPJ      String?
-  ciclo        Int           @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id        Int                  @id @default(autoincrement())
+  name      String               @unique
+  address   String?
+  phone     String?
+  imageUrl  String?
+  image     Bytes?
+  CPFCNPJ   String?
+  ciclo     Int                  @default(0)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  usuarios  UsuariosPorCliente[]
+
   veiculos     Veiculo[]
   agendamentos Agendamento[]
 }
@@ -118,4 +128,13 @@ model AgendamentosPorVeiculos {
   agendamento   Agendamento @relation(fields: [agendamentoId], references: [id])
 
   @@id([veiculoId, agendamentoId])
+}
+
+model UsuariosPorCliente {
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  @@id([userId, clienteId])
 }

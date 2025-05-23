@@ -14,7 +14,7 @@ interface AccessProps {
 export interface UserFull
   extends Pick<
     User,
-    "email" | "name" | "id" | "perfil" | "username" | "image"
+    "email" | "name" | "id" | "perfil" | "username" | "image" | "typeUser"
   > {
   accessLevel?: AccessProps | any;
 }

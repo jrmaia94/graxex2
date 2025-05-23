@@ -48,6 +48,28 @@ export const getAllClientes = async (user: User) => {
   }
 };
 
+export const getSomeClientesById = async (ids: number[], user: User) => {
+  if (user.perfil) {
+    const clientes = await prisma.cliente.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      include: {
+        veiculos: true,
+        agendamentos: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+    return clientes;
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
+};
+
 export const getAllClientesForUnifyReport = async (user?: User) => {
   const clientes = await prisma.cliente.findMany({
     include: {

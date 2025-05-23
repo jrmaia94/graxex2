@@ -47,12 +47,9 @@ const SignUp = () => {
     });
   };
 
-  useEffect(() => {
-    if (data?.user) redirect("/");
-  }, [data]);
   return (
     <div className="p-5 px-10 mt-[90px]">
-      {!data?.user && (
+      {data?.user && (
         <Card className="px-10">
           <CardHeader>
             <CardTitle>Criar usuário</CardTitle>

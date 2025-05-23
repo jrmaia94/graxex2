@@ -1,10 +1,13 @@
 "use client";
+import { getAllClientes } from "@/app/actions/get-clientes";
 import { getAllUsers, UserFull } from "@/app/actions/get-users";
-import { updateUser } from "@/app/actions/update-user";
+import { addClienteInUser, updateUser } from "@/app/actions/update-user";
 import CardUser from "@/components/card-user";
+import { ComboboxClientes } from "@/components/combox-cliente";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { typesAccess } from "@/constants/perfil-access";
+import { Cliente, TypeUser, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -21,6 +24,9 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
   });
 
   const [user, setUser] = useState<UserFull | null>(null);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [typeUser, setTypeUser] = useState<string>("CLIENTE");
+  const [selectedCliente, setSelectedCliente] = useState<number>(-1);
 
   const callUpdateUser = () => {
     let localUser: any = { ...user };
@@ -36,6 +42,7 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
       } else {
         localUser.perfil = false;
       }
+      localUser.typeUser = typeUser;
       updateUser(localUser, data.user)
         .then((res) => {
           toast.success("Usuário atualizado com sucesso");
@@ -44,6 +51,16 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
           console.log(err);
           toast.error("Não foi possível atualizar o usuário");
           toast.error(err.message);
+        });
+
+      addClienteInUser(selectedCliente, localUser.id, data.user)
+        .then((res) => {
+          console.log(res);
+          toast.success("Cliente vinculado com sucesso!");
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Erro ao vincular cliente ao usuário!");
         });
     }
   };
@@ -54,7 +71,6 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
         getAllUsers(data.user).then((res) => {
           let localUser = res.find((item) => item.id === params.id);
           if (localUser) {
-            console.log(localUser);
             let obj = {
               read: false,
               create: false,
@@ -65,8 +81,17 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
             !localUser.accessLevel
               ? setUser({ ...localUser, accessLevel: obj })
               : setUser({ ...localUser });
+            setTypeUser(localUser.typeUser);
           }
         });
+        getAllClientes(data.user)
+          .then((res) => {
+            setClientes(res);
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error("Não foi possível localizar os clientes");
+          });
       }
     }
   }, [params, data]);
@@ -77,7 +102,7 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
           <Card>
             <CardContent className="p-2">
               <CardUser user={user} />
-              <div className="flex justify-center h-full gap-6">
+              <div className="flex flex-col justify-center h-full gap-6">
                 <div className="w-[30%]">
                   {typesAccess.map((item: string, index: number) => {
                     return (
@@ -106,6 +131,21 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
                     );
                   })}
                 </div>
+                <select
+                  value={typeUser}
+                  className="h-10 rounded-md text-primary-foreground px-2"
+                  onChange={(e) => setTypeUser(e.target.value)}
+                >
+                  <option value="CLIENTE">Cliente</option>
+                  <option value="COLABORADOR">Colaborador</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+                <ComboboxClientes
+                  disabled={typeUser !== "CLIENTE"}
+                  selectedCliente={selectedCliente}
+                  setSelectedCliente={setSelectedCliente}
+                  clientes={clientes}
+                />
                 <div className="flex w-[30%] items-end">
                   <Button size="sm" onClick={callUpdateUser}>
                     Atualizar Usuário

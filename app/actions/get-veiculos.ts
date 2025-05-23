@@ -128,6 +128,39 @@ export const getFullVeiculoById = async (id: number, user: User) => {
   }
 };
 
+export const getVeiculosByCLientes = async (
+  clienteId: number[],
+  user: User
+) => {
+  if (user.perfil) {
+    const veiculos = await prisma.veiculo.findMany({
+      where: {
+        clienteId: {
+          in: clienteId,
+        },
+      },
+      include: {
+        cliente: true,
+        agendamentos: {
+          include: { agendamento: true },
+        },
+      },
+      orderBy: {
+        clienteId: "asc",
+      },
+    });
+
+    return clienteId.map((e) => {
+      return {
+        clienteId: e,
+        veiculos: veiculos.filter((i) => i.clienteId === e),
+      };
+    });
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
+};
+
 /* export const getAgendamentosFinalizados = async () => {
   const agendamentos = await prisma.agendamento.findMany({
     include: {

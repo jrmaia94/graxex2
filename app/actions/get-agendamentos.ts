@@ -147,3 +147,47 @@ export const getAgendamentoById = async (id: number, user: User) => {
     throw Error("Usuário não autorizado!");
   }
 };
+
+export const getAgendamentoByCliente = async (ids: number[], user: User) => {
+  if (user.perfil) {
+    const agendamentos = await prisma.agendamento.findMany({
+      where: {
+        clienteId: {
+          in: ids,
+        },
+      },
+      include: {
+        veiculos: {
+          include: {
+            veiculo: {
+              include: {
+                cliente: true,
+              },
+            },
+          },
+        },
+        cliente: {
+          include: {
+            veiculos: {
+              include: {
+                cliente: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        serviceCompleted: "desc",
+      },
+    });
+
+    return ids.map((e) => {
+      return {
+        clienteId: e,
+        servicos: agendamentos.filter((i) => i.clienteId === e),
+      };
+    });
+  } else {
+    throw Error("Usuário não autorizado!");
+  }
+};
