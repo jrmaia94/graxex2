@@ -13,6 +13,8 @@ import { updateCliente, UpdateCliente } from "@/app/actions/update-cliente";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/loader";
 import HandleVeiculo from "@/components/veiculos/handleVeiculo";
+import { TruckIcon } from "lucide-react";
+import Link from "next/link";
 
 interface ClientePageProps {
   params: {
@@ -154,8 +156,21 @@ const ClientePage = ({ params }: ClientePageProps) => {
         {isPending && <Loader />}
         <form
           onSubmit={() => {}}
-          className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8"
+          className="gap-4 flex flex-col bg-ring rounded-xl py-4 px-8 relative"
         >
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-primary-foreground"
+            asChild
+          >
+            <Link
+              href={`/dashboard/${cliente?.id}`}
+              className="absolute right-6 top-6"
+            >
+              <TruckIcon />
+            </Link>
+          </Button>
           <div className="flex flex-col">
             <label className="text-primary-foreground">id</label>
             <input
