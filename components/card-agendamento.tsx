@@ -103,6 +103,11 @@ const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
               agendamento.date
             )}
           </p>
+          <p className="text-xs font-light">
+            {Intl.DateTimeFormat("pt-BR", { year: "numeric" }).format(
+              agendamento.date
+            )}
+          </p>
           <Dialog>
             <DialogTrigger asChild>
               <Button

@@ -21,7 +21,15 @@ export interface UserFull
 
 export const getAllUsers = async (user: UserFull) => {
   if (user.perfil && user.accessLevel?.admin) {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: {
+        clientes: {
+          include: {
+            cliente: true,
+          },
+        },
+      },
+    });
     return users;
   } else {
     throw Error("Usuário não autorizado!");

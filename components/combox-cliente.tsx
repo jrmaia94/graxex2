@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, HTMLAttributes, SetStateAction, useState } from "react";
 import { Cliente } from "@prisma/client";
 
 export function ComboboxClientes({
@@ -25,14 +25,18 @@ export function ComboboxClientes({
   selectedCliente,
   setSelectedCliente,
   disabled,
+  className,
 }: {
   clientes: Cliente[];
   selectedCliente: number;
   setSelectedCliente: Dispatch<SetStateAction<number>>;
   disabled?: boolean;
+  className?: HTMLAttributes<HTMLButtonElement>["className"];
 }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(selectedCliente.toString());
+  const [value, setValue] = useState(
+    selectedCliente > 0 ? selectedCliente.toString() : null
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -42,7 +46,7 @@ export function ComboboxClientes({
           variant="default"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className={cn("w-[200px] justify-between", className)}
         >
           {value
             ? clientes.find((cliente) => cliente.id.toString() === value)?.name

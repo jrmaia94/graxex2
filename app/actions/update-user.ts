@@ -10,7 +10,11 @@ export const updateUser = async (data: UserFull, user: UserFull) => {
         where: {
           id: data.id,
         },
-        data: data,
+        data: {
+          accessLevel: data.accessLevel,
+          perfil: data.perfil,
+          typeUser: data.typeUser,
+        },
       });
       return user;
     } else {
@@ -22,30 +26,24 @@ export const updateUser = async (data: UserFull, user: UserFull) => {
 };
 
 export const addClienteInUser = async (
-  clienteId: number,
+  clienteId: number[],
   userId: string,
   user: UserFull
 ) => {
   if (user) {
     if (user.accessLevel?.admin) {
-      const updatedUser = prisma.user.update({
+      await prisma.usuariosPorCliente.deleteMany({
         where: {
-          id: userId,
-        },
-        data: {
-          clientes: {
-            create: {
-              cliente: {
-                connect: {
-                  id: clienteId,
-                },
-              },
-            },
-          },
+          userId,
         },
       });
 
-      return updatedUser;
+      await prisma.usuariosPorCliente.createMany({
+        data: clienteId.map((id) => ({
+          userId,
+          clienteId: id,
+        })),
+      });
     } else {
       throw Error("Usuário não autorizado");
     }

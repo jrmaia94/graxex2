@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
 import { format, subDays } from "date-fns";
 import { Calendar } from "./ui/calendar";
+import { groupAgendamentosByClient } from "@/lib/groupAgendamentos";
 
 const formSchema = z.object({
   param: z.string().trim(),
@@ -42,14 +43,13 @@ const Search = ({
       param: "",
       data: {
         to: new Date(new Date().setHours(23, 59, 59, 0)),
-        from: subDays(new Date().setHours(0, 0, 0, 0), 2),
+        from: new Date(new Date(2025, 0, 1).setHours(0, 0, 0, 0)),
       },
     },
   });
 
   const handleSubmit = (formData: z.infer<typeof formSchema>) => {
     const value = formData.param;
-    console.log(formData.data);
     if (data?.user) {
       startTransition(() => {
         switch (origin) {
@@ -73,17 +73,21 @@ const Search = ({
             break;
           case "agendamentos":
             action(() => {
-              return state.filter(
-                (e) =>
-                  e.cliente.name.toLowerCase().includes(value.toLowerCase()) &&
-                  new Date(e.serviceCompleted) >=
-                    new Date(formData.data.from.setHours(0, 0, 0, 0)) &&
-                  new Date(e.serviceCompleted) <=
-                    new Date(
-                      formData.data.to
-                        ? formData.data.to.setHours(23, 59, 59, 0)
-                        : formData.data.from.setHours(23, 59, 59, 0)
-                    )
+              return groupAgendamentosByClient(
+                state.filter(
+                  (e) =>
+                    e.cliente.name
+                      .toLowerCase()
+                      .includes(value.toLowerCase()) &&
+                    new Date(e.serviceCompleted) >=
+                      new Date(formData.data.from.setHours(0, 0, 0, 0)) &&
+                    new Date(e.serviceCompleted) <=
+                      new Date(
+                        formData.data.to
+                          ? formData.data.to.setHours(23, 59, 59, 0)
+                          : formData.data.from.setHours(23, 59, 59, 0)
+                      )
+                )
               );
             });
             break;

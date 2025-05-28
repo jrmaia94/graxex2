@@ -7,6 +7,17 @@ import Loader from "@/components/loader";
 import { useSession } from "next-auth/react";
 import { AgendamentoFull } from "../page";
 import { getAllAgendamentos } from "../actions/get-agendamentos";
+import {
+  groupAgendamentosByClient,
+  GroupedAgendamentos,
+} from "@/lib/groupAgendamentos";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 
 const Agendamentos = () => {
   const { data }: { data: any } = useSession({
@@ -15,50 +26,12 @@ const Agendamentos = () => {
 
   const [agendamentos, setAgendamentos] = useState<AgendamentoFull[]>([]);
   const [filteredAgendamentos, setFilteredAgendamentos] = useState<
-    AgendamentoFull[]
+    GroupedAgendamentos[]
   >([]);
   const [isPending, startTransition] = useTransition();
 
-  /*   useEffect(() => {
-    startTransition(() => {
-      if (loadAllAgendamentos) {
-        data?.user &&
-          getAllAgendamentos(data.user)
-            .then((res) => {
-              const newObj = res.map((e) => {
-                return {
-                  ...e,
-                  veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
-                };
-              });
-              setAgendamentos(newObj);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Erro ao buscar os agendamentos!");
-            });
-      } else {
-        data?.user &&
-          getAgendamentosFuturos(data.user)
-            .then((res) => {
-              const newObj = res.map((e) => {
-                return {
-                  ...e,
-                  veiculos: e.veiculos.map((veiculo) => veiculo.veiculo),
-                };
-              });
-              setAgendamentos(newObj);
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Erro ao buscar os agendamentos!");
-            });
-      }
-    });
-  }, [loadAllAgendamentos, data]); */
-
   useEffect(() => {
-    setFilteredAgendamentos(() => agendamentos.slice(0, 10));
+    setFilteredAgendamentos(() => groupAgendamentosByClient(agendamentos));
   }, [agendamentos]);
 
   useEffect(() => {
@@ -91,9 +64,59 @@ const Agendamentos = () => {
           </div>
         </div>
         <div className="flex flex-col gap-1 mt-[120px]">
-          {filteredAgendamentos.map((agendamento) => (
-            <CardAgendamento key={agendamento.id} agendamento={agendamento} />
-          ))}
+          <Accordion type="single" collapsible>
+            {filteredAgendamentos.map((item) => (
+              <AccordionItem
+                key={item.cliente.id}
+                value={item.cliente.id.toString()}
+                className={cn(
+                  "bg-primary text-primary-foreground rounded-t-lg",
+                  item.agendamentos.find((e) => e.paid === false) &&
+                    "bg-red-200"
+                )}
+              >
+                <AccordionTrigger
+                  className={cn(
+                    item.agendamentos.find((e) => e.paid === false) &&
+                      "text-red-800",
+                    "px-2"
+                  )}
+                >
+                  <div className="flex w-full justify-between items-center pr-4">
+                    <span className="text-lg">{item.cliente.name}</span>
+                    <div className="flex gap-2 text-primary-foreground">
+                      <div className="flex flex-col gap-1 text-xs items-end">
+                        <span>Nº atend</span>
+                        <span className="text-red-800">Não pagos</span>
+                        <span>Ult. atend</span>
+                      </div>
+                      <div className="flex flex-col gap-1 text-xs items-end">
+                        <span>{item.agendamentos.length}</span>
+                        <span className="text-red-800">
+                          {item.agendamentos.filter((e) => !e.paid).length}
+                        </span>
+                        <span>
+                          {Intl.DateTimeFormat("pt-BR", {
+                            year: "2-digit",
+                            month: "2-digit",
+                            day: "2-digit",
+                          }).format(item.agendamentos[0].date)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="p-2">
+                  {item.agendamentos.map((agendamento) => (
+                    <CardAgendamento
+                      key={agendamento.id}
+                      agendamento={agendamento}
+                    />
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </div>
     </div>

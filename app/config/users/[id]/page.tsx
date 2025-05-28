@@ -6,8 +6,18 @@ import CardUser from "@/components/card-user";
 import { ComboboxClientes } from "@/components/combox-cliente";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { typesAccess } from "@/constants/perfil-access";
-import { Cliente, TypeUser, User } from "@prisma/client";
+import { Cliente, Prisma } from "@prisma/client";
+import { PlusIcon, Trash2Icon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -18,15 +28,50 @@ interface PageEditUserParams {
   };
 }
 
+type UserConfig = Prisma.UserGetPayload<{
+  include: {
+    clientes: {
+      include: {
+        cliente: true;
+      };
+    };
+  };
+}> &
+  UserFull;
+
 const PageEditUser = ({ params }: PageEditUserParams) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
 
-  const [user, setUser] = useState<UserFull | null>(null);
+  const [user, setUser] = useState<UserConfig | null>(null);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [typeUser, setTypeUser] = useState<string>("CLIENTE");
   const [selectedCliente, setSelectedCliente] = useState<number>(-1);
+  const [selectedClientes, setSelectedClientes] = useState<number[]>([]);
+
+  const insertClient = () => {
+    setSelectedClientes((prevObj) => {
+      const newObj = [...prevObj];
+      if (newObj.includes(selectedCliente) || selectedCliente <= 0)
+        return newObj;
+
+      newObj.push(selectedCliente);
+
+      return newObj;
+    });
+  };
+
+  const removeClient = (id: number) => {
+    setSelectedClientes((prevObj) => {
+      const newObj = [...prevObj];
+      const index = newObj.indexOf(id);
+      if (index > -1) {
+        newObj.splice(index, 1);
+      }
+      return newObj;
+    });
+  };
 
   const callUpdateUser = () => {
     let localUser: any = { ...user };
@@ -53,14 +98,14 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
           toast.error(err.message);
         });
 
-      addClienteInUser(selectedCliente, localUser.id, data.user)
+      addClienteInUser(selectedClientes, localUser.id, data.user)
         .then((res) => {
           console.log(res);
-          toast.success("Cliente vinculado com sucesso!");
+          toast.success("Cliente(s) vinculado(s) com sucesso!");
         })
         .catch((err) => {
           console.log(err);
-          toast.error("Erro ao vincular cliente ao usuário!");
+          toast.error("Erro ao vincular cliente(s) ao usuário!");
         });
     }
   };
@@ -95,6 +140,11 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
       }
     }
   }, [params, data]);
+
+  useEffect(() => {
+    user?.clientes &&
+      setSelectedClientes(user.clientes.map((e) => e.clienteId));
+  }, [user]);
   return (
     <div className="mt-[90px] w-full">
       {user && (
@@ -140,12 +190,66 @@ const PageEditUser = ({ params }: PageEditUserParams) => {
                   <option value="COLABORADOR">Colaborador</option>
                   <option value="ADMIN">Admin</option>
                 </select>
-                <ComboboxClientes
-                  disabled={typeUser !== "CLIENTE"}
-                  selectedCliente={selectedCliente}
-                  setSelectedCliente={setSelectedCliente}
-                  clientes={clientes}
-                />
+                <div className="flex items-center gap-2">
+                  <ComboboxClientes
+                    disabled={typeUser !== "CLIENTE"}
+                    selectedCliente={selectedCliente}
+                    setSelectedCliente={setSelectedCliente}
+                    clientes={clientes}
+                    className="w-full"
+                  />
+                  <Button
+                    size="icon"
+                    className="rounded-full w-12 h-10"
+                    variant="success"
+                    onClick={insertClient}
+                  >
+                    <PlusIcon />
+                  </Button>
+                </div>
+                <Card className="bg-primary text-primary-foreground px-2 py-1">
+                  {clientes
+                    .filter((e) => selectedClientes.includes(e.id))
+                    .map((e) => {
+                      return (
+                        <div
+                          key={e.id}
+                          className="flex p-2 justify-between items-center"
+                        >
+                          <p>{e.name}</p>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="destructive"
+                                className="rounded-full w-7 h-7"
+                              >
+                                <Trash2Icon size={16} />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogTitle>
+                                Deseja desvincular o cliente do usuário?
+                              </DialogTitle>
+                              <DialogDescription></DialogDescription>
+                              <DialogFooter>
+                                <DialogClose className="min-w-[100px]">
+                                  Não
+                                </DialogClose>
+                                <Button
+                                  className="min-w-[100px]"
+                                  variant="destructive"
+                                  onClick={() => removeClient(e.id)}
+                                >
+                                  Sim
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      );
+                    })}
+                </Card>
                 <div className="flex w-[30%] items-end">
                   <Button size="sm" onClick={callUpdateUser}>
                     Atualizar Usuário
