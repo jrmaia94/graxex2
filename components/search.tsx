@@ -43,7 +43,7 @@ const Search = ({
       param: "",
       data: {
         to: new Date(new Date().setHours(23, 59, 59, 0)),
-        from: new Date(new Date(2025, 0, 1).setHours(0, 0, 0, 0)),
+        from: new Date(new Date(Date.now()).setHours(0, 0, 0, 0)),
       },
     },
   });
