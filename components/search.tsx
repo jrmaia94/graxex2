@@ -12,7 +12,7 @@ import { Dispatch, SetStateAction, useTransition } from "react";
 import Loader from "./loader";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
 import { groupAgendamentosByClient } from "@/lib/groupAgendamentos";
 
@@ -61,13 +61,14 @@ const Search = ({
             });
             break;
           case "veiculos":
+            console.log(state);
             action(() => {
               return state.filter(
                 (e) =>
                   e.cliente.name.toLowerCase().includes(value.toLowerCase()) ||
                   e.modelo.toLowerCase().includes(value.toLowerCase()) ||
                   e.placa.toLowerCase().includes(value.toLowerCase()) ||
-                  e.fabricante.toLowerCase().includes(value.toLowerCase())
+                  e.fabricante?.toLowerCase().includes(value.toLowerCase())
               );
             });
             break;
