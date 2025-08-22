@@ -28,6 +28,10 @@ export async function sendImage(imageParts: any[]) {
 
   const result = await model.generateContent([prompt, ...imageParts]);
   const response = await result.response;
-  console.log(response);
-  return response.text();
+  const json = response
+    .text()
+    .toString()
+    .replace(/^```json|```$/g, "");
+  console.log(json);
+  return json;
 }

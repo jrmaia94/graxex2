@@ -209,7 +209,8 @@ const VeiculoPage = ({ params }: VeiculoPageProps) => {
     veiculoFoto &&
       startTransition(() => {
         inputModeloRef.current.value = veiculoFoto?.modelo;
-        inputFabricanteRef.current.value = veiculoFoto?.fabricante;
+        inputFabricanteRef.current.value =
+          veiculoFoto?.fabricante.toUpperCase();
         inputPlacaRef.current.value = veiculoFoto?.placa;
         inputCorRef.current.value = veiculoFoto?.cor;
         inputFrotaRef.current.value = veiculoFoto?.numero_da_frota;
