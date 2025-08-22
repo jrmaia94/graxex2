@@ -163,6 +163,20 @@ export const FormVeiculo = ({ user, setIsOpen }: VeiculoPageProps) => {
       });
   }, [veiculoFoto]);
 
+  useEffect(() => {
+    let fabs = [];
+    let models = [];
+    for (let item of veiculos) {
+      item.fabricante && fabs.push(item.fabricante.toUpperCase());
+      item.modelo && models.push(item.modelo.toUpperCase());
+    }
+    fabs = [...new Set(fabs)].sort();
+    models = [...new Set(models)].sort();
+
+    setFabricantes(fabs);
+    setModelos(models);
+  }, [veiculos]);
+
   return (
     <div className="flex justify-center">
       <div className="w-full max-w-[600px]">

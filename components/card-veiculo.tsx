@@ -20,6 +20,16 @@ const CardVeiculo = ({ veiculo }: CardVeiculoProps) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
+  const switchFabricante = (fabricante: string) => {
+    switch (fabricante) {
+      case "MERCEDES BENZ":
+        return "MB";
+      case "VOLKSWAGEN":
+        return "VW";
+      default:
+        return fabricante;
+    }
+  };
   if (veiculo) {
     return (
       <div className="flex justify-between items-center max-w-[500px] gap-2">
@@ -38,7 +48,8 @@ const CardVeiculo = ({ veiculo }: CardVeiculoProps) => {
           <div className="flex w-full flex-col p-1 items-start justify-center">
             <Link href={`/veiculos/${veiculo.id}`} className="max-w-[90%]">
               <h3 className="text-bold pe-4 text-md uppercase truncate max-w-[100%]">
-                {veiculo.fabricante} -{" "}
+                {veiculo.frota && veiculo.frota + " - "}
+                {switchFabricante(veiculo.fabricante || "")} -{" "}
                 <span className="text-sm">{veiculo.modelo}</span>
               </h3>
             </Link>
