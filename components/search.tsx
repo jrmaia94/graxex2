@@ -28,10 +28,12 @@ const Search = ({
   state,
   action,
   origin,
+  filterIsPaid,
 }: {
   state: any[];
   action: Dispatch<SetStateAction<any[]>>;
   origin: string;
+  filterIsPaid?: boolean;
 }) => {
   const { data }: { data: any } = useSession({
     required: true,
@@ -75,20 +77,22 @@ const Search = ({
           case "agendamentos":
             action(() => {
               return groupAgendamentosByClient(
-                state.filter(
-                  (e) =>
-                    e.cliente.name
-                      .toLowerCase()
-                      .includes(value.toLowerCase()) &&
-                    new Date(e.serviceCompleted) >=
-                      new Date(formData.data.from.setHours(0, 0, 0, 0)) &&
-                    new Date(e.serviceCompleted) <=
-                      new Date(
-                        formData.data.to
-                          ? formData.data.to.setHours(23, 59, 59, 0)
-                          : formData.data.from.setHours(23, 59, 59, 0)
-                      )
-                )
+                state
+                  .filter(
+                    (e) =>
+                      e.cliente.name
+                        .toLowerCase()
+                        .includes(value.toLowerCase()) &&
+                      new Date(e.serviceCompleted) >=
+                        new Date(formData.data.from.setHours(0, 0, 0, 0)) &&
+                      new Date(e.serviceCompleted) <=
+                        new Date(
+                          formData.data.to
+                            ? formData.data.to.setHours(23, 59, 59, 0)
+                            : formData.data.from.setHours(23, 59, 59, 0)
+                        )
+                  )
+                  .filter((e) => (filterIsPaid ? e.paid === false : true))
               );
             });
             break;

@@ -1,15 +1,8 @@
 "use client";
-import { Agendamento, Cliente, Veiculo } from "@prisma/client";
+
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import {
-  AlertTriangleIcon,
-  EyeIcon,
-  FileWarningIcon,
-  MailWarningIcon,
-  Trash2,
-  UserIcon,
-} from "lucide-react";
+import { AlertTriangleIcon, EyeIcon, Trash2, UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -22,15 +15,22 @@ import {
   DialogClose,
 } from "./ui/dialog";
 import CardAgendamentoFull from "./card-agendamento-full";
-import { Description } from "@radix-ui/react-dialog";
 import { useSession } from "next-auth/react";
 import { deleteAgendamentoById } from "@/app/actions/delete-agendamento";
 import { toast } from "sonner";
 import { AgendamentoFull } from "@/app/page";
 import { cn } from "@/lib/utils";
+import { Input } from "./ui/input";
+import { updateIsPaidAgendamento } from "@/app/actions/update-is-paid-agendamento";
 //import CardAgendamentoFull from "./card-agendamento-full";
 
-const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
+const CardAgendamento = ({
+  agendamento,
+  source,
+}: {
+  agendamento: AgendamentoFull;
+  source?: string;
+}) => {
   const { data }: { data: any } = useSession({
     required: true,
   });
@@ -164,6 +164,34 @@ const CardAgendamento = ({ agendamento }: { agendamento: AgendamentoFull }) => {
             />
           </DialogContent>
         </Dialog>
+        {source === "simples" && (
+          <div className="absolute right-3.5">
+            <Input
+              type="checkbox"
+              className="h-4 w-4"
+              defaultChecked={agendamento.paid}
+              onChange={(e) => {
+                updateIsPaidAgendamento(agendamento.id, e.target.checked)
+                  .then((res) => {
+                    toast.success(
+                      `Status do pagamento do cliente ${
+                        agendamento.cliente.name
+                      } referente ao dia ${Intl.DateTimeFormat("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                      }).format(agendamento.date)} atualizado para ${
+                        res.paid ? "PAGO" : "NÃO PAGO"
+                      }`
+                    );
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                    toast.error("Erro ao atualizar o status do pagamento!");
+                  });
+              }}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -28,11 +28,22 @@ const Agendamentos = () => {
   const [filteredAgendamentos, setFilteredAgendamentos] = useState<
     GroupedAgendamentos[]
   >([]);
+  const [filterIsPaid, setFilterIsPaid] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setFilteredAgendamentos(() => groupAgendamentosByClient(agendamentos));
   }, [agendamentos]);
+
+  useEffect(() => {
+    filterIsPaid
+      ? setFilteredAgendamentos(() =>
+          groupAgendamentosByClient(
+            agendamentos.filter((e) => e.paid === false)
+          )
+        )
+      : setFilteredAgendamentos(() => groupAgendamentosByClient(agendamentos));
+  }, [filterIsPaid, agendamentos]);
 
   useEffect(() => {
     if (data?.user) {
@@ -60,10 +71,19 @@ const Agendamentos = () => {
               origin="agendamentos"
               state={agendamentos}
               action={setFilteredAgendamentos}
+              filterIsPaid={filterIsPaid}
             />
           </div>
+          <div className="flex justify-start items-center gap-2 mb-2">
+            <input
+              type="checkbox"
+              checked={filterIsPaid}
+              onChange={(e) => setFilterIsPaid(e.target.checked)}
+            />
+            <span>Mostrar apenas não pagos</span>
+          </div>
         </div>
-        <div className="flex flex-col gap-1 mt-[120px]">
+        <div className="flex flex-col gap-1 mt-[155px]">
           <Accordion type="single" collapsible>
             {filteredAgendamentos.map((item) => (
               <AccordionItem
@@ -111,6 +131,7 @@ const Agendamentos = () => {
                     <CardAgendamento
                       key={agendamento.id}
                       agendamento={agendamento}
+                      source="simples"
                     />
                   ))}
                 </AccordionContent>
