@@ -5,7 +5,13 @@ import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EyeIcon, Trash2Icon } from "lucide-react";
+import {
+  EllipsisIcon,
+  EyeIcon,
+  Trash2Icon,
+  TruckIcon,
+  WrenchIcon,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import CardVeiculo from "@/components/card-veiculo";
 import { getAllVeiculos } from "../actions/get-veiculos";
@@ -20,6 +26,14 @@ import {
 } from "@/components/ui/dialog";
 import CardVeiculoFull from "@/components/card-veiculo-full";
 import { VeiculoFull } from "../page";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DialogAgendamento } from "@/components/dialog-agendamento";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 const PageVeiculos = () => {
   const { data }: { data: any } = useSession({
@@ -28,6 +42,8 @@ const PageVeiculos = () => {
   const [isPending, startTransition] = useTransition();
   const [veiculos, setVeiculos] = useState<VeiculoFull[]>([]);
   const [filteredVeiculos, setFilteredVeiculos] = useState<VeiculoFull[]>([]);
+  const [isDialogAgendamentoOpen, setIsDialogAgendamentoOpen] =
+    useState<boolean>(false);
 
   useEffect(() => {
     startTransition(() => {
@@ -68,45 +84,81 @@ const PageVeiculos = () => {
             <Card key={veiculo.id}>
               <CardContent className="p-2 h-20 flex justify-between relative">
                 <CardVeiculo veiculo={veiculo} />
-                <div className="absolute top-0 right-0 flex flex-col justify-center gap-2 px-4">
-                  <Button
-                    onClick={() => {
-                      data?.user &&
-                        deleteVeiculoById(veiculo.id, data.user)
-                          .then(() => {
-                            toast.success(
-                              `Veículo com o id ${veiculo.id} foi excluído!`
-                            );
-                          })
-                          .catch((err) => {
-                            console.log(err);
-                            toast.error("Não foi possível deletar o veículo!");
-                          });
-                    }}
-                    variant="ghost"
-                    className="p-0 m-0 h-5 absolute right-1 bottom-4"
-                  >
-                    <Trash2Icon size={20} />
-                  </Button>
-                  <Dialog>
-                    <DialogTrigger asChild>
+                <div className="absolute top-1/2 -translate-y-1/2 right-0 flex flex-col justify-center gap-2 px-4">
+                  <DropdownMenu modal>
+                    <DropdownMenuTrigger>
+                      <EllipsisIcon />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-background shadow-md shadow-black/40 flex flex-col gap-0 min-w-fit w-fit p-0">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            className="p-3 my-4 h-5 w-fit"
+                          >
+                            <EyeIcon size={20} />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="left-1/2 top-1/2 max-h-[600px] w-[90%] p-5">
+                          <DialogHeader>
+                            <DialogTitle></DialogTitle>
+                          </DialogHeader>
+                          <div className="w-[100%]">
+                            <CardVeiculoFull veiculo={veiculo} />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                       <Button
                         size="xs"
                         variant="ghost"
-                        className="p-0 m-0 h-5 absolute right-1 top-2"
+                        className="p-3 my-4 h-5 w-fit"
+                        onClick={() =>
+                          setIsDialogAgendamentoOpen(!isDialogAgendamentoOpen)
+                        }
                       >
-                        <EyeIcon size={20} />
+                        <WrenchIcon size={20} />
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent className="left-1/2 top-1/2 max-h-[600px] w-[90%] p-5">
-                      <DialogHeader>
-                        <DialogTitle></DialogTitle>
-                      </DialogHeader>
-                      <div className="w-[100%]">
-                        <CardVeiculoFull veiculo={veiculo} />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                      <DialogAgendamento
+                        setIsOpen={setIsDialogAgendamentoOpen}
+                        isOpen={isDialogAgendamentoOpen}
+                        cliente={veiculo.cliente}
+                        veiculos={[veiculo]}
+                      />
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        className="p-3 my-4 h-5 w-fit"
+                        asChild
+                      >
+                        <Link href={`/dashboard/${veiculo.cliente.id}`}>
+                          <TruckIcon size={20} />
+                        </Link>
+                      </Button>
+                      <Separator className="bg-white/80" />
+                      <Button
+                        onClick={() => {
+                          data?.user &&
+                            deleteVeiculoById(veiculo.id, data.user)
+                              .then(() => {
+                                toast.success(
+                                  `Veículo com o id ${veiculo.id} foi excluído!`
+                                );
+                              })
+                              .catch((err) => {
+                                console.log(err);
+                                toast.error(
+                                  "Não foi possível deletar o veículo!"
+                                );
+                              });
+                        }}
+                        variant="ghost"
+                        className="p-3 my-4 h-5 w-fit text-red-600"
+                      >
+                        <Trash2Icon size={20} />
+                      </Button>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </CardContent>
             </Card>

@@ -146,14 +146,29 @@ const CardAgendamentoFull = ({
           <h3 className="font-bold uppercase text-gray-400">Cliente</h3>
           <CardCliente cliente={cliente} />
         </div>
-        <div className="border-b border-solid pb-2 flex items-center h-10 gap-2">
-          <label>Serviço pago?</label>
-          <input
-            type="checkbox"
-            defaultChecked={agendamento.paid}
-            className="w-4 h-4"
-            onChange={isServicePaid}
-          />
+        <div className="border-b border-solid p-2 flex justify-around gap-2">
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-muted-foreground text-xs mb-[6px]">
+              Serviço pago?
+            </span>
+            <input
+              type="checkbox"
+              defaultChecked={agendamento.paid}
+              className="w-4 h-4"
+              onChange={isServicePaid}
+            />
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-muted-foreground text-xs">
+              Valor do serviço:{" "}
+            </span>
+            <span className="text-lg ">
+              {Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(agendamento.price)}
+            </span>
+          </div>
         </div>
         <div className="pt-1">
           <h3 className="mb-2 font-bold uppercase text-gray-400">Veículos</h3>

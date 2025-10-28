@@ -330,6 +330,9 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                       .includes(e.target.value.toUpperCase()) ||
                     item.veiculo.placa
                       ?.toUpperCase()
+                      .includes(e.target.value.toUpperCase()) ||
+                    item.veiculo.frota
+                      ?.toUpperCase()
                       .includes(e.target.value.toUpperCase())
                   );
                 });
@@ -444,9 +447,8 @@ const UpdateAgendamentoPage = ({ params }: UpdateAgendamentoPageProps) => {
                       </div>
                     </DialogContent>
                   </Dialog>
-                  <span className="text-wrap truncate text-sm">
-                    {item.veiculo.placa} - {item.veiculo.fabricante} -{" "}
-                    {item.veiculo.modelo}
+                  <span className="truncate text-sm">
+                    {item.veiculo.placa} \\ {item.veiculo.frota}
                   </span>
                 </div>
               ))}

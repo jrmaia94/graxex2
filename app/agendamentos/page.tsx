@@ -103,7 +103,22 @@ const Agendamentos = () => {
                   )}
                 >
                   <div className="flex w-full justify-between items-center pr-4">
-                    <span className="text-lg">{item.cliente.name}</span>
+                    <div className="flex flex-col items-start">
+                      <span className="text-lg">{item.cliente.name}</span>
+                      <span className="text-sm">
+                        {item.agendamentos.filter((e) => e.paid === false)
+                          .length > 0 &&
+                          Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(
+                            item.agendamentos
+                              .filter((e) => e.paid === false)
+                              .map((e) => e.price)
+                              .reduce((prev, curr) => prev + curr, 0)
+                          )}
+                      </span>
+                    </div>
                     <div className="flex gap-2 text-primary-foreground">
                       <div className="flex flex-col gap-1 text-xs items-end">
                         <span>Nº atend</span>

@@ -76,10 +76,10 @@ const Clientes = () => {
           {filteredClientes?.map((cliente) => (
             <Card key={cliente.id}>
               <CardContent className="p-2 flex justify-between">
-                <div className="w-[85%]">
+                <div className="w-[100%]">
                   <CardCliente cliente={cliente} />
                 </div>
-                <div className="w-[15%] flex flex-col items-center justify-end gap-5 px-4">
+                {/* <div className="w-[15%] flex flex-col items-center justify-end gap-5 px-4">
                   <Dialog>
                     <DialogTrigger>
                       <Button variant="ghost" className="p-0 m-0 h-5" asChild>
@@ -104,7 +104,7 @@ const Clientes = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           ))}

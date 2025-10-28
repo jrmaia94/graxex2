@@ -2,11 +2,12 @@
 
 import { getClienteById } from "@/app/actions/get-clientes";
 import { Cliente, Veiculo } from "@prisma/client";
-import { PhoneCallIcon, TruckIcon } from "lucide-react";
+import { AxeIcon, PhoneCallIcon, TruckIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
+import { Button } from "./ui/button";
 
 interface VeiculoFull extends Veiculo {
   cliente: Cliente;

@@ -65,29 +65,36 @@ const CardAgendamento = ({
             <UserIcon size={50} />
           )}
           <div className="overflow-hidden">
-            <h3 className="truncate text-lg">{agendamento.cliente.name}</h3>
-            {agendamento.cliente.phone && (
-              <Link
-                href={`https://wa.me//${agendamento.cliente.phone}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
-                target="_blank"
-                className="flex gap-1"
-              >
-                <Image
-                  className="rounded-full"
-                  alt="Ícone Whatsapp"
-                  src="./wpp-icon.svg"
-                  width={15}
-                  height={15}
-                />
-                <p className="text-ring text-sm">{agendamento.cliente.phone}</p>
-              </Link>
-            )}
+            <div className="flex gap-4">
+              <h3 className="truncate text-lg">{agendamento.cliente.name}</h3>
+              {agendamento.cliente.phone && (
+                <Link
+                  href={`https://wa.me//${agendamento.cliente.phone}?text=Bom%20dia!%20Vamos%20engraxar%20hoje?`}
+                  target="_blank"
+                  className="flex gap-1"
+                >
+                  <Image
+                    className="rounded-full"
+                    alt="Ícone Whatsapp"
+                    src="./wpp-icon.svg"
+                    width={15}
+                    height={15}
+                  />
+                </Link>
+              )}
+            </div>
 
             <p className="text-xs italic">
               {agendamento.veiculos.length > 1
                 ? `${agendamento.veiculos.length} veículos`
                 : `${agendamento.veiculos.length} veículo`}
             </p>
+            <span>
+              {Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(agendamento.price)}
+            </span>
           </div>
         </div>
         <div className="flex w-[30%] flex-col items-center justify-center gap-1 px-2 py-3 pr-8">
