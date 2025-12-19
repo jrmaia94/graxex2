@@ -4,8 +4,9 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import AuthProvider from "../providers/session";
 import Header from "@/components/header";
-import ViewAds from "@/components/viewAds";
+
 import Redirector from "@/components/redirector";
+import { SnowfallComponent } from "@/components/snowfall";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,7 +39,7 @@ export default function RootLayout({
         <AuthProvider>
           <Redirector>
             <Header />
-            {/* <ViewAds /> */}
+            <SnowfallComponent />
             {children}
           </Redirector>
         </AuthProvider>
