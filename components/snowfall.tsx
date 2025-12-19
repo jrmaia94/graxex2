@@ -2,5 +2,9 @@
 import Snowfall from "react-snowfall";
 
 export const SnowfallComponent = () => {
-  return <Snowfall color="#82C3D9" />;
+  return (
+    <div className="w-screen h-screen fixed">
+      <Snowfall enable3DRotation color="#bdd4da" />
+    </div>
+  );
 };
