@@ -7,12 +7,13 @@ import { Edit } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { generate_PDF_recibo } from "@/app/actions/generate-PDF-recibo";
 import { generate_PDF_Agendamento } from "@/app/actions/generate-PDF-agendamento";
+import { generate_PDF_OS } from "@/app/actions/generate-PDF-OS";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { updatePaymentStatus } from "@/app/actions/update-agendamento";
 import { toast } from "sonner";
+import { Checkbox } from "./ui/checkbox";
 
 interface ClienteFull extends Cliente {
   veiculos: Veiculo[];
@@ -27,13 +28,15 @@ const CardAgendamentoFull = ({
   veiculos: Veiculo[];
   cliente: ClienteFull;
 }) => {
+  const [isOS, setIsOS] = useState(true);
+
   const isServicePaid = (e: ChangeEvent<HTMLInputElement>) => {
     updatePaymentStatus(agendamento.id, e.target.checked)
       .then((res) => {
         toast.success(
           `Status do pagamento com id ${agendamento.id} atualizado para ${
             e.target.checked ? "sim" : "não"
-          } com sucesso!`
+          } com sucesso!`,
         );
         setTimeout(() => {
           window.location.reload();
@@ -67,7 +70,7 @@ const CardAgendamentoFull = ({
                   />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="flex flex-col gap-2 w-fit max-w-[100vw]">
+              <PopoverContent className="flex flex-col gap-2 w-fit max-w-[100vw] relative">
                 <form
                   onSubmit={(e: any) => {
                     const idVeiculos: string[] = [];
@@ -76,26 +79,40 @@ const CardAgendamentoFull = ({
                     });
 
                     const selectedVeiculos = veiculos.filter((i) =>
-                      idVeiculos.includes(i.id.toString())
+                      idVeiculos.includes(i.id.toString()),
                     );
 
                     const pricePerVeiculos = agendamento.pricePerVeiculo.filter(
-                      (i: any) => idVeiculos.includes(i.veiculoId.toString())
+                      (i: any) => idVeiculos.includes(i.veiculoId.toString()),
                     );
-                    generate_PDF_Agendamento({
-                      cliente: cliente,
-                      agendamento: {
-                        ...agendamento,
-                        veiculos: selectedVeiculos,
-                        pricePerVeiculo: pricePerVeiculos,
-                      },
-                    });
+
+                    isOS
+                      ? generate_PDF_OS({
+                          cliente: cliente,
+                          agendamento: {
+                            ...agendamento,
+                            veiculos: selectedVeiculos,
+                            pricePerVeiculo: pricePerVeiculos,
+                          },
+                        })
+                      : generate_PDF_Agendamento({
+                          cliente: cliente,
+                          agendamento: {
+                            ...agendamento,
+                            veiculos: selectedVeiculos,
+                            pricePerVeiculo: pricePerVeiculos,
+                          },
+                        });
 
                     e.preventDefault();
                   }}
                   className="gap-4 flex flex-col"
                 >
-                  <Button type="submit">Emitir PDF</Button>
+                  <div className="w-full flex gap-2">
+                    <Button className="w-80" type="submit">
+                      Emitir Relatório
+                    </Button>
+                  </div>
                   <ScrollArea>
                     {veiculos.map((veiculo) => (
                       <div key={veiculo.id} className="flex py-1 items-center">
@@ -115,6 +132,13 @@ const CardAgendamentoFull = ({
                     ))}
                   </ScrollArea>
                 </form>
+                <div className="absolute right-5 top-5 justify-center gap-2 flex items-center">
+                  <span>OS?</span>
+                  <Checkbox
+                    onCheckedChange={(e) => setIsOS(!!e)}
+                    className="bg-white"
+                  />
+                </div>
               </PopoverContent>
             </Popover>
             {/*             <Button

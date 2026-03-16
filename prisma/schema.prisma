@@ -71,6 +71,12 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
+model GrupoCliente {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  veiculos Veiculo[]
+}
+
 model Cliente {
   id        Int                  @id @default(autoincrement())
   name      String               @unique
@@ -104,6 +110,8 @@ model Veiculo {
   clienteId      Int
   cliente        Cliente                   @relation(fields: [clienteId], references: [id])
   agendamentos   AgendamentosPorVeiculos[]
+  grupoId        Int?
+  grupo          GrupoCliente?             @relation(fields: [grupoId], references: [id])
 }
 
 model Agendamento {

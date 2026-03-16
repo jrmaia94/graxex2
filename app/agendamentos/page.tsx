@@ -39,8 +39,8 @@ const Agendamentos = () => {
     filterIsPaid
       ? setFilteredAgendamentos(() =>
           groupAgendamentosByClient(
-            agendamentos.filter((e) => e.paid === false)
-          )
+            agendamentos.filter((e) => e.paid === false),
+          ),
         )
       : setFilteredAgendamentos(() => groupAgendamentosByClient(agendamentos));
   }, [filterIsPaid, agendamentos]);
@@ -92,14 +92,14 @@ const Agendamentos = () => {
                 className={cn(
                   "bg-primary text-primary-foreground rounded-t-lg",
                   item.agendamentos.find((e) => e.paid === false) &&
-                    "bg-red-200"
+                    "bg-red-200",
                 )}
               >
                 <AccordionTrigger
                   className={cn(
                     item.agendamentos.find((e) => e.paid === false) &&
                       "text-red-800",
-                    "px-2"
+                    "px-2",
                   )}
                 >
                   <div className="flex w-full justify-between items-center pr-4">
@@ -115,7 +115,7 @@ const Agendamentos = () => {
                             item.agendamentos
                               .filter((e) => e.paid === false)
                               .map((e) => e.price)
-                              .reduce((prev, curr) => prev + curr, 0)
+                              .reduce((prev, curr) => prev + curr, 0),
                           )}
                       </span>
                     </div>
