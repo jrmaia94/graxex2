@@ -136,6 +136,7 @@ const CardAgendamentoFull = ({
                   <span>OS?</span>
                   <Checkbox
                     onCheckedChange={(e) => setIsOS(!!e)}
+                    checked={isOS}
                     className="bg-white"
                   />
                 </div>
