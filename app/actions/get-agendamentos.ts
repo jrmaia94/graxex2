@@ -78,7 +78,12 @@ export const getAgendamentosFinalizados = async (user: User) => {
   }
 };
 
-export const getAllAgendamentos = async (user: User) => {
+export const getAllAgendamentos = async (
+  user: User,
+  datas?: { start: Date; end: Date },
+  nome?: string,
+) => {
+  console.log(nome);
   if (user.perfil) {
     const agendamentos = await prisma.agendamento.findMany({
       include: {
@@ -98,6 +103,18 @@ export const getAllAgendamentos = async (user: User) => {
                 cliente: true,
               },
             },
+          },
+        },
+      },
+      where: {
+        date: {
+          gte: datas?.start,
+          lte: datas?.end,
+        },
+        cliente: {
+          name: {
+            contains: nome,
+            mode: "insensitive",
           },
         },
       },

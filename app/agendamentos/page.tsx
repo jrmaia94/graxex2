@@ -48,7 +48,10 @@ const Agendamentos = () => {
   useEffect(() => {
     if (data?.user) {
       startTransition(() => {
-        getAllAgendamentos(data.user)
+        getAllAgendamentos(data.user, {
+          start: new Date(new Date().setHours(0, 0, 0, 0)),
+          end: new Date(new Date().setHours(23, 59, 59, 999)),
+        })
           .then((res) => {
             setAgendamentos(res);
           })
@@ -58,6 +61,7 @@ const Agendamentos = () => {
       });
     }
   }, [data]);
+
   return (
     <div className="flex justify-center mt-[130px]">
       {isPending && <Loader />}

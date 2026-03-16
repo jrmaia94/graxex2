@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
 import { groupAgendamentosByClient } from "@/lib/groupAgendamentos";
+import { getAllAgendamentos } from "@/app/actions/get-agendamentos";
 
 const formSchema = z.object({
   param: z.string().trim(),
@@ -53,12 +54,12 @@ const Search = ({
   const handleSubmit = (formData: z.infer<typeof formSchema>) => {
     const value = formData.param;
     if (data?.user) {
-      startTransition(() => {
+      startTransition(async () => {
         switch (origin) {
           case "clientes":
             action(() => {
               return state.filter((e) =>
-                e.name.toLowerCase().includes(value.toLowerCase())
+                e.name.toLowerCase().includes(value.toLowerCase()),
               );
             });
             break;
@@ -70,14 +71,25 @@ const Search = ({
                   e.cliente.name.toLowerCase().includes(value.toLowerCase()) ||
                   e.modelo.toLowerCase().includes(value.toLowerCase()) ||
                   e.placa.toLowerCase().includes(value.toLowerCase()) ||
-                  e.fabricante?.toLowerCase().includes(value.toLowerCase())
+                  e.fabricante?.toLowerCase().includes(value.toLowerCase()),
               );
             });
             break;
           case "agendamentos":
+            const result = await getAllAgendamentos(
+              data.user,
+              {
+                start: new Date(formData.data.from.setHours(0, 0, 0, 0)),
+                end: formData.data.to
+                  ? new Date(formData.data.to.setHours(23, 59, 59, 999))
+                  : new Date(new Date().setHours(23, 59, 59, 999)),
+              },
+              value,
+            );
             action(() => {
               return groupAgendamentosByClient(
-                state
+                result.filter((e) => (filterIsPaid ? e.paid === false : true)),
+                /* state
                   .filter(
                     (e) =>
                       e.cliente.name
@@ -88,11 +100,10 @@ const Search = ({
                       new Date(e.serviceCompleted) <=
                         new Date(
                           formData.data.to
-                            ? formData.data.to.setHours(23, 59, 59, 0)
-                            : formData.data.from.setHours(23, 59, 59, 0)
-                        )
-                  )
-                  .filter((e) => (filterIsPaid ? e.paid === false : true))
+                            ? formData.data.to.setHours(23, 59, 59, 999)
+                            : formData.data.from.setHours(23, 59, 59, 999),
+                        ),
+                  ) */
               );
             });
             break;
@@ -139,7 +150,7 @@ const Search = ({
                           variant={"outline"}
                           className={cn(
                             "w-[240px] pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value?.from ? (
