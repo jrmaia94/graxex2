@@ -18,6 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const Agendamentos = () => {
   const { data }: { data: any } = useSession({
@@ -32,7 +33,9 @@ const Agendamentos = () => {
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    setFilteredAgendamentos(() => groupAgendamentosByClient(agendamentos));
+    startTransition(() => {
+      setFilteredAgendamentos(() => groupAgendamentosByClient(agendamentos));
+    });
   }, [agendamentos]);
 
   useEffect(() => {
@@ -85,6 +88,24 @@ const Agendamentos = () => {
               onChange={(e) => setFilterIsPaid(e.target.checked)}
             />
             <span>Mostrar apenas não pagos</span>
+            <Button
+              variant="destructive"
+              type="button"
+              className="p-2 m-0 h-6"
+              onClick={() =>
+                startTransition(() => {
+                  getAllAgendamentos(data.user)
+                    .then((res) => {
+                      setAgendamentos(res);
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                })
+              }
+            >
+              Buscar todos
+            </Button>
           </div>
         </div>
         <div className="flex flex-col gap-1 mt-[155px]">
